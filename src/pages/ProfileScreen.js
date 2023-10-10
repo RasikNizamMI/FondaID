@@ -7,23 +7,98 @@ import {
   Image,
   TouchableOpacity,
   Platform,
+  ActivityIndicator
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
 
 const ProfileScreen = ({navigation}) => {
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
+  const [userDocument, setUserDocument] = useState('');
+  const [userDateOfIssue, setUserDateOfIssue] = useState('');
+  const [userDateOfExpiry, setUserDateOfExpiry] = useState('');
+  const [userUploadImage, setUserUploadImage] = useState('');
+  const [userDocumentNumber, setUserDocumentNumber] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [userPhoneNO, setUserPhoneNO] = useState('');
+  const [userFirstName, setUserFirstName] = useState('');
+  const [userSurName, setUserSurName] = useState('');
+  const [userBirthName, setUserBirthName] = useState('');
+  const [userDateOfBirth, setUserDateOfBirth] = useState('');
+  const [userPlaceOfBirth, setUserPlaceOfBirth] = useState('');
+  const [userNationality, setUserNationality] = useState('');
+  const [userNativeCountry, setUserNativeCountry] = useState('');
+  const [userGender, setUserGender] = useState('');
+  const [userCountyCode, setUserCountyCode] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [apiResponseMessage, setApiResponseMessage] = useState('');
+  const [userUploadImageBase64, setUserUploadImageBase64] = useState('');
+  const [userFondaID, setUserFondaID] = useState('');
 
-  const data = [
-    {key: '1', value: 'Mobiles', disabled: true},
-    {key: '2', value: 'Appliances'},
-    {key: '3', value: 'Cameras'},
-    {key: '4', value: 'Computers', disabled: true},
-    {key: '5', value: 'Vegetables'},
-    {key: '6', value: 'Diary Products'},
-    {key: '7', value: 'Drinks'},
-  ];
+  useEffect(() => {
+    const loadRememberedCredentials = async () => {
+      setLoading(true);
+      try {
+        const storedUserDocument = await getData('addDoScelectDocument');
+        const storedUserDateOfIssue = await getData('addDoDateIssue');
+        const storedUserDateOfExpiry = await getData('addDoDateExpiry');
+        const storedUserUploadImage = await getData('addDoUploadImg');
+        const storeUserDocumentNumber = await getData('addDocumentNumber');
+        const storedUserEmail = await getData('emailID');
+        const storedUserPhoneNO = await getData('phoneNumber');
+        const storedUserFirstName = await getData('firstName');
+        const storedUserSurName = await getData('surName');
+        const storedUserBirthName = await getData('birthName');
+        const storedUserDateOfBirth = await getData('dateOfBirth');
+        const storedUserPlaceOfBirth = await getData('placeOfBirth');
+        const storedUserNationality = await getData('nationality');
+        const storedUserNativeCountry = await getData('nativeCountry');
+        const storeUserGender = await getData('gender');
+        const storeUserCountryCode = await getData('nationalityCode');
+        const storedUserUploadImageBase64 = await getData(
+          'addDoUploadImgBase64',
+        );
+        const storedUserFondaID = await getData('fondaId');
+        setUserDocument(storedUserDocument);
+        setUserDateOfIssue(storedUserDateOfIssue);
+        setUserDateOfExpiry(storedUserDateOfExpiry);
+        setUserUploadImage(storedUserUploadImage);
+        setUserDocumentNumber(storeUserDocumentNumber);
+        setUserEmail(storedUserEmail);
+        setUserPhoneNO(storedUserPhoneNO);
+        setUserFirstName(storedUserFirstName);
+        setUserSurName(storedUserSurName);
+        setUserBirthName(storedUserBirthName);
+        setUserDateOfBirth(storedUserDateOfBirth);
+        setUserPlaceOfBirth(storedUserPlaceOfBirth);
+        setUserNationality(storedUserNationality);
+        setUserNativeCountry(storedUserNativeCountry);
+        setUserGender(storeUserGender);
+        setUserCountyCode(storeUserCountryCode);
+        setUserUploadImageBase64(
+          'data:image/jpeg;base64,' + storedUserUploadImageBase64,
+        );
+        setUserFondaID(storedUserFondaID);
+        console.log(storeUserCountryCode);
+
+        if (userDocument === 'passport') {
+          console.log('Passport');
+        }
+        setLoading(false);
+      } catch (error) {
+        console.log('Error loading remembered credentials:', error);
+        setLoading(false);
+      }
+    };
+    loadRememberedCredentials();
+  }, []);
+
+  const formatDateOfBirth = dateOfBirth => {
+    const date = new Date(dateOfBirth);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
 
   const handleLogin = ({navigation}) => {
     navigation.navigate('LoginOtpScreen');
@@ -47,136 +122,166 @@ const ProfileScreen = ({navigation}) => {
             />
             <Text style={styles.headerText}>My Profile</Text>
           </View>
-
-          <View style={{backgroundColor: '#FFFFFF', marginTop: 20, marginBottom: 20}}>
-          <View style={styles.headerTextView}>
-            <Text style={styles.headerTexts}>First Name</Text>
-          </View>
-          <View style={styles.subheaderView}>
-            <Text style={styles.subheaderText}>Jagannath</Text>
-          </View>
-          </View>
-
-          <View style={styles.headerTextView1}>
-            <Text style={styles.headerTexts}>Sur Name</Text>
-          </View>
-          <View style={styles.subheaderView1}>
-            <Text style={styles.subheaderText}>Ranganathan</Text>
-          </View>
-
-          <View style={{backgroundColor: '#FFFFFF', marginTop: 20, marginBottom: 20}}>
-          <View style={styles.headerTextView}>
-            <Text style={styles.headerTexts}>Birth Name</Text>
-          </View>
-          <View style={styles.subheaderView}>
-            <Text style={styles.subheaderText}>Jagannath</Text>
-          </View>
-          </View>
-
-          <View style={styles.headerTextView1}>
-            <Text style={styles.headerTexts}>Date of Birth</Text>
-          </View>
-          <View style={styles.subheaderView1}>
-            <Text style={styles.subheaderText}>30/07/1984</Text>
-          </View>
-
-          <View style={{backgroundColor: '#FFFFFF', marginTop: 20, marginBottom: 20}}>
-          <View style={styles.headerTextView}>
-            <Text style={styles.headerTexts}>Nationality</Text>
-          </View>
-          <View style={styles.subheaderView}>
-            <Text style={styles.subheaderText}>Indian</Text>
-          </View>
-          </View>
-
-          <View style={styles.headerTextView1}>
-            <Text style={styles.headerTexts}>Place of Birth</Text>
-          </View>
-          <View style={styles.subheaderView1}>
-            <Text style={styles.subheaderText}>Pondicherry</Text>
-          </View>
-
-          <View style={{backgroundColor: '#FFFFFF', marginTop: 20, marginBottom: 20}}>
-          <View style={styles.headerTextView}>
-            <Text style={styles.headerTexts}>Native Country</Text>
-          </View>
-          <View style={styles.subheaderView}>
-            <Text style={styles.subheaderText}>India</Text>
-          </View>
-          </View>
-
-        
-          <View style={styles.headerTextView}>
-            <Text style={styles.headerTexts}>My Face ID</Text>
-          </View>
-          <View style={{flexDirection: 'row'}}> 
-          <View style={styles.imageView}>
-            <Image
-              source={require('../images/faceIdIcon.png')}
-              style={styles.images}
-            />
-          </View>
-          <TouchableOpacity
-            style={{ marginRight: 20, alignSelf: 'center', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF', height: 50, width: '40%', borderRadius: 10, elevation: 4}}
-            activeOpacity={0.5}
-            // onPress={handleSubmitPress}
-            onPress={() => navigation.navigate('RegisterScreen')}>
-            <Text style={styles.registerButtonTextStyle}>Change My Face ID</Text>
-          </TouchableOpacity>
-          </View>
-
-          <View style={{backgroundColor: '#FFFFFF', marginTop: 20, marginBottom: 20, flexDirection: 'row'}}>
-            <View style={{flexDirection: 'column'}}>
-          <View style={styles.headerTextView}>
-            <Text style={styles.headerTexts}>Mobile Number</Text>
-          </View>
-          <View style={styles.subheaderView}>
-            <Text style={styles.subheaderText}>625-452-280</Text>
-          </View>
-          </View>
-          <View style={{marginLeft: 20}}>
-          <Image
-              source={require('../images/editIcon.png')}
-              style={styles.editImages}
-            />
-          </View>
-          </View>
-
-
-          <View style={{ marginBottom: 20, flexDirection: 'row'}}>
-            <View style={{flexDirection: 'column'}}>
-            <View style={styles.headerTextView1}>
-            <Text style={styles.headerTexts}>Email Address</Text>
-          </View>
-          <View style={styles.subheaderView1}>
-            <Text style={styles.subheaderText}>ranganathanjagannath@gmail.com</Text>
-          </View>
-          </View>
-          <View style={{marginLeft: 20}}>
-          <Image
-              source={require('../images/editIcon.png')}
-              style={styles.editImages}
-            />
-          </View>
-          </View>
-
-
-         
-
-          <TouchableOpacity
-            style={styles.buttonStyle}
-            activeOpacity={0.5}
-            onPress={handleLogin}>
-            <Text style={styles.buttonTextStyle}>Update My Profile</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.registerButtonStyle}
-            activeOpacity={0.5}
-            // onPress={handleSubmitPress}
-            onPress={() => navigation.navigate('RegisterScreen')}>
-            <Text style={styles.registerButtonTextStyle}>Skip</Text>
-          </TouchableOpacity>
-          <View></View>
+          {loading ? (
+            <ActivityIndicator size="large" color="#F5A922" />
+          ) : (
+            <>
+              <View
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  marginTop: 20,
+                  marginBottom: 20,
+                }}>
+                <View style={styles.headerTextView}>
+                  <Text style={styles.headerTexts}>First Name</Text>
+                </View>
+                <View style={styles.subheaderView}>
+                  <Text style={styles.subheaderText}>{userFirstName}</Text>
+                </View>
+              </View>
+              <View style={styles.headerTextView1}>
+                <Text style={styles.headerTexts}>Sur Name</Text>
+              </View>
+              <View style={styles.subheaderView1}>
+                <Text style={styles.subheaderText}>{userSurName}</Text>
+              </View>
+              <View
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  marginTop: 20,
+                  marginBottom: 20,
+                }}>
+                <View style={styles.headerTextView}>
+                  <Text style={styles.headerTexts}>Birth Name</Text>
+                </View>
+                <View style={styles.subheaderView}>
+                  <Text style={styles.subheaderText}>{userBirthName}</Text>
+                </View>
+              </View>
+              <View style={styles.headerTextView1}>
+                <Text style={styles.headerTexts}>Date of Birth</Text>
+              </View>
+              <View style={styles.subheaderView1}>
+                <Text style={styles.subheaderText}>
+                  {formatDateOfBirth(userDateOfBirth)}
+                </Text>
+              </View>
+              <View
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  marginTop: 20,
+                  marginBottom: 20,
+                }}>
+                <View style={styles.headerTextView}>
+                  <Text style={styles.headerTexts}>Nationality</Text>
+                </View>
+                <View style={styles.subheaderView}>
+                  <Text style={styles.subheaderText}>{userNationality}</Text>
+                </View>
+              </View>
+              <View style={styles.headerTextView1}>
+                <Text style={styles.headerTexts}>Place of Birth</Text>
+              </View>
+              <View style={styles.subheaderView1}>
+                <Text style={styles.subheaderText}>{userPlaceOfBirth}</Text>
+              </View>
+              <View
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  marginTop: 20,
+                  marginBottom: 20,
+                }}>
+                <View style={styles.headerTextView}>
+                  <Text style={styles.headerTexts}>Native Country</Text>
+                </View>
+                <View style={styles.subheaderView}>
+                  <Text style={styles.subheaderText}>{userNationality}</Text>
+                </View>
+              </View>
+              <View style={styles.headerTextView}>
+                <Text style={styles.headerTexts}>My Face ID</Text>
+              </View>
+              <View style={{flexDirection: 'row'}}>
+                <View style={styles.imageView}>
+                  <Image
+                    source={require('../images/faceIdIcon.png')}
+                    style={styles.images}
+                  />
+                </View>
+                <TouchableOpacity
+                  style={{
+                    marginRight: 20,
+                    alignSelf: 'center',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: '#FFFFFF',
+                    height: 50,
+                    width: '40%',
+                    borderRadius: 10,
+                    elevation: 4,
+                  }}
+                  activeOpacity={0.5}
+                  // onPress={handleSubmitPress}
+                  onPress={() => navigation.navigate('RegisterScreen')}>
+                  <Text style={styles.registerButtonTextStyle}>
+                    Change My Face ID
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  marginTop: 20,
+                  marginBottom: 20,
+                  flexDirection: 'row',
+                }}>
+                <View style={{flexDirection: 'column'}}>
+                  <View style={styles.headerTextView}>
+                    <Text style={styles.headerTexts}>Mobile Number</Text>
+                  </View>
+                  <View style={styles.subheaderView}>
+                    <Text style={styles.subheaderText}>{userPhoneNO}</Text>
+                  </View>
+                </View>
+                <View style={{marginLeft: 20}}>
+                  <Image
+                    source={require('../images/editIcon.png')}
+                    style={styles.editImages}
+                  />
+                </View>
+              </View>
+              <View style={{marginBottom: 20, flexDirection: 'row'}}>
+                <View style={{flexDirection: 'column'}}>
+                  <View style={styles.headerTextView1}>
+                    <Text style={styles.headerTexts}>Email Address</Text>
+                  </View>
+                  <View style={styles.subheaderView1}>
+                    <Text style={styles.subheaderText}>{userEmail}</Text>
+                  </View>
+                </View>
+                <View style={{marginLeft: 20}}>
+                  <Image
+                    source={require('../images/editIcon.png')}
+                    style={styles.editImages}
+                  />
+                </View>
+              </View>
+              <TouchableOpacity
+                style={styles.buttonStyle}
+                activeOpacity={0.5}
+                onPress={handleLogin}>
+                <Text style={styles.buttonTextStyle}>Update My Profile</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.registerButtonStyle}
+                activeOpacity={0.5}
+                // onPress={handleSubmitPress}
+                onPress={() => navigation.navigate('RegisterScreen')}>
+                <Text style={styles.registerButtonTextStyle}>Skip</Text>
+              </TouchableOpacity>
+              <View></View>
+            </>
+          )}
         </View>
       </ScrollView>
     </View>
@@ -247,21 +352,21 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
   },
-  headerTextView: { marginLeft: 30,  marginTop: 10},
+  headerTextView: {marginLeft: 30, marginTop: 10},
   headerTexts: {color: '#999999', fontSize: 14},
   subheaderText: {color: '#37474F', fontSize: 14, fontWeight: 'bold'},
-  subheaderView: {marginTop: 5, marginLeft: 30,  marginBottom: 10},
-  headerTextView1: { marginLeft: 30,  },
+  subheaderView: {marginTop: 5, marginLeft: 30, marginBottom: 10},
+  headerTextView1: {marginLeft: 30},
   headerTexts1: {color: '#999999', fontSize: 14},
   subheaderText1: {color: '#37474F', fontSize: 14, fontWeight: 'bold'},
-  subheaderView1: {marginTop: 5, marginLeft: 30, },
+  subheaderView1: {marginTop: 5, marginLeft: 30},
   imageView: {
     alignItems: 'center',
     marginRight: 15,
     marginLeft: 30,
     marginTop: 15,
     height: 180,
-    width: 180, 
+    width: 180,
     backgroundColor: '#FFFFFF',
     borderRadius: 10,
     elevation: 4,

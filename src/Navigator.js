@@ -29,6 +29,8 @@ import PreviewDetailsScreen from './pages/PreviewDetailsScreen';
 import SubmitSuccessScreen from './pages/SubmitSuccessScreen';
 import TouchIDLogin from './pages/TouchIDLogin';
 import OTPVerificationScreen from './pages/OTPVerificationScreen';
+import DocumentDetailsScreen from './pages/DocumentDetailsScreen';
+import BioDetailsScreen from './pages/BioDetailsScreen';
 
 import {LogBox} from 'react-native';
 LogBox.ignoreLogs(['Warning: ...']); // Ignore log notification by message
@@ -37,15 +39,22 @@ LogBox.ignoreAllLogs(); // Ignore all log notifications
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-const AuthStack = createStackNavigator();
+const OnboardStack = createStackNavigator();
 
-const Auth = () => (
-  <AuthStack.Navigator initialRouteName="OnboardingScreen">
-    <AuthStack.Screen
+const Onboard = () => (
+  <OnboardStack.Navigator initialRouteName="OnboardingScreen">
+    <OnboardStack.Screen
       name="OnboardingScreen"
       component={OnboardingScreen}
       options={{headerShown: false}}
     />
+    </OnboardStack.Navigator>
+)
+
+const AuthStack = createStackNavigator();
+
+const Auth = () => (
+  <AuthStack.Navigator initialRouteName="LoginScreen">
     <AuthStack.Screen
       name="LoginScreen"
       component={LoginScreen}
@@ -109,14 +118,18 @@ const HomeStack = createStackNavigator();
 
 const HomeStackScreen = () => (
   <HomeStack.Navigator
-  initialRouteName="DataStoragePolicyScreen"
+  initialRouteName="Dashboard"
     screenOptions={{
       headerShown: false,
     }}>
     <HomeStack.Screen name="Dashboard" component={Dashboard} />
     <HomeStack.Screen
-      name="DataStoragePolicyScreen"
-      component={DataStoragePolicyScreen}
+      name="BioDetailsScreen"
+      component={BioDetailsScreen}
+    />
+    <HomeStack.Screen
+      name="DocumentDetailsScreen"
+      component={DocumentDetailsScreen}
     />
     <HomeStack.Screen name="SharingScreen" component={SharingScreen} />
     <HomeStack.Screen
@@ -151,7 +164,7 @@ const Home = () => (
             : require('./images/notification.png');
         } else if (route.name === 'Setting') {
           iconSource = focused
-            ? require('./images/setting.png')
+            ? require('./images/setting1.png')
             : require('./images/setting.png');
         }
 
@@ -195,6 +208,11 @@ function Navigation() {
           component={SplashScreen}
           options={{headerShown: false}}
           // initialParams={{ navigation }} // Pass the navigation prop to SplashScreen
+        />
+        <Stack.Screen
+          name="Onboard"
+          component={Onboard}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name="Auth"

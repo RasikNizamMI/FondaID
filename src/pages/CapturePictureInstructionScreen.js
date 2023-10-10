@@ -8,6 +8,7 @@ import {
   Image,
   TouchableOpacity,
   Platform,
+  PermissionsAndroid
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import {SelectList} from 'react-native-dropdown-select-list';

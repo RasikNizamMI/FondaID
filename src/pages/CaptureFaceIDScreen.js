@@ -8,29 +8,144 @@ import {
   Image,
   TouchableOpacity,
   Platform,
+  ActivityIndicator,
+  Alert,
+  PermissionsAndroid
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import {SelectList} from 'react-native-dropdown-select-list';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
+import {postRequest, putRequest} from '../Utils/apiUtils';
+import {API_ENDPOINTS} from '../Utils/apiConfig';
 
 const CaptureFaceIDScreen = ({navigation}) => {
-  const [useDocumentNumber, setUseDocumentNumber] = useState('');
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
-  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
-  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
-  const [selectedStartDate, setSelectedStartDate] = useState('Date of Issue');
-  const [selectedEndDate, setSelectedEndDate] = useState('Date of Expiry');
   const [filePath, setFilePath] = useState({});
 
+  const [userEmail, setUserEmail] = useState('');
+  const [userPhoneNO, setUserPhoneNO] = useState('');
+  const [userFirstName, setUserFirstName] = useState('');
+  const [userSurName, setUserSurName] = useState('');
+  const [userBirthName, setUserBirthName] = useState('');
+  const [userDateOfBirth, setUserDateOfBirth] = useState('');
+  const [userPlaceOfBirthl, setUserPlaceOfBirth] = useState('');
+  const [userNationality, setUserNationality] = useState('');
+  const [userNativeCountry, setUserNativeCountry] = useState('');
+  const [userGender, setUserGender] = useState('');
+  const [userRefID, setuserRefID] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [apiResponseMessage, setApiResponseMessage] = useState('');
   const handleSkip = () => {
     navigation.goBack(null);
-};
+  };
 
-const handleToAddNewDoc = () => {
-  navigation.navigate('UploadDocumentScreen');
-}
+  const handleToAddNewDoc = () => {
+    setLoading(true);
+    console.log('1234567890');
+    // Form validation and API call
+    const requestBody = {
+      ref_id: userRefID,
+    };
+
+    console.log(API_ENDPOINTS.CREATEUSER, requestBody);
+    putRequest(API_ENDPOINTS.CREATEUSER, requestBody)
+      .then(response => {
+        console.log('response' + JSON.stringify(response));
+        if (response.statusCode === 200) {
+          console.log('12345');
+          setData('fondaId',response.fondaId);
+          Alert.alert(response.message);
+          navigation.navigate('SubmitSuccessScreen');
+        } else {
+          console.log('12345678');
+          Alert.alert(response.message);
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        setApiResponseMessage('POST error:', error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    const loadRememberedCredentials = async () => {
+      try {
+        const storedUserEmail = await getData('emailID');
+        const storedUserPhoneNO = await getData('phoneNumber');
+        const storedUserFirstName = await getData('firstName');
+        const storedUserSurName = await getData('surName');
+        const storedUserBirthName = await getData('birthName');
+        const storedUserDateOfBirth = await getData('dateOfBirth');
+        const storedUserPlaceOfBirth = await getData('placeOfBirth');
+        const storedUserNationality = await getData('nationality');
+        const storedUserNativeCountry = await getData('nativeCountry');
+        const storeUserGender = await getData('gender');
+        const storeduserRefID = await getData('refID');
+        setUserEmail(storedUserEmail);
+        setUserPhoneNO(storedUserPhoneNO);
+        setUserFirstName(storedUserFirstName);
+        setUserSurName(storedUserSurName);
+        setUserBirthName(storedUserBirthName);
+        setUserDateOfBirth(storedUserDateOfBirth);
+        setUserPlaceOfBirth(storedUserPlaceOfBirth);
+        setUserNationality(storedUserNationality);
+        setUserNativeCountry(storedUserNativeCountry);
+        setUserGender(storeUserGender);
+        setuserRefID(storeduserRefID);
+      } catch (error) {
+        console.log('Error loading remembered credentials:', error);
+      }
+    };
+    loadRememberedCredentials();
+  }, []);
+
+  const handleCameraLaunch = async () => {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+        {
+          // title: 'Cool Photo App Camera Permission',
+          // message:
+          //   'FondaID Access to camera',
+          // buttonNegative: 'Cancel',
+          // buttonPositive: 'OK',
+        },
+      );
+      if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+        console.log('Camera permission denied');
+        return;
+      }
+    }
+
+    const options = {
+      mediaType: 'photo',
+      includeBase64: false,
+      maxHeight: 550,
+      maxWidth: 550,
+    };
+
+    launchCamera(options, response => {
+      console.log('Response = ', response);
+      const {assets} = response;
+      if (response.didCancel) {
+        console.log('User cancelled camera');
+      } else if (response.error) {
+        console.log('Camera Error: ', response.error);
+      } else {
+        console.log('base64 -> ', assets[0].base64);
+      console.log('uri -> ', assets[0].uri);
+      console.log('width -> ', assets[0].width);
+      console.log('height -> ', assets[0].height);
+      console.log('fileSize -> ', assets[0].fileSize);
+      console.log('type -> ', assets[0].type);
+      console.log('fileName -> ', assets[0].fileName);
+      setFilePath(assets[0]);
+      }
+    });
+  };
+
 
   const captureImage = type => {
     let options = {
@@ -73,71 +188,74 @@ const handleToAddNewDoc = () => {
 
   return (
     <View style={styles.mainBody}>
-      <ScrollView
-        contentContainerStyle={{flexGrow: 1}}
-        keyboardShouldPersistTaps="handled">
-        <View>
-          <View style={styles.headerView}>
-            <Feather
-              onPress={() => {
-                navigation.goBack(null);
-              }}
-              style={styles.headerIcon}
-              name="chevron-left"
-              size={25}
-              color={'#F5A922'}
-            />
-            <Text style={styles.headerText}>Capture Face ID</Text>
-          </View>
-
-          
-
-
-          <View style={styles.uploadView}>
-            <Text style={styles.uploadText}>
-            Please look into the camera and look still
-            </Text>
-          </View>
-
-          <TouchableOpacity onPress={() => captureImage('photo')}>
-            <View style={styles.uploadImageView}>
-              {filePath.uri ? (
-                <Image
-                  source={{uri: filePath.uri}}
-                  style={styles.uploadImage}
-                />
-              ) : (
-                <Image
-                  source={require('../images/camera.png')}
-                  style={styles.uploadImage}
-                />
-              )}
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.buttonStyle}
-            activeOpacity={0.5}
-            onPress={handleToAddNewDoc}>
-            <Text style={styles.buttonTextStyle}>Upload Supporting Documents</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.registerButtonStyle}
-            activeOpacity={0.5}
-            // onPress={handleSubmitPress}
-            onPress={handleSkip}>
-            <View style={styles.scannerView}>
+      {loading ? (
+        // Render the loader or loading indicator here
+        <ActivityIndicator size="large" color="#F5A922" />
+      ) : (
+        <ScrollView
+          contentContainerStyle={{flexGrow: 1}}
+          keyboardShouldPersistTaps="handled">
+          <View>
+            <View style={styles.headerView}>
               <Feather
-                style={styles.scannerImage}
+                onPress={() => {
+                  navigation.goBack(null);
+                }}
+                style={styles.headerIcon}
                 name="chevron-left"
                 size={25}
                 color={'#F5A922'}
               />
-              <Text style={styles.registerButtonTextStyle}>Back</Text>
+              <Text style={styles.headerText}>Capture Face ID</Text>
             </View>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+
+            <View style={styles.uploadView}>
+              <Text style={styles.uploadText}>
+                Please look into the camera and look still
+              </Text>
+            </View>
+
+            <TouchableOpacity onPress={() => handleCameraLaunch()}>
+              <View style={styles.uploadImageView}>
+                {filePath.uri ? (
+                  <Image
+                    source={{uri: filePath.uri}}
+                    style={styles.uploadImage}
+                  />
+                ) : (
+                  <Image
+                    source={require('../images/camera.png')}
+                    style={styles.uploadImage}
+                  />
+                )}
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.buttonStyle}
+              activeOpacity={0.5}
+              onPress={handleToAddNewDoc}>
+              {/* <Text style={styles.buttonTextStyle}>Upload Supporting Documents</Text> */}
+              <Text style={styles.buttonTextStyle}>Create Fonda Account</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.registerButtonStyle}
+              activeOpacity={0.5}
+              // onPress={handleSubmitPress}
+              onPress={handleSkip}>
+              <View style={styles.scannerView}>
+                <Feather
+                  style={styles.scannerImage}
+                  name="chevron-left"
+                  size={25}
+                  color={'#F5A922'}
+                />
+                <Text style={styles.registerButtonTextStyle}>Back</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      )}
     </View>
   );
 };

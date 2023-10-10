@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -8,14 +8,25 @@ import {
   TouchableOpacity,
   Linking,
 } from 'react-native';
+import { setData, getData } from '../Utils/AsyncStorageUtil';
 
 const DataStoragePolicyScreen = ({navigation}) => {
   const [dataStorageEnabled, setDataStorageEnabled] = useState(false);
   const [dataStorageEnabled1, setDataStorageEnabled1] = useState(false);
   const [dataStorageEnabled2, setDataStorageEnabled2] = useState(false);
 
+  useEffect(() => {
+    // Check if the user has already accepted the data storage policy
+    getData('dataStorageAccepted').then((value) => {
+      if (value === 'true') {
+        navigation.navigate('Dashboard'); // Redirect to dashboard if accepted
+      }
+    });
+  }, [navigation]);
+
   const toggleDataStorage = () => {
     setDataStorageEnabled(!dataStorageEnabled);
+
   };
   const toggleDataStorage1 = () => {
     setDataStorageEnabled1(!dataStorageEnabled1);
@@ -29,7 +40,9 @@ const DataStoragePolicyScreen = ({navigation}) => {
     Linking.openURL(url);
   };
 
-  const handleConfirm = () => {
+ const handleConfirm = async () => {
+    // Save that the user has accepted the data storage policy
+    await setData('dataStorageAccepted', 'true');
     navigation.navigate('Dashboard');
   }
 
@@ -76,7 +89,7 @@ const DataStoragePolicyScreen = ({navigation}) => {
               value={dataStorageEnabled1}
               onValueChange={toggleDataStorage1}
             />
-            <Text style={styles.switchLabel}>Data 2</Text>
+            <Text style={styles.switchLabel1}>Data 2</Text>
           </View>
           <View style={styles.switchContainer}>
             <Switch
@@ -86,7 +99,7 @@ const DataStoragePolicyScreen = ({navigation}) => {
               value={dataStorageEnabled2}
               onValueChange={toggleDataStorage2}
             />
-            <Text style={styles.switchLabel}>Data 3</Text>
+            <Text style={styles.switchLabel1}>Data 3</Text>
           </View>
           <View style={styles.textView}>
             <Text style={styles.mandatorytext}>
@@ -154,6 +167,14 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
   switchLabel: {
+    fontSize: 16,
+    marginRight: 10,
+    marginLeft: 10,
+    paddingRight: 40,
+    color: '#37474F',
+    marginTop: 20,
+  },
+  switchLabel1: {
     fontSize: 16,
     marginRight: 10,
     marginLeft: 10,

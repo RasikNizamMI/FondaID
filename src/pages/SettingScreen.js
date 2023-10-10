@@ -7,9 +7,11 @@ import {
   Switch,
   TouchableOpacity,
   Linking,
+  Image,
 } from 'react-native';
+import { setData, getData, removeData } from '../Utils/AsyncStorageUtil';
 
-const SettingScreen = () => {
+const SettingScreen = ({navigation}) => {
   const [dataStorageEnabled, setDataStorageEnabled] = useState(false);
   const [dataStorageEnabled1, setDataStorageEnabled1] = useState(false);
   const [dataStorageEnabled2, setDataStorageEnabled2] = useState(false);
@@ -24,87 +26,75 @@ const SettingScreen = () => {
     setDataStorageEnabled2(!dataStorageEnabled2);
   };
 
-  const handleLinkPress = () => {
-    const url = 'https://www.example.com'; // Replace with your desired URL
-    Linking.openURL(url);
+  const handleLogout = () => {
+    removeData('fonda_ID');
+    navigation.navigate('Auth', {screen: 'LoginScreen'})
   };
 
   return (
     <View style={styles.container}>
       <ScrollView>
-{/*         
-          <Text style={styles.heading}>Data Storage Acceptance</Text>
-          <View style={styles.textView}>
-            <Text style={styles.text}>I agree Fonda Team store</Text>
-            <Text style={styles.text}>my following personal data</Text>
-            <Text style={styles.text}>as per the GDPR policy.</Text>
-          </View>
-          <View style={styles.textView}>
-            <Text style={styles.text}>You may withdraw any data at</Text>
-            <Text style={styles.text}>
-              any time by visiting the Settings section.
-            </Text>
-          </View>
-          <View style={styles.linkTextView}>
-            <TouchableOpacity onPress={handleLinkPress}>
-              <Text style={styles.linkText}>View our Data Storage Policy</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.switchContainer}>
-            <Switch
-              style={{transform: [{scaleX: 1.2}, {scaleY: 1.2}]}}
-              trackColor={{false: '#767577', true: '#33C759'}}
-              thumbColor={dataStorageEnabled ? '#FFFFFF' : '#000000'}
-              value={dataStorageEnabled}
-              onValueChange={toggleDataStorage}
-            />
-            <Text style={styles.switchLabel}>
-              I agree to store my personal KYC details like, Name, Email, Mobile
-              Number, Date of birth, Nationality, Gender.
-            </Text>
-          </View>
-          <View style={styles.switchContainer}>
-            <Switch
-              style={{transform: [{scaleX: 1.2}, {scaleY: 1.2}]}}
-              trackColor={{false: '#767577', true: '#33C759'}}
-              thumbColor={dataStorageEnabled1 ? '#FFFFFF' : '#000000'}
-              value={dataStorageEnabled1}
-              onValueChange={toggleDataStorage1}
-            />
-            <Text style={styles.switchLabel}>Data 2</Text>
-          </View>
-          <View style={styles.switchContainer}>
-            <Switch
-              style={{transform: [{scaleX: 1.2}, {scaleY: 1.2}]}}
-              trackColor={{false: '#767577', true: '#33C759'}}
-              thumbColor={dataStorageEnabled2 ? '#FFFFFF' : '#000000'}
-              value={dataStorageEnabled2}
-              onValueChange={toggleDataStorage2}
-            />
-            <Text style={styles.switchLabel}>Data 3</Text>
-          </View>
-          <View style={styles.textView}>
-            <Text style={styles.mandatorytext}>
-              * Mandatory to select personal KYC information to store
-            </Text>
-            <Text style={styles.mandatorytext}>to store</Text>
-          </View>
+        <View>
+          <Text
+            style={{
+              textAlign: 'center',
+              marginTop: 50,
+              fontSize: 24,
+              fontWeight: 'bold',
+              color: '#F5A922',
+            }}>
+            Settings
+          </Text>
+        </View>
+        <View
+          style={{
+            marginTop: 20,
+            marginLeft: 30,
+            marginRight: 30,
+            height: 2,
+            backgroundColor: '#999999',
+          }}></View>
           <TouchableOpacity
-            style={styles.buttonStyle}
-            activeOpacity={0.5}
-            onPress={''}>
-            <Text style={styles.buttonTextStyle}>Confirm</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.skipButtonStyle}
-            activeOpacity={0.5}
-            onPress={''}>
-            <Text style={styles.skipButtonTextStyle}>Skip for now</Text>
-          </TouchableOpacity> */}
-        
+        activeOpacity={0.5}
+        onPress={handleLogout}>
+        <View style={{flexDirection: 'row', margin: 20}}>
+          <Image
+            source={require('../images/logout.png')}
+            style={{
+              width: 20,
+              height: 20,
+              resizeMode: 'contain',
+              marginLeft: 20,
+            }}
+          />
+          <Text
+            style={{
+              textAlign: 'center',
+              fontSize: 16,
+              fontWeight: '800',
+              color: '#37474F',
+              marginLeft: 20,
+            }}>
+            Logout
+          </Text>
+        </View>
+        </TouchableOpacity>
+        <View
+          style={{
+            marginLeft: 30,
+            marginRight: 30,
+            height: 2,
+            backgroundColor: '#999999',
+          }}></View>
       </ScrollView>
+      <TouchableOpacity
+        style={styles.buttonStyle}
+        activeOpacity={0.5}
+        onPress={() => {
+            navigation.goBack(null);
+          }}>
+        <Text style={styles.buttonTextStyle}>Back</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -113,11 +103,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F6F8F9',
     flexGrow: 1,
   },
   content: {
-    
     justifyContent: 'center',
     backgroundColor: '#FFFFFF',
     margin: 10,
@@ -197,6 +186,25 @@ const styles = StyleSheet.create({
     marginBottom: 110,
   },
   skipButtonTextStyle: {
+    color: '#F5A922',
+    paddingVertical: 10,
+    fontSize: 16,
+  },
+  buttonStyle: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    color: '#FFFFFF',
+    borderColor: '#F5A922',
+    height: 50,
+    alignItems: 'center',
+    borderRadius: 10,
+    marginLeft: 20,
+    marginRight: 20,
+    marginTop: 20,
+    marginBottom: 20,
+    justifyContent: 'center',
+  },
+  buttonTextStyle: {
     color: '#F5A922',
     paddingVertical: 10,
     fontSize: 16,

@@ -1,4 +1,4 @@
-import React, {useState, createRef, useEffect} from 'react';
+import React, {useState} from 'react';
 import {
   StyleSheet,
   TextInput,
@@ -8,11 +8,13 @@ import {
   Image,
   TouchableOpacity,
   Platform,
+  PermissionsAndroid
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import {SelectList} from 'react-native-dropdown-select-list';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
 
 const AddNewDocumentScreen = ({navigation}) => {
   const [useDocumentNumber, setUseDocumentNumber] = useState('');
@@ -23,16 +25,23 @@ const AddNewDocumentScreen = ({navigation}) => {
   const [selectedStartDate, setSelectedStartDate] = useState('Date of Issue');
   const [selectedEndDate, setSelectedEndDate] = useState('Date of Expiry');
   const [filePath, setFilePath] = useState({});
+  const [selectedDocumentType, setSelectedDocumentType] = React.useState('');
 
-  const data = [
-    {key: '1', value: 'Mobiles', disabled: true},
-    {key: '2', value: 'Appliances'},
-    {key: '3', value: 'Cameras'},
-    {key: '4', value: 'Computers', disabled: true},
-    {key: '5', value: 'Vegetables'},
-    {key: '6', value: 'Diary Products'},
-    {key: '7', value: 'Drinks'},
+  const documentTypes = [
+    {key: 'passport', value: 'Passport'},
+    {key: 'idCard', value: 'ID Card'},
+    {key: 'driverLicense', value: "Driver's License"},
+    {key: 'healthCard', value: 'Health Card'},
+    {key: 'professionalLicense', value: 'Professional License'},
+    {key: 'other', value: 'Other'},
   ];
+
+  const formatDate = date => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
   const handleStartDateChange = (event, date) => {
     setShowStartDatePicker(false);
@@ -62,9 +71,53 @@ const AddNewDocumentScreen = ({navigation}) => {
     setShowEndDatePicker(true);
   };
 
-const handleToAddNewDoc = () => {
-  navigation.navigate('ConfirmDocument');
-}
+  // const handleToAddNewDoc = () => {
+  //   navigation.navigate('ConfirmDocument');
+  // }
+  const handleCameraLaunch = async () => {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+        {
+          // title: 'Cool Photo App Camera Permission',
+          // message:
+          //   'FondaID Access to camera',
+          // buttonNegative: 'Cancel',
+          // buttonPositive: 'OK',
+        },
+      );
+      if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+        console.log('Camera permission denied');
+        return;
+      }
+    }
+
+    const options = {
+      mediaType: 'photo',
+      includeBase64: true,
+      maxHeight: 550,
+      maxWidth: 550,
+    };
+
+    launchCamera(options, response => {
+      console.log('Response = ', response);
+      const {assets} = response;
+      if (response.didCancel) {
+        console.log('User cancelled camera');
+      } else if (response.error) {
+        console.log('Camera Error: ', response.error);
+      } else {
+        console.log('base64 -> ', assets[0].base64);
+      console.log('uri -> ', assets[0].uri);
+      console.log('width -> ', assets[0].width);
+      console.log('height -> ', assets[0].height);
+      console.log('fileSize -> ', assets[0].fileSize);
+      console.log('type -> ', assets[0].type);
+      console.log('fileName -> ', assets[0].fileName);
+      setFilePath(assets[0]);
+      }
+    });
+  };
 
   const captureImage = type => {
     let options = {
@@ -75,6 +128,7 @@ const handleToAddNewDoc = () => {
       videoQuality: 'low',
       durationLimit: 30, //Video max duration in seconds
       saveToPhotos: true,
+      includeBase64: true
     };
 
     launchCamera(options, response => {
@@ -105,6 +159,19 @@ const handleToAddNewDoc = () => {
     });
   };
 
+  const handleToAddNewDoc = () => {
+    const formattedStartDate = formatDate(startDate);
+    const formattedEndDate = formatDate(endDate);
+    setData('addDoScelectDocument', selectedDocumentType);
+    setData('addDoDateIssue', formattedStartDate);
+    setData('addDoDateExpiry', formattedEndDate);
+    setData('addDoUploadImg', filePath.uri);
+    setData('addDocumentNumber', useDocumentNumber)
+    setData('addDoUploadImgBase64', filePath.base64)
+
+    navigation.navigate('ConfirmDocument');
+  };
+
   return (
     <View style={styles.mainBody}>
       <ScrollView
@@ -131,9 +198,9 @@ const handleToAddNewDoc = () => {
               dropdownStyles={styles.dropdown}
               inputStyles={{fontSize: 14, color: '#37474F'}}
               dropdownTextStyles={{fontSize: 14, color: '#37474F'}}
-              setSelected={val => setSelected(val)}
-              data={data}
-              save="value"
+              setSelected={val => setSelectedDocumentType(val)} // Set the selected document type
+              data={documentTypes}
+              save="key" // Save the key of the selected item
             />
           </View>
           <View style={styles.SectionStyle}>
@@ -202,12 +269,12 @@ const handleToAddNewDoc = () => {
             </Text>
           </View>
 
-          <TouchableOpacity onPress={() => captureImage('photo')}>
+          <TouchableOpacity onPress={() => handleCameraLaunch()}>
             <View style={styles.uploadImageView}>
               {filePath.uri ? (
                 <Image
                   source={{uri: filePath.uri}}
-                  style={styles.uploadImage}
+                  style={styles.afterUploadImage}
                 />
               ) : (
                 <Image
@@ -390,6 +457,11 @@ const styles = StyleSheet.create({
   uploadImage: {
     height: 350,
     resizeMode: 'contain',
+  },
+  afterUploadImage: {
+    height: 200, // Set your desired height here
+    aspectRatio: 1, // Maintain the aspect ratio (1:1)
+    resizeMode: 'contain', // You can use other values like 'cover' or 'stretch' based on your needs
   },
   scannerView: {
     alignSelf: 'center',

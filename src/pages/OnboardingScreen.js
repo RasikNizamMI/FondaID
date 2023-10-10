@@ -1,22 +1,22 @@
 import React, {useRef} from 'react';
 import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import Swiper from 'react-native-swiper';
+import { setData, getData } from '../Utils/AsyncStorageUtil';
 
-const OnboardingScreen = ({navigation}) => {
+const OnboardingScreen = ({ navigation }) => {
   const swiperRef = useRef(null);
 
   const handleSkip = () => {
-    // Handle the "Skip" button click here
     swiperRef.current?.scrollTo(4);
   };
 
   const handleArrowClick = () => {
-    // Handle the arrow button click here
     swiperRef.current?.scrollBy(1);
   };
 
-  const handleGetStart = () => {
-    navigation.navigate('LoginScreen');
+  const handleGetStart = async () => {
+    await setData('onboard', 'true');
+    navigation.navigate('Auth');
   };
 
   return (
@@ -28,7 +28,7 @@ const OnboardingScreen = ({navigation}) => {
     >
       <View style={styles.slide}>
         <Image
-          source={require('../images/Vector.png')}
+          source={require('../images/illustration.png')}
           style={styles.backgroundImage}
         />
         {/* Your content goes here */}
@@ -39,11 +39,11 @@ const OnboardingScreen = ({navigation}) => {
             </TouchableOpacity>
           </View>
           <View>
-            <View style={styles.topImageView}>
-              <Image
+            <View style={styles.topImage}>
+              {/* <Image
                 source={require('../images/illustration.png')}
                 style={styles.topImage}
-              />
+              /> */}
             </View>
             <View style={{}}>
               <Text style={styles.text1View}>Drained to upload</Text>
@@ -63,7 +63,7 @@ const OnboardingScreen = ({navigation}) => {
       </View>
       <View style={styles.slide}>
         <Image
-          source={require('../images/Vector.png')}
+          source={require('../images/illustration1.png')}
           style={styles.backgroundImage}
         />
         {/* Your content goes here */}
@@ -74,11 +74,11 @@ const OnboardingScreen = ({navigation}) => {
             </TouchableOpacity>
           </View>
           <View>
-            <View style={styles.topImageView}>
-              <Image
+            <View style={styles.topImage}>
+              {/* <Image
                 source={require('../images/illustration1.png')}
                 style={styles.topImage}
-              />
+              /> */}
             </View>
             <View style={{}}>
               <Text style={styles.text1View}>Here, Upload all your</Text>
@@ -98,7 +98,7 @@ const OnboardingScreen = ({navigation}) => {
       </View>
       <View style={styles.slide}>
         <Image
-          source={require('../images/Vector.png')}
+          source={require('../images/illustration2.png')}
           style={styles.backgroundImage}
         />
         {/* Your content goes here */}
@@ -109,11 +109,11 @@ const OnboardingScreen = ({navigation}) => {
             </TouchableOpacity>
           </View>
           <View>
-            <View style={styles.topImageView}>
-              <Image
+            <View style={styles.topImage}>
+              {/* <Image
                 source={require('../images/illustration2.png')}
                 style={styles.topImage}
-              />
+              /> */}
             </View>
             <View style={{}}>
               <Text style={styles.text1View}>Use our Fonda ID for</Text>
@@ -138,19 +138,19 @@ const OnboardingScreen = ({navigation}) => {
       </View>
       <View style={styles.slide}>
         <Image
-          source={require('../images/Vector.png')}
+          source={require('../images/illustration3.png')}
           style={styles.backgroundImage}
         />
         {/* Your content goes here */}
         <View style={styles.contentContainer}>
           <View>
-            <View style={styles.topImageView}>
-              <Image
+            <View style={styles.topImage}>
+              {/* <Image
                 source={require('../images/illustration3.png')}
                 style={styles.topImage}
-              />
+              /> */}
             </View>
-            <View style={{}}>
+            <View style={{marginTop: 20}}>
               <Text style={styles.text1View}>There are 3 steps as</Text>
               <View style={{flexDirection: 'row'}}>
                 <Text style={styles.text1View}>simple - </Text>
@@ -168,7 +168,7 @@ const OnboardingScreen = ({navigation}) => {
                 onPress={handleGetStart}
                 // onPress={() => navigation.navigate('WebViewPage')}
               >
-                <Text style={styles.buttonTextStyle}>Get Start</Text>
+                <Text style={styles.buttonTextStyle}>Get Started</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -260,7 +260,6 @@ const styles = StyleSheet.create({
     borderColor: '#F5A922',
     height: 50,
     alignItems: 'center',
-    borderRadius: 0,
     marginLeft: 35,
     marginRight: 35,
     marginTop: 30,

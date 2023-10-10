@@ -1,4 +1,4 @@
-import React, {useState, createRef, useEffect} from 'react';
+import React, {useState} from 'react';
 import {
   StyleSheet,
   TextInput,
@@ -6,175 +6,212 @@ import {
   Text,
   ScrollView,
   Image,
-  Keyboard,
   TouchableOpacity,
-  KeyboardAvoidingView,
+  ActivityIndicator,
+  Keyboard,
+  Modal,
 } from 'react-native';
 
+import {setData} from '../Utils/AsyncStorageUtil';
+import {postRequest} from '../Utils/apiUtils';
+import {API_ENDPOINTS} from '../Utils/apiConfig';
+
 const LoginScreen = ({navigation}) => {
-  const [useFandaID, setUseFandaID] = useState('');
-  const [useFandaPhone, setUseFandaPhone] = useState('');
+  const [fandaID, setFandaID] = useState('');
+  const [fandaPhone, setFandaPhone] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [emailErrorMessage, setEmailErrorMessage] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
 
   const formatPhoneNumber = number => {
     const formattedNumber = number.replace(/(\d{3})(\d{3})(\d{3})/, '$1-$2-$3');
-    setUseFandaPhone(formattedNumber);
+    setFandaPhone(formattedNumber);
   };
 
-  const handleLogin = () => {
-    navigation.navigate('LoginOtpScreen');
+  const handleLogin = async () => {
+    setLoading(true);
+
+    if (!fandaID) {
+      setErrorMessage('Please enter valid Fonda ID');
+      setLoading(false);
+    } else if (!fandaPhone) {
+      setEmailErrorMessage('Please enter valid Email/Phone Number');
+      setErrorMessage('');
+      setLoading(false);
+    } else {
+      const requestBody = {
+        fonda_id: fandaID,
+        email_id_phone_number: fandaPhone,
+      };
+
+      try {
+        const response = await postRequest(
+          API_ENDPOINTS.LOGINUSER,
+          requestBody,
+        );
+
+        if (response.Status.responseCode === 'F200') {
+          await setData('refID', response.refId);
+          await setData('phoneNumber', fandaPhone);
+          navigation.navigate('LoginOtpScreen');
+          setFandaID('');
+          setFandaPhone('');
+          setErrorMessage('');
+          setEmailErrorMessage('')
+
+        } else {
+          setModalVisible(true);
+        }
+      } catch (error) {
+        console.log('error', error);
+        setErrorMessage('Please check credentials');
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   const handleRegister = () => {
     navigation.navigate('RegisterScreen');
-  }
+  };
 
   const handleTouchID = () => {
     navigation.navigate('TouchIDLogin');
-  }
+  };
 
   return (
     <View style={styles.mainBody}>
-      <ScrollView
-        contentContainerStyle={{flexGrow: 1}}
-        keyboardShouldPersistTaps="handled">
-        <View>
-          <View style={{alignItems: 'center'}}>
-            <Image
-              source={require('../images/logo.png')}
-              style={{
-                width: 277.97,
-                height: 100,
-                resizeMode: 'contain',
-                margin: 30,
-              }}
-            />
-          </View>
-
-          <View style={styles.SectionTextStyle}>
-            <Text style={styles.TextStyle}>Fonda ID</Text>
-          </View>
-          <View style={styles.SectionStyle}>
-            <TextInput
-              value={useFandaID}
-              style={styles.inputStyle}
-              onChangeText={UserFandaID => setUseFandaID(UserFandaID)}
-              placeholder="Enter Fonda ID" //dummy@abc.com
-              placeholderTextColor="#37474F"
-              autoCapitalize="none"
-              keyboardType="default"
-              returnKeyType="next"
-              onSubmitEditing={() =>
-                passwordInputRef.current && passwordInputRef.current.focus()
-              }
-              underlineColorAndroid="#f000"
-              blurOnSubmit={false}
-            />
-          </View>
-          <View style={styles.SectionTextStyle}>
-            <Text style={styles.TextStyle}>Email / Phone Number</Text>
-          </View>
-          <View style={styles.SectionStyle}>
-            <TextInput
-              value={useFandaPhone}
-              style={styles.inputStyle}
-              onChangeText={formatPhoneNumber}
-              placeholder="Enter Email / Phone Number" //12345
-              placeholderTextColor="#37474F"
-              keyboardType="default"
-              onSubmitEditing={Keyboard.dismiss}
-              blurOnSubmit={false}
-              underlineColorAndroid="#f000"
-              returnKeyType="next"
-            />
-          </View>
-
-          <TouchableOpacity
-            style={styles.buttonStyle}
-            activeOpacity={0.5}
-            onPress={handleLogin}>
-            <Text style={styles.buttonTextStyle}>Login</Text>
-          </TouchableOpacity>
-
-          <View style={{ alignSelf: 'flex-end', marginRight: 30}}>
-            <TouchableOpacity onPress={''}>
-            <Text
-              style={{
-                color: '#007CFF',
-                fontSize: 14,
-                alignSelf: 'center',
-                marginTop: 10,
-                textDecorationLine: 'underline',
-                textDecorationColor: '#007CFF',
-              }}>
-               Trouble logging in?
-            </Text>
-            </TouchableOpacity>
-          </View>
-
+      {loading ? (
+        <ActivityIndicator size="large" color="#F5A922" />
+      ) : (
+        <ScrollView
+          contentContainerStyle={styles.scrollViewContent}
+          keyboardShouldPersistTaps="handled">
           <View>
-            <Text
-              style={{
-                color: '#37474F',
-                fontSize: 16,
-                alignSelf: 'center',
-                marginTop: 20,
-              }}>
-              Don't have a Fonda Account?
-            </Text>
-          </View>
-          <TouchableOpacity
-            style={styles.registerButtonStyle}
-            activeOpacity={0.5}
-            // onPress={handleSubmitPress}
-            onPress={handleRegister}>
-            <View style={{alignSelf: 'center'}}>
-              <Text style={styles.registerButtonTextStyle}>
-                Create Fonda Account
+            <View style={styles.logoContainer}>
+              <Image
+                source={require('../images/logo.png')}
+                style={styles.logoImage}
+              />
+            </View>
+
+            <View style={styles.inputSection}>
+              <Text style={styles.label}>Fonda ID</Text>
+              <TextInput
+                value={fandaID}
+                style={styles.input}
+                onChangeText={userFandaID => setFandaID(userFandaID)}
+                placeholder="Enter Fonda ID"
+                placeholderTextColor="#37474F"
+                autoCapitalize="none"
+                keyboardType="default"
+                returnKeyType="next"
+                underlineColorAndroid="#f000"
+                blurOnSubmit={false}
+              />
+            </View>
+
+            {errorMessage ? (
+              <Text style={styles.errorText}>{errorMessage}</Text>
+            ) : null}
+
+            <View style={styles.inputSection}>
+              <Text style={styles.label}>Email / Phone Number</Text>
+              <TextInput
+                value={fandaPhone}
+                style={styles.input}
+                onChangeText={fandaPhone => setFandaPhone(fandaPhone)}
+                placeholder="Enter Email / Phone Number"
+                placeholderTextColor="#37474F"
+                keyboardType="default"
+                onSubmitEditing={Keyboard.dismiss}
+                blurOnSubmit={false}
+                underlineColorAndroid="#f000"
+                returnKeyType="next"
+              />
+            </View>
+
+            {emailErrorMessage ? (
+              <Text style={styles.errorText}>{emailErrorMessage}</Text>
+            ) : null}
+
+            <TouchableOpacity
+              style={styles.button}
+              activeOpacity={0.5}
+              onPress={handleLogin}>
+              <Text style={styles.buttonText}>Login</Text>
+            </TouchableOpacity>
+
+            <View style={styles.troubleLoginContainer}>
+              <TouchableOpacity onPress={handleLogin}>
+                <Text style={styles.troubleLoginText}>Trouble logging in?</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.createAccountContainer}>
+              <Text style={styles.createAccountText}>
+                Don't have a Fonda Account?
               </Text>
             </View>
-          </TouchableOpacity>
-          <View style={{flexDirection: 'row', alignSelf: 'center', marginTop: 20}}>
-            <Text
-              style={{
-                color: '#37474F',
-                fontSize: 14,
-                alignSelf: 'center',
-                marginTop: 20,
-              }}>
-              Switch to 
-            </Text>
-            <TouchableOpacity onPress={handleTouchID}>
-            <Text
-              style={{
-                color: '#F5A922',
-                fontSize: 18,
-                alignSelf: 'center',
-                marginTop: 20,
-                textDecorationLine: 'underline',
-                textDecorationColor: '#F5A922',
-              }}>
-               Touch ID Login
-            </Text>
+
+            <TouchableOpacity
+              style={styles.registerButton}
+              activeOpacity={0.5}
+              onPress={handleRegister}>
+              <Text style={styles.registerButtonText}>
+                Create Fonda Account
+              </Text>
             </TouchableOpacity>
-          </View>
-          <View>
-            <View style={{alignItems: 'center'}}>
+
+            <View style={styles.switchToTouchIDContainer}>
+              <Text style={styles.switchToText}>Switch to</Text>
+              <TouchableOpacity onPress={handleTouchID}>
+                <Text style={styles.touchIDText}>Touch ID Login</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.imageContainer}>
               <Image
                 source={require('../images/loginImage.png')}
-                style={{
-                  width: 360,
-                  height: 233.31,
-                  resizeMode: 'contain',
-                  margin: 20,
-                }}
+                style={styles.loginImage}
               />
             </View>
           </View>
+        </ScrollView>
+      )}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(false);
+        }}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>Oops!</Text>
+            <Text style={styles.modalSubText}>
+              Fonda ID or Email/Phone Number is not registered with us
+            </Text>
+            <Image
+              source={require('../images/modalImage.png')}
+              style={styles.modalImage}
+            />
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalVisible(false)}>
+              <Text style={styles.closeButtonText}>Try Again</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleRegister}>
+              <Text style={styles.creaeAccount}>Or Create a Fonda Account</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </ScrollView>
+      </Modal>
     </View>
   );
 };
+
 export default LoginScreen;
 
 const styles = StyleSheet.create({
@@ -182,35 +219,40 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     backgroundColor: '#F6F8F9',
-    alignContent: 'center',
-  },
-  SectionStyle: {
-    flexDirection: 'row',
-    height: 50,
-    marginTop: 20,
-    marginLeft: 35,
-    marginRight: 35,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#FFFFFF',
   },
-  SectionTextStyle: {
-    marginTop: 20,
-    marginLeft: 35,
-    marginRight: 35,
+  scrollViewContent: {
+    flexGrow: 1,
   },
-  TextStyle: {
+  logoContainer: {
+    alignItems: 'center',
+  },
+  logoImage: {
+    width: 277.97,
+    height: 100,
+    resizeMode: 'contain',
+    marginVertical: 30,
+  },
+  inputSection: {
+    marginHorizontal: 10,
+    marginVertical: 20,
+  },
+  label: {
     color: '#37474F',
   },
-  HeaderTextStyle: {
-    color: '#000',
-    fontSize: 20,
-    fontWeight: 'bold',
+  input: {
+    flex: 1,
+    color: '#37474F',
+    paddingLeft: 15,
+    paddingRight: 15,
+    elevation: 4,
+    backgroundColor: '#ffffff',
+    height: 50,
+    borderWidth: 1,
+    borderColor: '#FFFFFF',
+    marginTop: 5,
   },
-  SubHeadingTextStyle: {
-    color: '#8392a5',
-  },
-  buttonStyle: {
+  button: {
     backgroundColor: '#F5A922',
     borderWidth: 0,
     color: '#FFFFFF',
@@ -218,11 +260,35 @@ const styles = StyleSheet.create({
     height: 50,
     alignItems: 'center',
     borderRadius: 10,
-    marginLeft: 35,
-    marginRight: 35,
-    marginTop: 20,
+    marginHorizontal: 10,
+    marginVertical: 20,
   },
-  registerButtonStyle: {
+  buttonText: {
+    color: '#FFFFFF',
+    paddingVertical: 10,
+    fontSize: 16,
+  },
+  troubleLoginContainer: {
+    alignSelf: 'flex-end',
+    marginRight: 30,
+  },
+  troubleLoginText: {
+    color: '#007CFF',
+    fontSize: 14,
+    alignSelf: 'center',
+    marginTop: 10,
+    textDecorationLine: 'underline',
+    textDecorationColor: '#007CFF',
+  },
+  createAccountContainer: {
+    alignSelf: 'center',
+    marginVertical: 20,
+  },
+  createAccountText: {
+    color: '#37474F',
+    fontSize: 16,
+  },
+  registerButton: {
     backgroundColor: '#fff',
     borderWidth: 1,
     color: '#FFFFFF',
@@ -230,54 +296,104 @@ const styles = StyleSheet.create({
     height: 50,
     alignItems: 'center',
     borderRadius: 0,
-    marginLeft: 35,
-    marginRight: 35,
-    marginTop: 10,
+    marginHorizontal: 10,
+    marginVertical: 10,
     elevation: 4,
   },
-  buttonTextStyle: {
-    color: '#FFFFFF',
-    paddingVertical: 10,
-    fontSize: 16,
-  },
-  registerButtonTextStyle: {
+  registerButtonText: {
     color: '#F5A922',
     paddingVertical: 10,
     fontSize: 16,
   },
-  inputStyle: {
-    flex: 1,
+  switchToTouchIDContainer: {
+    flexDirection: 'row',
+    alignSelf: 'center',
+    marginVertical: 20,
+  },
+  switchToText: {
     color: '#37474F',
-    paddingLeft: 15,
-    paddingRight: 15,
-    elevation: 4,
-    backgroundColor: '#ffffff',
-  },
-  registerTextStyle: {
-    color: '#F5A922',
-    textAlign: 'center',
-    fontWeight: 'bold',
     fontSize: 14,
     alignSelf: 'center',
-    padding: 10,
-    marginTop: 10,
   },
-  errorTextStyle: {
+  touchIDText: {
+    color: '#F5A922',
+    fontSize: 18,
+    alignSelf: 'center',
+    textDecorationLine: 'underline',
+    textDecorationColor: '#F5A922',
+  },
+  imageContainer: {
+    alignItems: 'center',
+  },
+  loginImage: {
+    width: 360,
+    height: 233.31,
+    resizeMode: 'contain',
+    marginVertical: 20,
+  },
+  errorText: {
     color: 'red',
     textAlign: 'center',
     fontSize: 14,
+    marginBottom: 10,
   },
-  checkboxContainer: {
-    flexDirection: 'row',
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+    backgroundColor: '#000',
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+    fontSize: 24,
+    color: '#F5A922',
+  },
+  modalSubText: {
+    marginBottom: 15,
+    textAlign: 'center',
+    fontSize: 14,
+    color: '#000',
+  },
+  modalImage: {
+    width: 158,
+    height: 220,
+    resizeMode: 'contain',
+    marginVertical: 20,
+  },
+  closeButton: {
+    backgroundColor: '#F5A922',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  closeButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    marginLeft: 20,
+    marginRight: 20,
+  },
+  creaeAccount: {
+    marginBottom: 15,
     marginTop: 20,
-    marginLeft: 35,
-    marginRight: 35,
-  },
-  checkbox: {
-    alignSelf: 'center',
-    color: '#0168fa',
-  },
-  icon: {
-    marginRight: 10,
+    textAlign: 'center',
+    fontSize: 14,
+    color: '#000',
   },
 });

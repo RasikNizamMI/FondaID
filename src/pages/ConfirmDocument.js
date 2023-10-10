@@ -1,4 +1,4 @@
-import React, {useState, createRef, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
   View,
@@ -6,31 +6,159 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
-  Platform,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {getData} from '../Utils/AsyncStorageUtil';
+import {postRequest} from '../Utils/apiUtils';
+import {API_ENDPOINTS} from '../Utils/apiConfig';
+import {convertImageToBase64} from 'react-native-image-base64';
 
 const ConfirmDocument = ({navigation}) => {
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
+  const [userDocument, setUserDocument] = useState('');
+  const [userDateOfIssue, setUserDateOfIssue] = useState('');
+  const [userDateOfExpiry, setUserDateOfExpiry] = useState('');
+  const [userUploadImage, setUserUploadImage] = useState('');
+  const [userDocumentNumber, setUserDocumentNumber] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [userPhoneNO, setUserPhoneNO] = useState('');
+  const [userFirstName, setUserFirstName] = useState('');
+  const [userSurName, setUserSurName] = useState('');
+  const [userBirthName, setUserBirthName] = useState('');
+  const [userDateOfBirth, setUserDateOfBirth] = useState('');
+  const [userPlaceOfBirth, setUserPlaceOfBirth] = useState('');
+  const [userNationality, setUserNationality] = useState('');
+  const [userNativeCountry, setUserNativeCountry] = useState('');
+  const [userGender, setUserGender] = useState('');
+  const [userCountyCode, setUserCountyCode] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [apiResponseMessage, setApiResponseMessage] = useState('');
+  const [userUploadImageBase64, setUserUploadImageBase64] = useState('');
+  const [userFondaID, setUserFondaID] = useState('');
 
-  const data = [
-    {key: '1', value: 'Mobiles', disabled: true},
-    {key: '2', value: 'Appliances'},
-    {key: '3', value: 'Cameras'},
-    {key: '4', value: 'Computers', disabled: true},
-    {key: '5', value: 'Vegetables'},
-    {key: '6', value: 'Diary Products'},
-    {key: '7', value: 'Drinks'},
-  ];
+  useEffect(() => {
+    const loadRememberedCredentials = async () => {
+      try {
+        const storedUserDocument = await getData('addDoScelectDocument');
+        const storedUserDateOfIssue = await getData('addDoDateIssue');
+        const storedUserDateOfExpiry = await getData('addDoDateExpiry');
+        const storedUserUploadImage = await getData('addDoUploadImg');
+        const storeUserDocumentNumber = await getData('addDocumentNumber');
+        const storedUserEmail = await getData('emailID');
+        const storedUserPhoneNO = await getData('phoneNumber');
+        const storedUserFirstName = await getData('firstName');
+        const storedUserSurName = await getData('surName');
+        const storedUserBirthName = await getData('birthName');
+        const storedUserDateOfBirth = await getData('dateOfBirth');
+        const storedUserPlaceOfBirth = await getData('placeOfBirth');
+        const storedUserNationality = await getData('nationality');
+        const storedUserNativeCountry = await getData('nativeCountry');
+        const storeUserGender = await getData('gender');
+        const storeUserCountryCode = await getData('nationalityCode');
+        const storedUserUploadImageBase64 = await getData('addDoUploadImgBase64'); 
+        const storedUserFondaID = await getData('fondaId');
+        setUserDocument(storedUserDocument);
+        setUserDateOfIssue(storedUserDateOfIssue);
+        setUserDateOfExpiry(storedUserDateOfExpiry);
+        setUserUploadImage(storedUserUploadImage);
+        setUserDocumentNumber(storeUserDocumentNumber);
+        setUserEmail(storedUserEmail);
+        setUserPhoneNO(storedUserPhoneNO);
+        setUserFirstName(storedUserFirstName);
+        setUserSurName(storedUserSurName);
+        setUserBirthName(storedUserBirthName);
+        setUserDateOfBirth(storedUserDateOfBirth);
+        setUserPlaceOfBirth(storedUserPlaceOfBirth);
+        setUserNationality(storedUserNationality);
+        setUserNativeCountry(storedUserNativeCountry);
+        setUserGender(storeUserGender);
+        setUserCountyCode(storeUserCountryCode);
+         setUserUploadImageBase64(storedUserUploadImageBase64);
+         setUserFondaID(storedUserFondaID);
+
+        if (userDocument === 'passport') {
+          console.log('Passport');
+        }
+      } catch (error) {
+        console.log('Error loading remembered credentials:', error);
+      }
+    };
+    loadRememberedCredentials();
+  }, []);
+
+  const formatDateOfBirth = (dateOfBirth) => {
+    const date = new Date(dateOfBirth);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${year}-${month}-${day}`;
+  };
 
   const handletoSubmitDoc = () => {
-    navigation.navigate('SubmitSuccess');
+    setLoading(true);
+
+    const requestBody = {
+      fonda_id: userFondaID,
+      payload: {
+        first_name: userFirstName,
+        last_name: userSurName,
+        date_of_birth: formatDateOfBirth(userDateOfBirth),
+        place_of_birth: userPlaceOfBirth,
+        gender: userGender,
+        country: userNativeCountry,
+        doc_id: userDocumentNumber,
+        doc_type: userDocument,
+        doc_date_of_issue: userDateOfIssue,
+        doc_date_of_expiration: userDateOfExpiry,
+        face_image: "imageToProcess",
+        face_template: "imageToProcess"
+    },
+    images: {
+      imageToProcess: userUploadImageBase64
   }
+    };
+    console.log("RequestBody-------"+API_ENDPOINTS.UPLOADDOCUMENT)
+    console.log("RequestBody-------"+JSON.stringify(requestBody))
+    postRequest(API_ENDPOINTS.UPLOADDOCUMENT, requestBody)
+      .then(response => {
+        console.log(response)
+       if (response.responseCode === 'F200') {
+          // Display a success alert
+          Alert.alert('Success', response.message, [
+            {
+              text: 'OK',
+              onPress: () => {
+                // Navigate to the 'SubmitSuccess' screen
+                navigation.navigate('SubmitSuccess');
+              },
+            },
+          ]);
+        } else {
+          // Display an error alert
+          Alert.alert('Error', response.message, [
+            {
+              text: 'OK',
+              onPress: () => {
+                // Handle the error as needed
+              },
+            },
+          ]);
+        }
+      })
+      .catch(error => {
+        console.log('error' + error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
   return (
     <View style={styles.mainBody}>
+      {loading ? (
+        <ActivityIndicator size="large" color="#F5A922" />
+      ) : (
       <ScrollView
         contentContainerStyle={{flexGrow: 1}}
         keyboardShouldPersistTaps="handled">
@@ -52,38 +180,35 @@ const ConfirmDocument = ({navigation}) => {
             <Text style={styles.headerTexts}>Document Type</Text>
           </View>
           <View style={styles.subheaderView}>
-            <Text style={styles.subheaderText}>Driving License</Text>
+            <Text style={styles.subheaderText}>{userDocument}</Text>
           </View>
 
           <View style={styles.headerTextView}>
-            <Text style={styles.headerTexts}>Document Type</Text>
+            <Text style={styles.headerTexts}>Document Number</Text>
           </View>
           <View style={styles.subheaderView}>
-            <Text style={styles.subheaderText}>Driving License</Text>
+            <Text style={styles.subheaderText}>{userDocumentNumber}</Text>
           </View>
 
           <View style={styles.headerTextView}>
-            <Text style={styles.headerTexts}>Document Type</Text>
+            <Text style={styles.headerTexts}>Date of Issue</Text>
           </View>
           <View style={styles.subheaderView}>
-            <Text style={styles.subheaderText}>Driving License</Text>
+            <Text style={styles.subheaderText}>{userDateOfIssue}</Text>
           </View>
 
           <View style={styles.headerTextView}>
-            <Text style={styles.headerTexts}>Document Type</Text>
+            <Text style={styles.headerTexts}>Date of Expiry</Text>
           </View>
           <View style={styles.subheaderView}>
-            <Text style={styles.subheaderText}>Driving License</Text>
+            <Text style={styles.subheaderText}>{userDateOfExpiry}</Text>
           </View>
 
           <View style={styles.headerTextView}>
             <Text style={styles.headerTexts}>Document Preview</Text>
           </View>
           <View style={styles.imageView}>
-            <Image
-              source={require('../images/documentPreview.png')}
-              style={styles.images}
-            />
+            <Image source={{uri: userUploadImage}} style={styles.images} />
           </View>
 
           <TouchableOpacity
@@ -95,16 +220,16 @@ const ConfirmDocument = ({navigation}) => {
           <TouchableOpacity
             style={styles.registerButtonStyle}
             activeOpacity={0.5}
-            // onPress={handleSubmitPress}
             onPress={() => navigation.navigate('RegisterScreen')}>
             <Text style={styles.registerButtonTextStyle}>Skip</Text>
           </TouchableOpacity>
-          <View></View>
         </View>
       </ScrollView>
+      )}
     </View>
   );
 };
+
 export default ConfirmDocument;
 
 const styles = StyleSheet.create({

@@ -8,8 +8,13 @@ import {
   Image,
   TouchableOpacity,
   Platform,
+  ActivityIndicator,
+  Alert
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
+import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
+import {postRequest} from '../Utils/apiUtils';
+import {API_ENDPOINTS} from '../Utils/apiConfig';
 
 import {
   CodeField,
@@ -29,22 +34,246 @@ const OTPVerificationScreen = ({navigation}) => {
   });
 
   const [emailValue, setEmailValue] = useState('');
-  const emailref = useBlurOnFulfill({emailValue, emailCellCount: EMAIL_CELL_COUNT});
+  const emailref = useBlurOnFulfill({
+    emailValue,
+    emailCellCount: EMAIL_CELL_COUNT,
+  });
   const [emailprops, emailGetCellOnLayoutHandler] = useClearByFocusCell({
     value,
     setValue,
   });
+  const [userEmail, setUserEmail] = useState('');
+  const [userPhoneNO, setUserPhoneNO] = useState('');
+  const [userPhoneOTP, setUserPhoneOTP] = useState('');
+  const [userEmailOTP, setUserEmailOTP] = useState('');
 
+  const [mobileVerificationSuccess, setMobileVerificationSuccess] =
+    useState(false);
+  const [mobileVerificationError, setMobileVerificationError] = useState(false);
+  const [emailVerificationSuccess, setEmailVerificationSuccess] =
+    useState(false);
+  const [emailVerificationError, setEmailVerificationError] = useState(false);
+  const [userRefID, setuserRefID] = useState('');
+  const [apiResponseMessage, setApiResponseMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const loadRememberedCredentials = async () => {
+      try {
+        const storedUserEmail = await getData('emailID');
+        const storedUserPhoneNO = await getData('phoneNumber');
+        const storedUserPhoneOTP = await getData('phoneOTP');
+        const storedUserEmailOTP = await getData('emailOTP');
+        const storeduserRefID = await getData('refID');
+
+        setUserEmail(storedUserEmail);
+        setUserPhoneNO(storedUserPhoneNO);
+        setUserPhoneOTP(storedUserPhoneOTP);
+        setUserEmailOTP(storedUserEmailOTP);
+        setuserRefID(storeduserRefID);
+      } catch (error) {
+        console.log('Error loading remembered credentials:', error);
+      }
+    };
+    loadRememberedCredentials();
+  }, []);
 
   const handleCaptureFaceID = () => {
-    navigation.navigate('CaptureFaceIDScreen');
-};
+    if(mobileVerificationSuccess && emailVerificationSuccess){
+      navigation.navigate('CaptureFaceIDScreen');
+    }
+  };
 
-const handleSkip = () => {
+  const handleSkip = () => {
     navigation.goBack(null);
-};
+  };
+
+  const handleMobileResend = () => {
+    setLoading(true);
+    const requestBody = {
+      ref_id: userRefID,
+    };
+
+    console.log(API_ENDPOINTS.MOBILERESENDOTP);
+    postRequest(API_ENDPOINTS.MOBILERESENDOTP, requestBody)
+      .then(response => {
+        setLoading(false);
+        console.log('response' + JSON.stringify(response));
+        if (
+          response.responseCode === 'F200'
+        ) {
+          setLoading(false);
+          Alert.alert(response.responseMessage)
+        } else {
+          setLoading(false);
+          setApiResponseMessage(response.Status.responseMessage);
+        }
+      })
+      .catch(error => {
+        setApiResponseMessage('POST error:', error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  const handleEmailResend = () => {
+    setLoading(true);
+    const requestBody = {
+      ref_id: userRefID,
+    };
+
+    console.log(API_ENDPOINTS.EMAILRESENDOTP);
+    postRequest(API_ENDPOINTS.EMAILRESENDOTP, requestBody)
+      .then(response => {
+        setLoading(false);
+        console.log('response' + JSON.stringify(response));
+        if (
+          response.responseCode === 'F200'
+        ) {
+          setLoading(false);
+          Alert.alert(response.responseMessage)
+          // setData('emailOTP', response.emailOTP);
+          // setUserEmailOTP(response.emailOTP);
+        } else {
+          setLoading(false);
+          setApiResponseMessage(response.responseMessage);
+        }
+      })
+      .catch(error => {
+        setApiResponseMessage('POST error:', error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  const handleMobileVerification = () => {
+    setLoading(true);
+    const requestBody = {
+      phone_otp: value,
+      ref_id: userRefID,
+    };
+
+    console.log(API_ENDPOINTS.REGISTERMOBILEVALIDATE);
+    postRequest(API_ENDPOINTS.REGISTERMOBILEVALIDATE, requestBody)
+      .then(response => {
+        removeData('phoneOTP');
+        console.log('response' + JSON.stringify(response));
+        if (
+          response.responseCode === 'F200'
+        ) {
+          setLoading(false);
+          setMobileVerificationSuccess(true);
+          setMobileVerificationError(false); // Reset error state
+        } else {
+          setApiResponseMessage(response.responseMessage);
+          setMobileVerificationSuccess(false);
+      setMobileVerificationError(true);
+        }
+      })
+      .catch(error => {
+        setLoading(false);
+        setApiResponseMessage('POST error:', error);
+        setMobileVerificationSuccess(false);
+      setMobileVerificationError(true);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  const handleEmailVerification = () => {
+    setLoading(true);
+    const requestBody = {
+      email_otp: emailValue,
+      ref_id: userRefID,
+    };
+
+    console.log(API_ENDPOINTS.REGISTEREMAILVALIDATE);
+    postRequest(API_ENDPOINTS.REGISTEREMAILVALIDATE, requestBody)
+      .then(response => {
+        removeData('phoneOTP');
+        console.log('response' + JSON.stringify(response));
+        if (
+          response.responseCode === 'F200'
+        ) {
+          setLoading(false);
+          setEmailVerificationSuccess(true);
+      setEmailVerificationError(false); 
+        } else {
+          setLoading(false);
+          setApiResponseMessage(response.responseMessage);
+          setEmailVerificationSuccess(false);
+      setEmailVerificationError(true);
+        }
+      })
+      .catch(error => {
+        setLoading(false);
+        setApiResponseMessage('POST error:', error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+  const renderMobileVerificationButton = () => {
+    if (mobileVerificationSuccess) {
+      return (
+        <Text style={styles.buttonSuccessTextStyle}>
+          Mobile Verified Successfully
+        </Text>
+      );
+    } else {
+      return (
+        <TouchableOpacity onPress={handleMobileVerification}>
+          <Text
+            style={{
+              color: mobileVerificationError == true ? 'red' : '#007CFF',
+              fontSize: 16,
+              alignSelf: 'center',
+              marginTop: 10,
+              textDecorationLine: 'underline',
+              textDecorationColor:
+                mobileVerificationError == true ? 'red' : '#007CFF',
+            }}>
+            Verify Mobile Number
+          </Text>
+        </TouchableOpacity>
+      );
+    }
+  };
+
+  const renderEmailVerificationButton = () => {
+    if (emailVerificationSuccess) {
+      return (
+        <Text style={styles.buttonSuccessTextStyle}>
+          Email Verified Successfully
+        </Text>
+      );
+    } else {
+      return (
+        <TouchableOpacity onPress={handleEmailVerification}>
+          <Text
+            style={{
+              color: emailVerificationError == true ? 'red' : '#007CFF',
+              fontSize: 16,
+              alignSelf: 'center',
+              marginTop: 10,
+              textDecorationLine: 'underline',
+              textDecorationColor:
+                emailVerificationError == true ? 'red' : '#007CFF',
+            }}>
+            Verify Email Account
+          </Text>
+        </TouchableOpacity>
+      );
+    }
+  };
   return (
     <View style={styles.mainBody}>
+      {loading ? (
+        <ActivityIndicator size="large" color="#F5A922" />
+      ) : (
       <ScrollView
         contentContainerStyle={{flexGrow: 1}}
         keyboardShouldPersistTaps="handled">
@@ -68,11 +297,11 @@ const handleSkip = () => {
           </View>
           <View style={styles.SectionTextStyle}>
             <Text style={styles.SubHeadingTextStyle}>
-              Please enter the 4 digit code sent to
+              Please enter the 6 digit code sent to
             </Text>
           </View>
           <View style={styles.SectionTextStyle}>
-            <Text style={styles.SubMobileHeaderTextStyle}>625-452-280</Text>
+            <Text style={styles.SubMobileHeaderTextStyle}>{userPhoneNO}</Text>
           </View>
           <View>
             <CodeField
@@ -126,7 +355,7 @@ const handleSkip = () => {
             </Text>
             <Text> </Text>
 
-            <TouchableOpacity onPress={''}>
+            <TouchableOpacity onPress={handleMobileResend}>
               <Text
                 style={{
                   color: '#F5A922',
@@ -139,39 +368,29 @@ const handleSkip = () => {
             </TouchableOpacity>
           </View>
           <View style={{alignSelf: 'center'}}>
-            <TouchableOpacity onPress={''}>
+            {renderMobileVerificationButton()}
+          </View>
+          {mobileVerificationSuccess && (
+            <View style={styles.SectionTextStyle}>
               <Text
                 style={{
-                  color: '#007CFF',
-                  fontSize: 16,
-                  alignSelf: 'center',
                   marginTop: 10,
-                  textDecorationLine: 'underline',
-                  textDecorationColor: '#007CFF',
+                  color: '#37474F',
+                  textAlign: 'center',
+                  fontSize: 13,
                 }}>
-                Verify Mobile Number
+                Your Mobile Number has been successfully verified!
               </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.SectionTextStyle}>
-            <Text
-              style={{
-                marginTop: 10,
-                color: '#37474F',
-                textAlign: 'center',
-                fontSize: 13,
-              }}>
-              Your Mobile Number has been successfully verified!
-            </Text>
-          </View>
+            </View>
+          )}
 
           <View style={styles.SectionTextStyle}>
             <Text style={styles.SubHeadingTextStyle}>
-              Please enter the 4 digit code sent to
+              Please enter the 6 digit code sent to
             </Text>
           </View>
           <View style={styles.SectionTextStyle}>
-            <Text style={styles.SubMobileHeaderTextStyle}>contact@307itec.com</Text>
+            <Text style={styles.SubMobileHeaderTextStyle}>{userEmail}</Text>
           </View>
           <View>
             <CodeField
@@ -225,7 +444,7 @@ const handleSkip = () => {
             </Text>
             <Text> </Text>
 
-            <TouchableOpacity onPress={''}>
+            <TouchableOpacity onPress={handleEmailResend}>
               <Text
                 style={{
                   color: '#F5A922',
@@ -238,31 +457,22 @@ const handleSkip = () => {
             </TouchableOpacity>
           </View>
           <View style={{alignSelf: 'center'}}>
-            <TouchableOpacity onPress={''}>
+            {renderEmailVerificationButton()}
+          </View>
+          {emailVerificationSuccess && (
+            <View style={styles.SectionTextStyle}>
               <Text
                 style={{
-                  color: '#007CFF',
-                  fontSize: 16,
-                  alignSelf: 'center',
                   marginTop: 10,
-                  textDecorationLine: 'underline',
-                  textDecorationColor: '#007CFF',
+                  color: '#37474F',
+                  textAlign: 'center',
+                  fontSize: 13,
                 }}>
-               Verify Email Acount
+                Your Email Account has been successfully verified!
               </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.SectionTextStyle}>
-            <Text
-              style={{
-                marginTop: 10,
-                color: '#37474F',
-                textAlign: 'center',
-                fontSize: 13,
-              }}>
-              Your Email Account has been successfully verified!
-            </Text>
-          </View>
+            </View>
+          )}
+
           <TouchableOpacity
             style={styles.buttonStyle}
             activeOpacity={0.5}
@@ -286,6 +496,7 @@ const handleSkip = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      )}
     </View>
   );
 };
@@ -402,4 +613,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   scannerImage: {height: 24, width: 24, marginRight: 10},
+  buttonSuccessTextStyle: {
+    color: 'green',
+    fontSize: 16,
+    alignSelf: 'center',
+    marginTop: 10,
+  },
 });

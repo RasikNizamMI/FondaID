@@ -11,11 +11,14 @@ import {
   KeyboardAvoidingView,
   Button,
   Platform,
+  Share,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import {SelectList} from 'react-native-dropdown-select-list';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
+import {useClipboard} from '@react-native-community/clipboard';
 
 const SubmitSuccess = ({navigation}) => {
   const [useDocumentNumber, setUseDocumentNumber] = useState('');
@@ -26,56 +29,24 @@ const SubmitSuccess = ({navigation}) => {
   const [selectedStartDate, setSelectedStartDate] = useState('Date of Issue');
   const [selectedEndDate, setSelectedEndDate] = useState('Date of Expiry');
   const [filePath, setFilePath] = useState({});
+  const [userFondaID, setUserFondaID] = useState('');
+  const [data, setString] = useClipboard();
 
   const [selected, setSelected] = React.useState('');
 
-  const data = [
-    {key: '1', value: 'Mobiles', disabled: true},
-    {key: '2', value: 'Appliances'},
-    {key: '3', value: 'Cameras'},
-    {key: '4', value: 'Computers', disabled: true},
-    {key: '5', value: 'Vegetables'},
-    {key: '6', value: 'Diary Products'},
-    {key: '7', value: 'Drinks'},
-  ];
+  useEffect(() => {
+    const loadRememberedCredentials = async () => {
+      try {
+        const storedUserFondaID = await getData('fondaId');
 
-  const handleStartDateChange = (event, date) => {
-    setShowStartDatePicker(false);
-    setShowStartDatePicker(Platform.OS === 'ios');
-    if (date) {
-      setStartDate(date);
-      const formattedDate = date.toDateString(); // Format the selected date
-      setSelectedStartDate(formattedDate);
-    }
-  };
+        setUserFondaID(storedUserFondaID);
+      } catch (error) {
+        console.log('Error loading remembered credentials:', error);
+      }
+    };
+    loadRememberedCredentials();
+  }, []);
 
-  const handleEndDateChange = (event, date) => {
-    setShowEndDatePicker(false);
-    setShowEndDatePicker(Platform.OS === 'ios');
-    if (date) {
-      setEndDate(date);
-      const formattedDate = date.toDateString(); // Format the selected date
-      setSelectedEndDate(formattedDate);
-    }
-  };
-
-  const showStartDatePickerModal = () => {
-    setShowStartDatePicker(true);
-  };
-
-  const showEndDatePickerModal = () => {
-    setShowEndDatePicker(true);
-  };
-
-  const handlePress = () => {
-    console.log('Start Date:', startDate);
-    console.log('End Date:', endDate);
-  };
-
-  const formatPhoneNumber = number => {
-    const formattedNumber = number.replace(/(\d{3})(\d{3})(\d{3})/, '$1-$2-$3');
-    setUseFandaPhone(formattedNumber);
-  };
 
   const handleLogin = () => {
     navigation.navigate('Dashboard');
@@ -85,51 +56,21 @@ const SubmitSuccess = ({navigation}) => {
     navigation.navigate("AddNewDocumentScreen")
   }
 
-  const captureImage = type => {
-    let options = {
-      mediaType: type,
-      maxWidth: 550,
-      maxHeight: 550,
-      quality: 1,
-      videoQuality: 'low',
-      durationLimit: 30, //Video max duration in seconds
-      saveToPhotos: true,
-    };
-
-    launchCamera(options, response => {
-      console.log('Response = ', response);
-      const {assets} = response;
-
-      if (response.didCancel) {
-        alert('User cancelled camera picker');
-        return;
-      } else if (response.errorCode === 'camera_unavailable') {
-        alert('Camera not available on device');
-        return;
-      } else if (response.errorCode === 'permission') {
-        alert('Permission not satisfied');
-        return;
-      } else if (response.errorCode === 'others') {
-        alert(response.errorMessage);
-        return;
-      }
-      console.log('base64 -> ', assets[0].base64);
-      console.log('uri -> ', assets[0].uri);
-      console.log('width -> ', assets[0].width);
-      console.log('height -> ', assets[0].height);
-      console.log('fileSize -> ', assets[0].fileSize);
-      console.log('type -> ', assets[0].type);
-      console.log('fileName -> ', assets[0].fileName);
-      setFilePath(assets[0]);
-    });
-  };
+ 
 
   const handleShare = async () => {
-    navigation.navigate("SharingScreen")
+    try {
+      const messageToShare = userFondaID;
+      await Share.share({
+        message: messageToShare,
+      });
+    } catch (error) {
+      console.error('Error sharing:', error.message);
+    }
   };
 
   const handleCopyToClipboard = () => {
-    navigation.navigate("SharingScreen")
+    setString(userFondaID);
   };
 
   return (
@@ -213,11 +154,11 @@ const SubmitSuccess = ({navigation}) => {
                 flexDirection: 'column',
               }}>
               <Text style={styles.text}>Your Fonda ID:</Text>
-              <Text style={styles.subText}>FD87457AS23</Text>
+              <Text style={styles.subText}>{userFondaID}</Text>
             </View>
 
             <View style={{flexDirection: 'column', marginRight: 20,}}>
-              <TouchableOpacity onPress={handleShare}>
+              <TouchableOpacity onPress={handleCopyToClipboard}>
                 <View
                   style={{
                     width: 40,
@@ -242,7 +183,7 @@ const SubmitSuccess = ({navigation}) => {
                 </View>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={handleCopyToClipboard}>
+              <TouchableOpacity onPress={handleShare}>
                 <View
                   style={{
                     marginTop: 10,
