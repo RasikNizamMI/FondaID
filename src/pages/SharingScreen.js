@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Linking,
 } from 'react-native';
+import {COLORS, FONTS} from '../assets/Colors';
 
 const SharingScreen = ({navigation}) => {
   const [dataStorageEnabled, setDataStorageEnabled] = useState(false);
@@ -117,7 +118,7 @@ const SharingScreen = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1A2E35',
+    backgroundColor: COLORS.MAINLYBLUE,
     padding: 16,
     flexGrow: 1,
   },

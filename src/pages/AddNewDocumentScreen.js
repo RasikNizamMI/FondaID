@@ -8,13 +8,16 @@ import {
   Image,
   TouchableOpacity,
   Platform,
-  PermissionsAndroid
+  PermissionsAndroid,
+  Modal
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import {SelectList} from 'react-native-dropdown-select-list';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
+import {COLORS, FONTS} from '../assets/Colors';
+import CommonModal from '../component/CommonModal';
 
 const AddNewDocumentScreen = ({navigation}) => {
   const [useDocumentNumber, setUseDocumentNumber] = useState('');
@@ -26,6 +29,11 @@ const AddNewDocumentScreen = ({navigation}) => {
   const [selectedEndDate, setSelectedEndDate] = useState('Date of Expiry');
   const [filePath, setFilePath] = useState({});
   const [selectedDocumentType, setSelectedDocumentType] = React.useState('');
+  const [modalImage, setModalImage] = useState('');
+  const [modalColor, setModalColor] = useState('');
+  const [modalHeader, setModalHeader] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
 
   const documentTypes = [
     {key: 'passport', value: 'Passport'},
@@ -69,6 +77,9 @@ const AddNewDocumentScreen = ({navigation}) => {
 
   const showEndDatePickerModal = () => {
     setShowEndDatePicker(true);
+  };
+  const closeModal = () => {
+    setModalVisible(false);
   };
 
   // const handleToAddNewDoc = () => {
@@ -160,6 +171,20 @@ const AddNewDocumentScreen = ({navigation}) => {
   };
 
   const handleToAddNewDoc = () => {
+    if (
+      !selectedDocumentType ||
+      !useDocumentNumber ||
+      selectedStartDate === 'Date of Issue' ||
+      selectedEndDate === 'Date of Expiry' ||
+      !filePath.uri
+    ) {
+      setModalVisible(true);
+      setErrorMessage('Please fill in all fields');
+      setModalColor(COLORS.PRIMARY);
+      setModalImage(require('../assets/images/failur.png'));
+      setModalHeader('Error');
+      return;
+    }else{
     const formattedStartDate = formatDate(startDate);
     const formattedEndDate = formatDate(endDate);
     setData('addDoScelectDocument', selectedDocumentType);
@@ -170,6 +195,7 @@ const AddNewDocumentScreen = ({navigation}) => {
     setData('addDoUploadImgBase64', filePath.base64)
 
     navigation.navigate('ConfirmDocument');
+    }
   };
 
   return (
@@ -186,7 +212,7 @@ const AddNewDocumentScreen = ({navigation}) => {
               style={styles.headerIcon}
               name="chevron-left"
               size={25}
-              color={'#F5A922'}
+              color={COLORS.PRIMARY}
             />
             <Text style={styles.headerText}>Add New Document</Text>
           </View>
@@ -196,8 +222,8 @@ const AddNewDocumentScreen = ({navigation}) => {
               placeholder="Choose Document Type"
               boxStyles={styles.dropdowmBox}
               dropdownStyles={styles.dropdown}
-              inputStyles={{fontSize: 14, color: '#37474F'}}
-              dropdownTextStyles={{fontSize: 14, color: '#37474F'}}
+              inputStyles={{fontSize: 14, color: COLORS.TEXTCOLOR, fontFamily: FONTS.Regular}}
+              dropdownTextStyles={{fontSize: 14, color: COLORS.TEXTCOLOR, fontFamily: FONTS.Regular}}
               setSelected={val => setSelectedDocumentType(val)} // Set the selected document type
               data={documentTypes}
               save="key" // Save the key of the selected item
@@ -211,7 +237,7 @@ const AddNewDocumentScreen = ({navigation}) => {
                 setUseDocumentNumber(UserDocumentNumber)
               }
               placeholder="Document Number" //dummy@abc.com
-              placeholderTextColor="#37474F"
+              placeholderTextColor={COLORS.TEXTCOLOR}
               autoCapitalize="none"
               keyboardType="default"
               returnKeyType="next"
@@ -220,6 +246,7 @@ const AddNewDocumentScreen = ({navigation}) => {
               }
               underlineColorAndroid="#f000"
               blurOnSubmit={false}
+              maxLength={12}
             />
           </View>
 
@@ -236,7 +263,7 @@ const AddNewDocumentScreen = ({navigation}) => {
               <View style={styles.datePickerViews}>
                 <Text style={styles.datePickerText}>{selectedStartDate}</Text>
                 <Image
-                  source={require('../images/Date.png')}
+                  source={require('../assets/images/Date.png')}
                   // tintColor={Colors.primaryColor}
                   style={styles.datePickerIcon}></Image>
               </View>
@@ -256,7 +283,7 @@ const AddNewDocumentScreen = ({navigation}) => {
               <View style={styles.datePickerViews}>
                 <Text style={styles.datePickerText}>{selectedEndDate}</Text>
                 <Image
-                  source={require('../images/Date.png')}
+                  source={require('../assets/images/Date.png')}
                   // tintColor={Colors.primaryColor}
                   style={styles.datePickerIcon}></Image>
               </View>
@@ -265,7 +292,7 @@ const AddNewDocumentScreen = ({navigation}) => {
 
           <View style={styles.uploadView}>
             <Text style={styles.uploadText}>
-              Upload/Capture a picture of the document along with your FaceID.
+             Capture a picture of the document along with your FaceID.
             </Text>
           </View>
 
@@ -278,7 +305,7 @@ const AddNewDocumentScreen = ({navigation}) => {
                 />
               ) : (
                 <Image
-                  source={require('../images/camera.png')}
+                  source={require('../assets/images/camera.png')}
                   style={styles.uploadImage}
                 />
               )}
@@ -291,22 +318,15 @@ const AddNewDocumentScreen = ({navigation}) => {
             onPress={handleToAddNewDoc}>
             <Text style={styles.buttonTextStyle}>Preview Document</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.registerButtonStyle}
-            activeOpacity={0.5}
-            // onPress={handleSubmitPress}
-            onPress={() => navigation.navigate('RegisterScreen')}>
-            <View style={styles.scannerView}>
-              <Image
-                source={require('../images/qrcode.png')}
-                style={styles.scannerImage}></Image>
-              <Text style={styles.registerButtonTextStyle}>
-                Switch to QR Scanner
-              </Text>
-            </View>
-          </TouchableOpacity>
-          <View></View>
+         
         </View>
+        <CommonModal
+        visible={modalVisible}
+        onClose={closeModal}
+        message={errorMessage}
+        header={modalHeader}
+        color={modalColor}
+        imageSource={modalImage}></CommonModal>
       </ScrollView>
     </View>
   );
@@ -328,14 +348,14 @@ const styles = StyleSheet.create({
     marginRight: 30,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#FFFFFF',
+    borderColor: COLORS.WHITE,
     borderRadius: 10,
   },
   buttonStyle: {
-    backgroundColor: '#F5A922',
+    backgroundColor: COLORS.PRIMARY,
     borderWidth: 0,
-    color: '#FFFFFF',
-    borderColor: '#F5A922',
+    color: COLORS.WHITE,
+    borderColor: COLORS.PRIMARY,
     height: 50,
     alignItems: 'center',
     borderRadius: 10,
@@ -346,11 +366,11 @@ const styles = StyleSheet.create({
   registerButtonStyle: {
     backgroundColor: '#fff',
     borderWidth: 1,
-    color: '#FFFFFF',
-    borderColor: '#FFFFFF',
+    color: COLORS.WHITE,
+    borderColor: COLORS.WHITE,
     height: 50,
     alignItems: 'center',
-    borderRadius: 0,
+    borderRadius: 10,
     marginLeft: 35,
     marginRight: 35,
     marginTop: 10,
@@ -359,22 +379,25 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   buttonTextStyle: {
-    color: '#FFFFFF',
+    color: COLORS.WHITE,
     paddingVertical: 10,
     fontSize: 16,
+    fontFamily: FONTS.Regular,
   },
   registerButtonTextStyle: {
-    color: '#F5A922',
+    color: COLORS.PRIMARY,
     paddingVertical: 10,
     fontSize: 16,
   },
   inputStyle: {
     flex: 1,
-    color: '#37474F',
+    color: COLORS.TEXTCOLOR,
     paddingLeft: 15,
     paddingRight: 15,
     elevation: 4,
-    backgroundColor: '#ffffff',
+    backgroundColor: COLORS.WHITE,
+    fontFamily: FONTS.Regular,
+    fontSize: 14,
   },
   headerView: {
     flexDirection: 'row',
@@ -391,24 +414,24 @@ const styles = StyleSheet.create({
   headerText: {
     marginTop: 12,
     fontSize: 18,
-    color: '#F5A922',
+    color: COLORS.PRIMARY,
     textAlign: 'center',
-    fontWeight: 'bold',
+    fontFamily: FONTS.Bold
   },
   dropdowmBox: {
     marginTop: 10,
     marginLeft: 30,
     marginRight: 30,
-    borderColor: '#FFFFFF',
-    backgroundColor: '#FFFFFF',
+    borderColor: COLORS.WHITE,
+    backgroundColor: COLORS.WHITE,
     elevation: 4,
   },
   dropdown: {
     marginTop: 0,
     marginLeft: 30,
     marginRight: 30,
-    borderColor: '#FFFFFF',
-    backgroundColor: '#FFFFFF',
+    borderColor: COLORS.WHITE,
+    backgroundColor: COLORS.WHITE,
     elevation: 4,
   },
   datePickerView: {
@@ -420,8 +443,8 @@ const styles = StyleSheet.create({
     marginTop: 15,
     marginLeft: 30,
     marginRight: 30,
-    borderColor: '#FFFFFF',
-    backgroundColor: '#FFFFFF',
+    borderColor: COLORS.WHITE,
+    backgroundColor: COLORS.WHITE,
     elevation: 4,
     height: 50,
 
@@ -435,9 +458,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     flex: 1,
     marginTop: 5,
-
+fontFamily: FONTS.Regular,
     textAlign: 'left',
-    color: '#37474F',
+    color: COLORS.TEXTCOLOR,
     marginLeft: 16,
   },
   datePickerIcon: {
@@ -447,7 +470,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   uploadView: {marginTop: 15, marginLeft: 30},
-  uploadText: {color: '#37474F', fontSize: 16},
+  uploadText: {color: COLORS.TEXTCOLOR, fontSize: 16, fontFamily: FONTS.Medium},
   uploadImageView: {
     alignItems: 'center',
     marginRight: 30,

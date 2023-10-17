@@ -8,12 +8,13 @@ import {
   Image,
   TouchableOpacity,
   Platform,
-  PermissionsAndroid
+  PermissionsAndroid,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import {SelectList} from 'react-native-dropdown-select-list';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {COLORS, FONTS} from '../assets/Colors';
 
 const CapturePictureInstructionScreen = ({navigation}) => {
   const [useDocumentNumber, setUseDocumentNumber] = useState('');
@@ -131,48 +132,53 @@ const CapturePictureInstructionScreen = ({navigation}) => {
             <Text style={styles.headerText}>Upload Documents</Text>
           </View>
           <View style={styles.SectionTextStyle}>
-            <Text style={styles.TextStyle}>Please Upload / Capture a Selfie  Picture Face ID along with Document.</Text>
+            <Text style={styles.TextStyle}>
+              Please Upload / Capture a Selfie Picture Face ID along with
+              Document.
+            </Text>
           </View>
           <View style={styles.SubSectionTextStyle}>
-            <Text style={styles.TextStyle}>Hold your camera steady while taking picture</Text>
+            <Text style={styles.TextStyle}>
+              Hold your camera steady while taking picture
+            </Text>
           </View>
           <View style={styles.SampleSectionTextStyle}>
             <Text style={styles.SampleTextStyle}>Samples:</Text>
           </View>
           <View style={styles.uploadImageView}>
-                <Image
-                  source={require('../images/capture.png')}
-                  style={styles.uploadImage}
-                />
-            </View>
-          
-            <View style={{
-    alignItems: 'center',
-    marginRight: 30,
-    marginLeft: 30,
-    marginTop: 15,
-    flexDirection: 'row'
+            <Image
+              source={require('../assets/images/capture.png')}
+              style={styles.uploadImage}
+            />
+          </View>
 
-  }}>
-                <Image
-                  source={require('../images/capture1.png')}
-                  style={{
-                    marginLeft: 35,
-                    height: 180,
-                    width: '40%',
-                    resizeMode: 'contain',
-                  }}
-                />
-                <Image
-                  source={require('../images/capture2.png')}
-                  style={{
-                    marginLeft: 10,
-                    height: 180,
-                    width: '40%',
-                    resizeMode: 'contain',
-                  }}
-                />
-            </View>
+          <View
+            style={{
+              alignItems: 'center',
+              marginRight: 30,
+              marginLeft: 30,
+              marginTop: 15,
+              flexDirection: 'row',
+            }}>
+            <Image
+              source={require('../assets/images/capture1.png')}
+              style={{
+                marginLeft: 35,
+                height: 180,
+                width: '40%',
+                resizeMode: 'contain',
+              }}
+            />
+            <Image
+              source={require('../assets/images/capture2.png')}
+              style={{
+                marginLeft: 10,
+                height: 180,
+                width: '40%',
+                resizeMode: 'contain',
+              }}
+            />
+          </View>
 
           <TouchableOpacity
             style={styles.buttonStyle}
@@ -224,7 +230,7 @@ const styles = StyleSheet.create({
     borderColor: '#FFFFFF',
     height: 50,
     alignItems: 'center',
-    borderRadius: 0,
+    borderRadius: 10,
     marginLeft: 35,
     marginRight: 35,
     marginTop: 10,
@@ -328,7 +334,6 @@ const styles = StyleSheet.create({
     marginRight: 30,
     marginLeft: 30,
     marginTop: 15,
-
   },
   uploadImage: {
     height: 250,

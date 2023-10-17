@@ -20,10 +20,13 @@ import {useClipboard} from '@react-native-community/clipboard';
 import {postRequest, getRequest} from '../Utils/apiUtils';
 import {API_ENDPOINTS} from '../Utils/apiConfig';
 import {useIsFocused} from '@react-navigation/native';
+import {COLORS, FONTS} from '../assets/Colors';
+import CommonModal from '../component/CommonModal';
 
 const Dashboard = ({navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [iconStatus, setIconStatus] = useState(false);
+  const [mandatory, setMandatory] = useState(false);
   const [dataStorageEnabled, setDataStorageEnabled] = useState(false);
   const [dataStorageEnabled1, setDataStorageEnabled1] = useState(false);
   const [dataStorageEnabled2, setDataStorageEnabled2] = useState(false);
@@ -34,6 +37,10 @@ const Dashboard = ({navigation}) => {
   const [loading, setLoading] = useState(false);
   const [userRefID, setUserRefID] = useState('');
   const isFocused = useIsFocused();
+  const [modalImage, setModalImage] = useState('');
+  const [modalColor, setModalColor] = useState('');
+  const [modalHeader, setModalHeader] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,6 +48,11 @@ const Dashboard = ({navigation}) => {
         const storedUserRefID = await getData('refID');
         const storedUserFondaID = await getData('fonda_ID');
         const storedDataStorage = await getData('dataStorageAccepted');
+        const storedIconStatus = await getData('iconStatus');
+
+        if (storedIconStatus !== null) {
+          setIconStatus(storedIconStatus === 'true');
+        }
 
         setUserRefID(storedUserRefID || '');
         setUserFondaID(storedUserFondaID);
@@ -54,13 +66,6 @@ const Dashboard = ({navigation}) => {
           console.log('fodaid++++' + storedUserFondaID);
         } else {
           console.log('No remembered credentials found.');
-        }
-
-        if (storedDataStorage !== null) {
-          console.log(storedDataStorage);
-          setIconStatus(true);
-        } else {
-          setIconStatus(false);
         }
       } catch (error) {
         console.log('Error loading remembered credentials:', error);
@@ -81,32 +86,31 @@ const Dashboard = ({navigation}) => {
     }
   };
 
-  const handleUser = async (userRefID) => {
+  const handleUser = async userRefID => {
     setLoading(true);
-  
-      try {
-        const response = await getRequest(API_ENDPOINTS.GETUSER+userRefID);
-        console.log(JSON.stringify(response));
-        setData('fondaId', response.fonda_id)
-        setData('_id', response._id);
-        setData('emailID', response.email_id);
-        setData('phoneNumber', response.phone_number);
-        setData('firstName', response.first_name);
-        setData('surName', response.sur_name);
-        setData('birthName', response.birth_name);
-        setData('dateOfBirth', response.date_of_birth);
-        setData('placeOfBirth', response.place_of_birth);
-        setData('nationality', response.nationality);
-        setData('nativeCountry', response.native_country);
-        setData('gender', response.gender);
-        
-      } catch (error) {
-        console.log('error', error);
-        setErrorMessage('Please check credentials');
-      } finally {
-        setLoading(false);
-      }
+
+    try {
+      const response = await getRequest(API_ENDPOINTS.GETUSER + userRefID);
+      console.log(JSON.stringify(response));
+      setData('fondaId', response.fonda_id);
+      setData('_id', response._id);
+      setData('emailID', response.email_id);
+      setData('phoneNumber', response.phone_number);
+      setData('firstName', response.first_name);
+      setData('surName', response.sur_name);
+      setData('birthName', response.birth_name);
+      setData('dateOfBirth', response.date_of_birth);
+      setData('placeOfBirth', response.place_of_birth);
+      setData('nationality', response.nationality);
+      setData('nativeCountry', response.native_country);
+      setData('gender', response.gender);
+    } catch (error) {
+      console.log('error', error);
+      setErrorMessage('Please check credentials');
+    } finally {
+      setLoading(false);
     }
+  };
 
   const getDocumentDetails = fondaId => {
     setLoading(true);
@@ -128,6 +132,11 @@ const Dashboard = ({navigation}) => {
 
   const handleCopyToClipboard = () => {
     setString(userFondaID);
+    setModalVisible(true);
+    setErrorMessage('Fonda ID Coppied Successfully');
+    setModalColor(COLORS.PRIMARY);
+    setModalImage(require('../assets/images/sucess.png'));
+    setModalHeader('Success');
   };
 
   const handleIconClick = itemId => {
@@ -162,9 +171,23 @@ const Dashboard = ({navigation}) => {
     ) {
       await setData('dataStorageAccepted', 'true');
       setIconStatus(true);
+      setMandatory(false);
+      await setData('iconStatus', 'true');
     } else {
-      Alert.alert('Please enable Data storage');
+      setIconStatus(false);
+      setMandatory(true);
     }
+  };
+
+  const handleSkip = async () => {
+    console.log('iconStatus');
+    setIconStatus(true);
+    setMandatory(true);
+    console.log(iconStatus);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
   };
 
   return iconStatus == true ? (
@@ -179,7 +202,7 @@ const Dashboard = ({navigation}) => {
           <TouchableOpacity onPress={handleCopyToClipboard}>
             <View style={styles.shareView}>
               <Image
-                source={require('../images/copyIcon.png')}
+                source={require('../assets/images/copyIcon.png')}
                 style={styles.shareImage}
               />
             </View>
@@ -188,7 +211,7 @@ const Dashboard = ({navigation}) => {
           <TouchableOpacity onPress={handleShare}>
             <View style={styles.copyView}>
               <Image
-                source={require('../images/shareIcon.png')}
+                source={require('../assets/images/shareIcon.png')}
                 style={styles.shareImage}
               />
             </View>
@@ -200,7 +223,7 @@ const Dashboard = ({navigation}) => {
       </View>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#F5A922" />
+        <ActivityIndicator size="large" color={COLORS.PRIMARY} />
       ) : (
         <FlatList
           data={documents}
@@ -214,44 +237,53 @@ const Dashboard = ({navigation}) => {
               }>
               <View style={styles.documentItem}>
                 <View style={{flexDirection: 'row'}}>
-                  {item.doc_type == 'passport' && (
-                    <Image
-                      source={require('../images/passport.png')}
-                      style={styles.documentImage}
-                    />
-                  )}
-                  {item.doc_type == 'driverLicense' && (
-                    <Image
-                      source={require('../images/driving.png')}
-                      style={styles.documentImage}
-                    />
-                  )}
-                  {item.doc_type == 'idCard' && (
-                    <Image
-                      source={require('../images/national.png')}
-                      style={styles.documentImage}
-                    />
-                  )}
-                  {item.doc_type == 'healthCard' && (
-                    <Image
-                      source={require('../images/health.png')}
-                      style={styles.documentImage}
-                    />
-                  )}
-                  {item.doc_type == 'professionalLicense' && (
-                    <Image
-                      source={require('../images/professional.png')}
-                      style={styles.documentImage}
-                    />
-                  )}
-                  {item.doc_type == 'other' && (
-                    <Image
-                      source={require('../images/other.png')}
-                      style={styles.documentImage}
-                    />
-                  )}
+                  <View
+                    style={{
+                      borderColor: COLORS.BORDER,
+                      borderWidth: 2,
+                      borderRadius: 10,
+                      margin: 10,
+                      padding: 5,
+                    }}>
+                    {item.doc_type == 'passport' && (
+                      <Image
+                        source={require('../assets/images/passport.png')}
+                        style={styles.documentImage}
+                      />
+                    )}
+                    {item.doc_type == 'driverLicense' && (
+                      <Image
+                        source={require('../assets/images/driving.png')}
+                        style={styles.documentImage}
+                      />
+                    )}
+                    {item.doc_type == 'idCard' && (
+                      <Image
+                        source={require('../assets/images/national.png')}
+                        style={styles.documentImage}
+                      />
+                    )}
+                    {item.doc_type == 'healthCard' && (
+                      <Image
+                        source={require('../assets/images/health.png')}
+                        style={styles.documentImage}
+                      />
+                    )}
+                    {item.doc_type == 'professionalLicense' && (
+                      <Image
+                        source={require('../assets/images/professional.png')}
+                        style={styles.documentImage}
+                      />
+                    )}
+                    {item.doc_type == 'other' && (
+                      <Image
+                        source={require('../assets/images/other.png')}
+                        style={styles.documentImage}
+                      />
+                    )}
+                  </View>
 
-                  <View style={{flexDirection: 'column'}}>
+                  <View style={{flexDirection: 'column',}}>
                     <Text style={styles.documentType}>
                       {item.doc_type == 'passport' && 'Passport'}
                       {item.doc_type == 'driverLicense' && 'Driving License'}
@@ -261,7 +293,24 @@ const Dashboard = ({navigation}) => {
                         'Professional Card'}
                       {item.doc_type == 'other' && 'Other'}
                     </Text>
-                    <Text style={styles.documentId}>{item.doc_id}</Text>
+                    {item.doc_type == 'passport' && (
+                     <Text style={styles.documentId}>{"A French passport is an identity document issued to French citizens"}</Text>
+                    )}
+                    {item.doc_type == 'driverLicense' && (
+                     <Text style={styles.documentId}>{"Driving licences issued in Saint Barthélemy"}</Text>
+                    )}
+                    {item.doc_type == 'idCard' && (
+                      <Text style={styles.documentId}>{"Official ID consisting of an electronic bearing a photograph, name and address."}</Text>
+                    )}
+                    {item.doc_type == 'healthCard' && (
+                      <Text style={styles.documentId}>{"The Carte Vitale is the health insurance card."}</Text>
+                    )}
+                    {item.doc_type == 'professionalLicense' && (
+                     <Text style={styles.documentId}>{"A valid card is issued for any profession."}</Text>
+                    )}
+                    {item.doc_type == 'other' && (
+                     <Text style={styles.documentId}>{"Other cards such any special cards."}</Text>
+                    )}
                   </View>
                 </View>
               </View>
@@ -270,7 +319,13 @@ const Dashboard = ({navigation}) => {
           keyExtractor={item => item._id}
         />
       )}
-
+      <CommonModal
+        visible={modalVisible}
+        onClose={closeModal}
+        message={errorMessage}
+        header={modalHeader}
+        color={modalColor}
+        imageSource={modalImage}></CommonModal>
       <TouchableOpacity
         style={styles.buttonStyle}
         activeOpacity={0.5}
@@ -306,7 +361,7 @@ const Dashboard = ({navigation}) => {
             <Switch
               style={{transform: [{scaleX: 1.2}, {scaleY: 1.2}]}}
               trackColor={{false: '#767577', true: '#33C759'}}
-              thumbColor={dataStorageEnabled ? '#FFFFFF' : '#000000'}
+              thumbColor={dataStorageEnabled ? COLORS.WHITE : '#000000'}
               value={dataStorageEnabled}
               onValueChange={toggleDataStorage}
             />
@@ -322,7 +377,7 @@ const Dashboard = ({navigation}) => {
             <Switch
               style={{transform: [{scaleX: 1.2}, {scaleY: 1.2}]}}
               trackColor={{false: '#767577', true: '#33C759'}}
-              thumbColor={dataStorageEnabled1 ? '#FFFFFF' : '#000000'}
+              thumbColor={dataStorageEnabled1 ? COLORS.WHITE : '#000000'}
               value={dataStorageEnabled1}
               onValueChange={toggleDataStorage1}
             />
@@ -332,18 +387,21 @@ const Dashboard = ({navigation}) => {
             <Switch
               style={{transform: [{scaleX: 1.2}, {scaleY: 1.2}]}}
               trackColor={{false: '#767577', true: '#33C759'}}
-              thumbColor={dataStorageEnabled2 ? '#FFFFFF' : '#000000'}
+              thumbColor={dataStorageEnabled2 ? COLORS.WHITE : '#000000'}
               value={dataStorageEnabled2}
               onValueChange={toggleDataStorage2}
             />
             <Text style={styles.dataswitchLabel1}>Data 3</Text>
           </View>
-          <View style={styles.datatextView}>
+          {mandatory == true && (
+            <View style={styles.datatextView}>
             <Text style={styles.datamandatorytext}>
               * Mandatory to select personal KYC information
             </Text>
             <Text style={styles.datamandatorytext}>to store</Text>
           </View>
+          )}
+          
           <TouchableOpacity
             style={styles.databuttonStyle}
             activeOpacity={0.5}
@@ -354,7 +412,7 @@ const Dashboard = ({navigation}) => {
           <TouchableOpacity
             style={styles.dataskipButtonStyle}
             activeOpacity={0.5}
-            onPress={() => BackHandler.exitApp()}>
+            onPress={() => handleSkip()}>
             <Text style={styles.dataskipButtonTextStyle}>Skip for now</Text>
           </TouchableOpacity>
         </View>
@@ -372,31 +430,32 @@ const styles = StyleSheet.create({
   },
   content: {
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.WHITE,
     margin: 10,
     flexGrow: 1,
   },
   heading: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontFamily: FONTS.Bold,
     textAlign: 'center',
     marginTop: 10,
-    color: '#F5A922',
+    color: COLORS.PRIMARY,
   },
   textView: {
     marginTop: 10,
   },
   text: {
-    fontSize: 16,
+    fontSize: 18,
     textAlign: 'center',
-    color: '#37474F',
+    color: COLORS.TEXTCOLOR,
     marginTop: 15,
+    fontFamily: FONTS.Medium,
   },
   subText: {
     fontSize: 32,
     textAlign: 'center',
-    color: '#F5A922',
-    fontWeight: 'bold',
+    color: COLORS.PRIMARY,
+    fontFamily: FONTS.Bold,
   },
   mandatorytext: {
     fontSize: 14,
@@ -414,7 +473,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     marginLeft: 10,
     paddingRight: 20,
-    color: '#37474F',
+    color: COLORS.TEXTCOLOR,
   },
   linkTextView: {
     marginTop: 10,
@@ -426,10 +485,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   buttonStyle: {
-    backgroundColor: '#F5A922',
+    backgroundColor: COLORS.PRIMARY,
     borderWidth: 0,
-    color: '#FFFFFF',
-    borderColor: '#F5A922',
+    color: COLORS.WHITE,
+    borderColor: COLORS.PRIMARY,
     height: 50,
     alignItems: 'center',
     borderRadius: 10,
@@ -439,15 +498,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonTextStyle: {
-    color: '#FFFFFF',
+    color: COLORS.WHITE,
     paddingVertical: 10,
     fontSize: 16,
+    fontFamily: FONTS.Regular,
   },
   skipButtonStyle: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.WHITE,
     borderWidth: 0,
-    color: '#FFFFFF',
-    borderColor: '#F5A922',
+    color: COLORS.WHITE,
+    borderColor: COLORS.PRIMARY,
     height: 50,
     alignItems: 'center',
     borderRadius: 10,
@@ -459,7 +519,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   skipButtonTextStyle: {
-    color: '#F5A922',
+    color: COLORS.PRIMARY,
     paddingVertical: 10,
     fontSize: 16,
   },
@@ -470,17 +530,17 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     borderStyle: 'dashed',
     borderRadius: 10,
-    borderColor: '#F5A922',
+    borderColor: COLORS.PRIMARY,
     borderWidth: 2,
     flexDirection: 'column',
   },
   shareView: {
     width: 40,
     height: 40,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.WHITE,
     borderWidth: 1,
-    color: '#FFFFFF',
-    borderColor: '#FFFFFF',
+    color: COLORS.WHITE,
+    borderColor: COLORS.WHITE,
     borderRadius: 10,
     elevation: 4,
   },
@@ -495,66 +555,71 @@ const styles = StyleSheet.create({
     marginTop: 10,
     width: 40,
     height: 40,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.WHITE,
     borderWidth: 1,
-    color: '#FFFFFF',
-    borderColor: '#FFFFFF',
+    color: COLORS.WHITE,
+    borderColor: COLORS.WHITE,
     borderRadius: 10,
     elevation: 4,
   },
   infoContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
+    marginTop: 10,
   },
   iconContainer: {flexDirection: 'column', marginRight: 20},
   documentsHeader: {marginLeft: 20, marginTop: 20},
-  documentsHeaderText: {color: '#37474F'},
+  documentsHeaderText: {
+    color: COLORS.TEXTCOLOR,
+    fontFamily: FONTS.Bold,
+    fontSize: 18,
+  },
   documentItem: {
-    height: 100,
     marginLeft: 20,
     marginRight: 20,
     marginTop: 10,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.WHITE,
     borderRadius: 10,
+    elevation: 2,
   },
   documentImage: {
-    width: 80,
-    height: 80,
+    width: 60,
+    height: 60,
     resizeMode: 'contain',
-    marginTop: 10,
-    marginLeft: 10,
   },
   documentType: {
     marginTop: 20,
-    marginLeft: 20,
+    marginLeft: 10,
     fontSize: 16,
-    fontWeight: '700',
-    color: '#37474F',
+    fontFamily: FONTS.SemiBold,
+    color: COLORS.TEXTCOLOR,
   },
   documentId: {
     marginTop: 10,
-    marginLeft: 20,
-    fontSize: 16,
-    color: '#999999',
+  marginLeft: 10,
+  paddingRight: 100,
+  fontSize: 12,
+  fontFamily: FONTS.Regular,
+  color: COLORS.TEXTCOLOR,
   },
   datacontainer: {
     flex: 1,
-    backgroundColor: '#1A2E35',
+    backgroundColor: COLORS.MAINLYBLUE,
     padding: 16,
     flexGrow: 1,
   },
   datacontent: {
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.WHITE,
     margin: 10,
     flexGrow: 1,
   },
   dataheading: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontFamily: FONTS.Bold,
     textAlign: 'center',
     marginTop: 10,
-    color: '#F5A922',
+    color: COLORS.PRIMARY,
   },
   datatextView: {
     marginTop: 10,
@@ -562,7 +627,8 @@ const styles = StyleSheet.create({
   datatext: {
     fontSize: 16,
     textAlign: 'center',
-    color: '#37474F',
+    color: COLORS.TEXTCOLOR,
+    fontFamily: FONTS.Medium,
   },
   datamandatorytext: {
     fontSize: 14,
@@ -580,7 +646,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     marginLeft: 10,
     paddingRight: 40,
-    color: '#37474F',
+    color: COLORS.TEXTCOLOR,
     marginTop: 20,
   },
   dataswitchLabel1: {
@@ -588,7 +654,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     marginLeft: 10,
     paddingRight: 40,
-    color: '#37474F',
+    color: COLORS.TEXTCOLOR,
   },
   datalinkTextView: {
     marginTop: 10,
@@ -598,12 +664,13 @@ const styles = StyleSheet.create({
     color: 'blue',
     textDecorationLine: 'underline',
     textAlign: 'center',
+    fontFamily: FONTS.Regular,
   },
   databuttonStyle: {
-    backgroundColor: '#F5A922',
+    backgroundColor: COLORS.PRIMARY,
     borderWidth: 0,
-    color: '#FFFFFF',
-    borderColor: '#F5A922',
+    color: COLORS.WHITE,
+    borderColor: COLORS.PRIMARY,
     height: 50,
     alignItems: 'center',
     borderRadius: 10,
@@ -612,15 +679,15 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   databuttonTextStyle: {
-    color: '#FFFFFF',
+    color: COLORS.WHITE,
     paddingVertical: 10,
     fontSize: 16,
   },
   dataskipButtonStyle: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.WHITE,
     borderWidth: 0,
-    color: '#FFFFFF',
-    borderColor: '#F5A922',
+    color: COLORS.WHITE,
+    borderColor: COLORS.PRIMARY,
     height: 50,
     alignItems: 'center',
     borderRadius: 10,
@@ -631,7 +698,7 @@ const styles = StyleSheet.create({
     marginBottom: 110,
   },
   dataskipButtonTextStyle: {
-    color: '#F5A922',
+    color: COLORS.PRIMARY,
     paddingVertical: 10,
     fontSize: 16,
   },

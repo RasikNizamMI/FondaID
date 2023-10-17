@@ -6,6 +6,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import {postRequest, getRequest} from '../Utils/apiUtils';
 import {API_ENDPOINTS} from '../Utils/apiConfig';
 import { WebView } from 'react-native-webview';
+import {COLORS, FONTS} from '../assets/Colors';
 
 const getDisplayName = doc_type => {
   switch (doc_type) {

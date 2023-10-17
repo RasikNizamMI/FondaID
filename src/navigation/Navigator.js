@@ -7,30 +7,31 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Image} from 'react-native';
 
 // Import your screen components
-import SplashScreen from './pages/SplashScreen';
-import OnboardingScreen from './pages/OnboardingScreen';
-import LoginScreen from './pages/LoginScreen';
-import LoginOtpScreen from './pages/LoginOtpScreen';
-import DataStoragePolicyScreen from './pages/DataStoragePolicyScreen';
-import Dashboard from './pages/Dashboard';
-import ProfileScreen from './pages/ProfileScreen';
-import NotificationScreen from './pages/NotificationScreen';
-import SettingScreen from './pages/SettingScreen';
-import SharingScreen from './pages/SharingScreen';
-import AddNewDocumentScreen from './pages/AddNewDocumentScreen';
-import ConfirmDocument from './pages/ConfirmDocument';
-import SubmitSuccess from './pages/SubmitSuccess';
-import RegisterScreen from './pages/RegisterScreen';
-import CaptureFaceIDScreen from './pages/CaptureFaceIDScreen';
-import UploadDocumentScreen from './pages/UploadDocumentScreen';
-import CapturePictureInstructionScreen from './pages/CapturePictureInstructionScreen';
-import CapturePictureScreen from './pages/CapturePictureScreen';
-import PreviewDetailsScreen from './pages/PreviewDetailsScreen';
-import SubmitSuccessScreen from './pages/SubmitSuccessScreen';
-import TouchIDLogin from './pages/TouchIDLogin';
-import OTPVerificationScreen from './pages/OTPVerificationScreen';
-import DocumentDetailsScreen from './pages/DocumentDetailsScreen';
-import BioDetailsScreen from './pages/BioDetailsScreen';
+import SplashScreen from '../pages/SplashScreen';
+import OnboardingScreen from '../pages/OnboardingScreen';
+import LoginScreen from '../pages/LoginScreen';
+import LoginOtpScreen from '../pages/LoginOtpScreen';
+import DataStoragePolicyScreen from '../pages/DataStoragePolicyScreen';
+import Dashboard from '../pages/Dashboard';
+import ProfileScreen from '../pages/ProfileScreen';
+import NotificationScreen from '../pages/NotificationScreen';
+import SettingScreen from '../pages/SettingScreen';
+import SharingScreen from '../pages/SharingScreen';
+import AddNewDocumentScreen from '../pages/AddNewDocumentScreen';
+import ConfirmDocument from '../pages/ConfirmDocument';
+import SubmitSuccess from '../pages/SubmitSuccess';
+import RegisterScreen from '../pages/RegisterScreen';
+import CaptureFaceIDScreen from '../pages/CaptureFaceIDScreen';
+import UploadDocumentScreen from '../pages/UploadDocumentScreen';
+import CapturePictureInstructionScreen from '../pages/CapturePictureInstructionScreen';
+import CapturePictureScreen from '../pages/CapturePictureScreen';
+import PreviewDetailsScreen from '../pages/PreviewDetailsScreen';
+import SubmitSuccessScreen from '../pages/SubmitSuccessScreen';
+import TouchIDLogin from '../pages/TouchIDLogin';
+import OTPVerificationScreen from '../pages/OTPVerificationScreen';
+import DocumentDetailsScreen from '../pages/DocumentDetailsScreen';
+import BioDetailsScreen from '../pages/BioDetailsScreen';
+import {COLORS, FONTS} from '../assets/Colors';
 
 import {LogBox} from 'react-native';
 LogBox.ignoreLogs(['Warning: ...']); // Ignore log notification by message
@@ -48,8 +49,8 @@ const Onboard = () => (
       component={OnboardingScreen}
       options={{headerShown: false}}
     />
-    </OnboardStack.Navigator>
-)
+  </OnboardStack.Navigator>
+);
 
 const AuthStack = createStackNavigator();
 
@@ -110,7 +111,6 @@ const Auth = () => (
       component={SubmitSuccessScreen}
       options={{headerShown: false}}
     />
-    
   </AuthStack.Navigator>
 );
 
@@ -118,15 +118,12 @@ const HomeStack = createStackNavigator();
 
 const HomeStackScreen = () => (
   <HomeStack.Navigator
-  initialRouteName="Dashboard"
+    initialRouteName="Dashboard"
     screenOptions={{
       headerShown: false,
     }}>
     <HomeStack.Screen name="Dashboard" component={Dashboard} />
-    <HomeStack.Screen
-      name="BioDetailsScreen"
-      component={BioDetailsScreen}
-    />
+    <HomeStack.Screen name="BioDetailsScreen" component={BioDetailsScreen} />
     <HomeStack.Screen
       name="DocumentDetailsScreen"
       component={DocumentDetailsScreen}
@@ -152,20 +149,20 @@ const Home = () => (
 
         if (route.name === 'Dashboard') {
           iconSource = focused
-            ? require('./images/Dashboard1.png')
-            : require('./images/Dashboard.png');
+            ? require('../assets/images/Dashboard1.png')
+            : require('../assets/images/Dashboard.png');
         } else if (route.name === 'Profile') {
           iconSource = focused
-            ? require('./images/profile1.png')
-            : require('./images/profile.png');
+            ? require('../assets/images/profile1.png')
+            : require('../assets/images/profile.png');
         } else if (route.name === 'Notification') {
           iconSource = focused
-            ? require('./images/notification1.png')
-            : require('./images/notification.png');
+            ? require('../assets/images/notification1.png')
+            : require('../assets/images/notification.png');
         } else if (route.name === 'Setting') {
           iconSource = focused
-            ? require('./images/setting1.png')
-            : require('./images/setting.png');
+            ? require('../assets/images/setting1.png')
+            : require('../assets/images/setting.png');
         }
 
         return (

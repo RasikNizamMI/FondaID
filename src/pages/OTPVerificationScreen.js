@@ -15,6 +15,8 @@ import Feather from 'react-native-vector-icons/Feather';
 import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
 import {postRequest} from '../Utils/apiUtils';
 import {API_ENDPOINTS} from '../Utils/apiConfig';
+import {COLORS, FONTS} from '../assets/Colors';
+import CommonModal from '../component/CommonModal';
 
 import {
   CodeField,
@@ -56,6 +58,11 @@ const OTPVerificationScreen = ({navigation}) => {
   const [userRefID, setuserRefID] = useState('');
   const [apiResponseMessage, setApiResponseMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalImage, setModalImage] = useState('');
+  const [modalColor, setModalColor] = useState('');
+  const [modalHeader, setModalHeader] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     const loadRememberedCredentials = async () => {
@@ -81,6 +88,13 @@ const OTPVerificationScreen = ({navigation}) => {
   const handleCaptureFaceID = () => {
     if(mobileVerificationSuccess && emailVerificationSuccess){
       navigation.navigate('CaptureFaceIDScreen');
+    }else{
+      setModalVisible(true);
+        setErrorMessage("Please Verify Mobile Number and Email OTP");
+        setModalColor(COLORS.PRIMARY);
+        setModalImage(require('../assets/images/failur.png'))
+        setModalHeader('Error')
+        // navigation.navigate('CaptureFaceIDScreen');
     }
   };
 
@@ -103,10 +117,18 @@ const OTPVerificationScreen = ({navigation}) => {
           response.responseCode === 'F200'
         ) {
           setLoading(false);
-          Alert.alert(response.responseMessage)
+           setModalVisible(true);
+        setErrorMessage(response.responseMessage);
+        setModalColor(COLORS.PRIMARY);
+        setModalImage(require('../assets/images/sucess.png'))
+        setModalHeader('Success')
         } else {
           setLoading(false);
-          setApiResponseMessage(response.Status.responseMessage);
+          setModalVisible(true);
+        setErrorMessage(response.responseMessage);
+        setModalColor(COLORS.ERROR);
+        setModalImage(require('../assets/images/error.png'))
+        setModalHeader('Error')
         }
       })
       .catch(error => {
@@ -132,12 +154,18 @@ const OTPVerificationScreen = ({navigation}) => {
           response.responseCode === 'F200'
         ) {
           setLoading(false);
-          Alert.alert(response.responseMessage)
-          // setData('emailOTP', response.emailOTP);
-          // setUserEmailOTP(response.emailOTP);
-        } else {
-          setLoading(false);
-          setApiResponseMessage(response.responseMessage);
+          setModalVisible(true);
+          setErrorMessage(response.responseMessage);
+          setModalColor(COLORS.PRIMARY);
+          setModalImage(require('../assets/images/sucess.png'))
+          setModalHeader('Success')
+          } else {
+            setLoading(false);
+            setModalVisible(true);
+          setErrorMessage(response.responseMessage);
+          setModalColor(COLORS.ERROR);
+          setModalImage(require('../assets/images/error.png'))
+          setModalHeader('Error')
         }
       })
       .catch(error => {
@@ -165,11 +193,21 @@ const OTPVerificationScreen = ({navigation}) => {
         ) {
           setLoading(false);
           setMobileVerificationSuccess(true);
-          setMobileVerificationError(false); // Reset error state
+          setMobileVerificationError(false);
+            setModalVisible(true);
+        setErrorMessage(response.responseMessage);
+        setModalColor(COLORS.PRIMARY);
+        setModalImage(require('../assets/images/sucess.png'))
+        setModalHeader('Success')
         } else {
           setApiResponseMessage(response.responseMessage);
           setMobileVerificationSuccess(false);
       setMobileVerificationError(true);
+      setModalVisible(true);
+      setErrorMessage(response.responseMessage);
+      setModalColor(COLORS.ERROR);
+      setModalImage(require('../assets/images/error.png'))
+      setModalHeader('Error')
         }
       })
       .catch(error => {
@@ -177,6 +215,11 @@ const OTPVerificationScreen = ({navigation}) => {
         setApiResponseMessage('POST error:', error);
         setMobileVerificationSuccess(false);
       setMobileVerificationError(true);
+      setModalVisible(true);
+      setErrorMessage(error);
+      setModalColor(COLORS.ERROR);
+      setModalImage(require('../assets/images/error.png'))
+      setModalHeader('Error')
       })
       .finally(() => {
         setLoading(false);
@@ -201,16 +244,31 @@ const OTPVerificationScreen = ({navigation}) => {
           setLoading(false);
           setEmailVerificationSuccess(true);
       setEmailVerificationError(false); 
+      setModalVisible(true);
+        setErrorMessage(response.responseMessage);
+        setModalColor(COLORS.PRIMARY);
+        setModalImage(require('../assets/images/sucess.png'))
+        setModalHeader('Success')
         } else {
           setLoading(false);
-          setApiResponseMessage(response.responseMessage);
           setEmailVerificationSuccess(false);
       setEmailVerificationError(true);
+      setMobileVerificationError(true);
+      setModalVisible(true);
+      setErrorMessage(response.responseMessage);
+      setModalColor(COLORS.ERROR);
+      setModalImage(require('../assets/images/error.png'))
+      setModalHeader('Error')
         }
       })
       .catch(error => {
         setLoading(false);
         setApiResponseMessage('POST error:', error);
+        setModalVisible(true);
+        setErrorMessage(error);
+        setModalColor(COLORS.ERROR);
+        setModalImage(require('../assets/images/error.png'))
+        setModalHeader('Error')
       })
       .finally(() => {
         setLoading(false);
@@ -228,13 +286,13 @@ const OTPVerificationScreen = ({navigation}) => {
         <TouchableOpacity onPress={handleMobileVerification}>
           <Text
             style={{
-              color: mobileVerificationError == true ? 'red' : '#007CFF',
+              color: mobileVerificationError == true ? 'red' : COLORS.DODGUERBLUE,
               fontSize: 16,
               alignSelf: 'center',
               marginTop: 10,
               textDecorationLine: 'underline',
               textDecorationColor:
-                mobileVerificationError == true ? 'red' : '#007CFF',
+                mobileVerificationError == true ? 'red' : COLORS.DODGUERBLUE,
             }}>
             Verify Mobile Number
           </Text>
@@ -255,13 +313,13 @@ const OTPVerificationScreen = ({navigation}) => {
         <TouchableOpacity onPress={handleEmailVerification}>
           <Text
             style={{
-              color: emailVerificationError == true ? 'red' : '#007CFF',
+              color: emailVerificationError == true ? 'red' : COLORS.DODGUERBLUE,
               fontSize: 16,
               alignSelf: 'center',
               marginTop: 10,
               textDecorationLine: 'underline',
               textDecorationColor:
-                emailVerificationError == true ? 'red' : '#007CFF',
+                emailVerificationError == true ? 'red' : COLORS.DODGUERBLUE,
             }}>
             Verify Email Account
           </Text>
@@ -269,10 +327,18 @@ const OTPVerificationScreen = ({navigation}) => {
       );
     }
   };
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
+  const sucess = () => {
+    setModalVisible(false);
+    navigation.navigate('Home', {screen: 'Dashboard'})
+  };
   return (
     <View style={styles.mainBody}>
       {loading ? (
-        <ActivityIndicator size="large" color="#F5A922" />
+        <ActivityIndicator size="large" color={COLORS.PRIMARY} />
       ) : (
       <ScrollView
         contentContainerStyle={{flexGrow: 1}}
@@ -286,7 +352,7 @@ const OTPVerificationScreen = ({navigation}) => {
               style={styles.headerIcon}
               name="chevron-left"
               size={25}
-              color={'#F5A922'}
+              color={COLORS.PRIMARY}
             />
             <Text style={styles.headerText}>OTP Verification</Text>
           </View>
@@ -324,11 +390,11 @@ const OTPVerificationScreen = ({navigation}) => {
                       lineHeight: 50,
                       fontSize: 24,
                       borderWidth: 2,
-                      borderColor: '#F5A922',
+                      borderColor: COLORS.PRIMARY,
                       textAlign: 'center',
                       borderRadius: 10,
-                      color: '#FFFFFF',
-                      backgroundColor: symbol ? '#F5A922' : '#FFFFFF',
+                      color: COLORS.WHITE,
+                      backgroundColor: symbol ? COLORS.PRIMARY : COLORS.WHITE,
                     },
                     isFocused && styles.focusCell,
                   ]}
@@ -346,10 +412,11 @@ const OTPVerificationScreen = ({navigation}) => {
             }}>
             <Text
               style={{
-                color: '#37474F',
-                fontSize: 16,
+                color: COLORS.TEXTCOLOR,
+                fontSize: 13,
                 alignSelf: 'center',
                 marginTop: 20,
+                fontFamily: FONTS.Regular
               }}>
               Didn’t receive a code?
             </Text>
@@ -358,10 +425,11 @@ const OTPVerificationScreen = ({navigation}) => {
             <TouchableOpacity onPress={handleMobileResend}>
               <Text
                 style={{
-                  color: '#F5A922',
-                  fontSize: 16,
+                  color: COLORS.PRIMARY,
+                  fontSize: 13,
                   alignSelf: 'center',
                   marginTop: 20,
+                  fontFamily: FONTS.Bold
                 }}>
                 Resend Code
               </Text>
@@ -375,9 +443,10 @@ const OTPVerificationScreen = ({navigation}) => {
               <Text
                 style={{
                   marginTop: 10,
-                  color: '#37474F',
+                  color: COLORS.TEXTCOLOR,
                   textAlign: 'center',
                   fontSize: 13,
+                  fontFamily: FONTS.Italic
                 }}>
                 Your Mobile Number has been successfully verified!
               </Text>
@@ -413,11 +482,11 @@ const OTPVerificationScreen = ({navigation}) => {
                       lineHeight: 50,
                       fontSize: 24,
                       borderWidth: 2,
-                      borderColor: '#F5A922',
+                      borderColor: COLORS.PRIMARY,
                       textAlign: 'center',
                       borderRadius: 10,
-                      color: '#FFFFFF',
-                      backgroundColor: symbol ? '#F5A922' : '#FFFFFF',
+                      color: COLORS.WHITE,
+                      backgroundColor: symbol ? COLORS.PRIMARY : COLORS.WHITE,
                     },
                     isFocused && styles.focusCell,
                   ]}
@@ -435,10 +504,11 @@ const OTPVerificationScreen = ({navigation}) => {
             }}>
             <Text
               style={{
-                color: '#37474F',
-                fontSize: 16,
+                color: COLORS.TEXTCOLOR,
+                fontSize: 13,
                 alignSelf: 'center',
                 marginTop: 20,
+                fontFamily: FONTS.Regular
               }}>
               Didn’t receive a code?
             </Text>
@@ -447,10 +517,11 @@ const OTPVerificationScreen = ({navigation}) => {
             <TouchableOpacity onPress={handleEmailResend}>
               <Text
                 style={{
-                  color: '#F5A922',
-                  fontSize: 16,
+                  color: COLORS.PRIMARY,
+                  fontSize: 13,
                   alignSelf: 'center',
                   marginTop: 20,
+                  fontFamily: FONTS.Bold
                 }}>
                 Resend Code
               </Text>
@@ -464,9 +535,10 @@ const OTPVerificationScreen = ({navigation}) => {
               <Text
                 style={{
                   marginTop: 10,
-                  color: '#37474F',
+                  color: COLORS.TEXTCOLOR,
                   textAlign: 'center',
                   fontSize: 13,
+                  fontFamily: FONTS.Italic
                 }}>
                 Your Email Account has been successfully verified!
               </Text>
@@ -489,12 +561,14 @@ const OTPVerificationScreen = ({navigation}) => {
                 style={styles.scannerImage}
                 name="chevron-left"
                 size={25}
-                color={'#F5A922'}
+                color={COLORS.PRIMARY}
               />
               <Text style={styles.registerButtonTextStyle}>Back</Text>
             </View>
           </TouchableOpacity>
         </View>
+        <CommonModal visible={modalVisible} onClose={closeModal} message={errorMessage} header={modalHeader} color={modalColor} imageSource={modalImage}>
+      </CommonModal>
       </ScrollView>
       )}
     </View>
@@ -524,10 +598,10 @@ const styles = StyleSheet.create({
   },
   headerText: {
     marginTop: 12,
-    fontSize: 18,
-    color: '#F5A922',
+    fontSize: 24,
+    color: COLORS.PRIMARY,
     textAlign: 'center',
-    fontWeight: 'bold',
+    fontFamily: FONTS.Bold
   },
 
   SectionTextStyle: {
@@ -535,23 +609,24 @@ const styles = StyleSheet.create({
     marginRight: 35,
   },
   HeaderTextStyle: {
-    color: '#F5A922',
+    color: COLORS.PRIMARY,
     fontSize: 24,
-    fontWeight: 'bold',
+   fontFamily: FONTS.Bold,
     textAlign: 'center',
   },
   SubMobileHeaderTextStyle: {
-    color: '#F5A922',
+    color: COLORS.PRIMARY,
     marginTop: 5,
     fontSize: 16,
-    fontWeight: 'bold',
     textAlign: 'center',
+    fontFamily: FONTS.Bold
   },
   SubHeadingTextStyle: {
     marginTop: 20,
-    color: '#37474F',
+    color: COLORS.TEXTCOLOR,
     textAlign: 'center',
     fontSize: 16,
+    fontFamily: FONTS.Regular,
   },
   codeFiledRoot: {marginTop: 30, marginRight: 30, marginLeft: 30},
   cell: {
@@ -560,20 +635,21 @@ const styles = StyleSheet.create({
     lineHeight: 70,
     fontSize: 24,
     borderWidth: 2,
-    borderColor: '#F5A922',
+    borderColor: COLORS.PRIMARY,
     textAlign: 'center',
     borderRadius: 10,
-    color: '#FFFFFF',
+    color: COLORS.WHITE,
+    fontFamily: FONTS.Regular,
   },
   focusCell: {
-    borderColor: '#F5A922',
-    backgroundColor: '#F5A922',
+    borderColor: COLORS.PRIMARY,
+    backgroundColor: COLORS.PRIMARY,
   },
   buttonStyle: {
-    backgroundColor: '#F5A922',
+    backgroundColor: COLORS.PRIMARY,
     borderWidth: 0,
-    color: '#FFFFFF',
-    borderColor: '#F5A922',
+    color: COLORS.WHITE,
+    borderColor: COLORS.PRIMARY,
     height: 50,
     alignItems: 'center',
     borderRadius: 10,
@@ -584,11 +660,11 @@ const styles = StyleSheet.create({
   registerButtonStyle: {
     backgroundColor: '#fff',
     borderWidth: 1,
-    color: '#FFFFFF',
-    borderColor: '#FFFFFF',
+    color: COLORS.WHITE,
+    borderColor: COLORS.WHITE,
     height: 50,
     alignItems: 'center',
-    borderRadius: 0,
+    borderRadius: 10,
     marginLeft: 35,
     marginRight: 35,
     marginTop: 10,
@@ -597,14 +673,16 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   buttonTextStyle: {
-    color: '#FFFFFF',
+    color: COLORS.WHITE,
     paddingVertical: 10,
     fontSize: 16,
+    fontFamily: FONTS.Regular
   },
   registerButtonTextStyle: {
-    color: '#F5A922',
+    color: COLORS.PRIMARY,
     paddingVertical: 10,
     fontSize: 16,
+    fontFamily: FONTS.Regular
   },
   scannerView: {
     alignSelf: 'center',
@@ -618,5 +696,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     alignSelf: 'center',
     marginTop: 10,
+    fontFamily: FONTS.SemiBold
   },
 });

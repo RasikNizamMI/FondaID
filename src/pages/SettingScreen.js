@@ -10,6 +10,7 @@ import {
   Image,
 } from 'react-native';
 import { setData, getData, removeData } from '../Utils/AsyncStorageUtil';
+import {COLORS, FONTS} from '../assets/Colors';
 
 const SettingScreen = ({navigation}) => {
   const [dataStorageEnabled, setDataStorageEnabled] = useState(false);
@@ -27,7 +28,6 @@ const SettingScreen = ({navigation}) => {
   };
 
   const handleLogout = () => {
-    removeData('fonda_ID');
     navigation.navigate('Auth', {screen: 'LoginScreen'})
   };
 
@@ -40,7 +40,7 @@ const SettingScreen = ({navigation}) => {
               textAlign: 'center',
               marginTop: 50,
               fontSize: 24,
-              fontWeight: 'bold',
+              fontFamily: FONTS.Bold,
               color: '#F5A922',
             }}>
             Settings
@@ -59,7 +59,7 @@ const SettingScreen = ({navigation}) => {
         onPress={handleLogout}>
         <View style={{flexDirection: 'row', margin: 20}}>
           <Image
-            source={require('../images/logout.png')}
+            source={require('../assets/images/logout.png')}
             style={{
               width: 20,
               height: 20,
@@ -71,7 +71,7 @@ const SettingScreen = ({navigation}) => {
             style={{
               textAlign: 'center',
               fontSize: 16,
-              fontWeight: '800',
+              fontFamily: FONTS.SemiBold,
               color: '#37474F',
               marginLeft: 20,
             }}>

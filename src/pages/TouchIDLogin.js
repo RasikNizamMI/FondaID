@@ -12,8 +12,9 @@ import {
   Clipboard,
   FlatList,
 } from 'react-native';
-import Navigation from '../Navigator';
+import Navigation from '../navigation/Navigator';
 import TouchID from 'react-native-touch-id';
+import {COLORS, FONTS} from '../assets/Colors';
 
 const TouchIDLogin = ({navigation}) => {
   const [iconStatus, setIconStatus] = useState(false);
@@ -75,7 +76,7 @@ const TouchIDLogin = ({navigation}) => {
       <View
         style={{justifyContent: 'center', marginTop: 20, alignItems: 'center'}}>
         <Image
-          source={require('../images/TouchID.png')}
+          source={require('../assets/images/TouchID.png')}
           style={{
             justifyContent: 'center',
             width: 200,
@@ -93,6 +94,7 @@ const TouchIDLogin = ({navigation}) => {
             fontSize: 14,
             alignSelf: 'center',
             marginTop: 20,
+            fontFamily: FONTS.SemiBold
           }}>
           Switch to
         </Text>
@@ -105,6 +107,7 @@ const TouchIDLogin = ({navigation}) => {
               marginTop: 20,
               textDecorationLine: 'underline',
               textDecorationColor: '#F5A922',
+              fontFamily: FONTS.SemiBold
             }}>
             Manual Sign In
           </Text>
@@ -134,10 +137,10 @@ const styles = StyleSheet.create({
   },
   heading: {
     fontSize: 24,
-    fontWeight: 'bold',
     textAlign: 'center',
     marginTop: 30,
     color: '#F5A922',
+    fontFamily: FONTS.Bold
   },
   textView: {
     marginTop: 10,
@@ -198,6 +201,7 @@ const styles = StyleSheet.create({
     color: '#F5A922',
     paddingVertical: 10,
     fontSize: 16,
+    fontFamily: FONTS.Regular
   },
   skipButtonStyle: {
     backgroundColor: '#FFFFFF',

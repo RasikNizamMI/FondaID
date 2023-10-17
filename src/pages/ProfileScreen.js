@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
+import {COLORS, FONTS} from '../assets/Colors';
 
 const ProfileScreen = ({navigation}) => {
   const [userDocument, setUserDocument] = useState('');
@@ -99,6 +100,10 @@ const ProfileScreen = ({navigation}) => {
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
+  const handleSkip = () => {
+    navigation.goBack(null);
+  };
+
 
   const handleLogin = ({navigation}) => {
     navigation.navigate('LoginOtpScreen');
@@ -118,17 +123,17 @@ const ProfileScreen = ({navigation}) => {
               style={styles.headerIcon}
               name="chevron-left"
               size={25}
-              color={'#F5A922'}
+              color={COLORS.PRIMARY}
             />
             <Text style={styles.headerText}>My Profile</Text>
           </View>
           {loading ? (
-            <ActivityIndicator size="large" color="#F5A922" />
+            <ActivityIndicator size="large" color={COLORS.PRIMARY} />
           ) : (
             <>
               <View
                 style={{
-                  backgroundColor: '#FFFFFF',
+                  backgroundColor: COLORS.WHITE,
                   marginTop: 20,
                   marginBottom: 20,
                 }}>
@@ -147,7 +152,7 @@ const ProfileScreen = ({navigation}) => {
               </View>
               <View
                 style={{
-                  backgroundColor: '#FFFFFF',
+                  backgroundColor: COLORS.WHITE,
                   marginTop: 20,
                   marginBottom: 20,
                 }}>
@@ -168,7 +173,7 @@ const ProfileScreen = ({navigation}) => {
               </View>
               <View
                 style={{
-                  backgroundColor: '#FFFFFF',
+                  backgroundColor: COLORS.WHITE,
                   marginTop: 20,
                   marginBottom: 20,
                 }}>
@@ -187,7 +192,7 @@ const ProfileScreen = ({navigation}) => {
               </View>
               <View
                 style={{
-                  backgroundColor: '#FFFFFF',
+                  backgroundColor: COLORS.WHITE,
                   marginTop: 20,
                   marginBottom: 20,
                 }}>
@@ -195,7 +200,7 @@ const ProfileScreen = ({navigation}) => {
                   <Text style={styles.headerTexts}>Native Country</Text>
                 </View>
                 <View style={styles.subheaderView}>
-                  <Text style={styles.subheaderText}>{userNationality}</Text>
+                  <Text style={styles.subheaderText}>{userNativeCountry}</Text>
                 </View>
               </View>
               <View style={styles.headerTextView}>
@@ -204,7 +209,7 @@ const ProfileScreen = ({navigation}) => {
               <View style={{flexDirection: 'row'}}>
                 <View style={styles.imageView}>
                   <Image
-                    source={require('../images/faceIdIcon.png')}
+                    source={require('../assets/images/faceIdIcon.png')}
                     style={styles.images}
                   />
                 </View>
@@ -214,15 +219,15 @@ const ProfileScreen = ({navigation}) => {
                     alignSelf: 'center',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: COLORS.WHITE,
                     height: 50,
                     width: '40%',
                     borderRadius: 10,
                     elevation: 4,
                   }}
                   activeOpacity={0.5}
-                  // onPress={handleSubmitPress}
-                  onPress={() => navigation.navigate('RegisterScreen')}>
+                  onPress={" "}>
+                 
                   <Text style={styles.registerButtonTextStyle}>
                     Change My Face ID
                   </Text>
@@ -230,7 +235,7 @@ const ProfileScreen = ({navigation}) => {
               </View>
               <View
                 style={{
-                  backgroundColor: '#FFFFFF',
+                  backgroundColor: COLORS.WHITE,
                   marginTop: 20,
                   marginBottom: 20,
                   flexDirection: 'row',
@@ -245,7 +250,7 @@ const ProfileScreen = ({navigation}) => {
                 </View>
                 <View style={{marginLeft: 20}}>
                   <Image
-                    source={require('../images/editIcon.png')}
+                    source={require('../assets/images/editIcon.png')}
                     style={styles.editImages}
                   />
                 </View>
@@ -261,7 +266,7 @@ const ProfileScreen = ({navigation}) => {
                 </View>
                 <View style={{marginLeft: 20}}>
                   <Image
-                    source={require('../images/editIcon.png')}
+                    source={require('../assets/images/editIcon.png')}
                     style={styles.editImages}
                   />
                 </View>
@@ -276,7 +281,7 @@ const ProfileScreen = ({navigation}) => {
                 style={styles.registerButtonStyle}
                 activeOpacity={0.5}
                 // onPress={handleSubmitPress}
-                onPress={() => navigation.navigate('RegisterScreen')}>
+                onPress={handleSkip}>
                 <Text style={styles.registerButtonTextStyle}>Skip</Text>
               </TouchableOpacity>
               <View></View>
@@ -297,10 +302,10 @@ const styles = StyleSheet.create({
     alignContent: 'center',
   },
   buttonStyle: {
-    backgroundColor: '#F5A922',
+    backgroundColor: COLORS.PRIMARY,
     borderWidth: 0,
-    color: '#FFFFFF',
-    borderColor: '#F5A922',
+    color: COLORS.WHITE,
+    borderColor: COLORS.PRIMARY,
     height: 50,
     alignItems: 'center',
     borderRadius: 10,
@@ -311,11 +316,11 @@ const styles = StyleSheet.create({
   registerButtonStyle: {
     backgroundColor: '#fff',
     borderWidth: 1,
-    color: '#FFFFFF',
-    borderColor: '#FFFFFF',
+    color: COLORS.WHITE,
+    borderColor: COLORS.WHITE,
     height: 50,
     alignItems: 'center',
-    borderRadius: 0,
+    borderRadius: 10,
     marginLeft: 35,
     marginRight: 35,
     marginTop: 10,
@@ -324,14 +329,16 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   buttonTextStyle: {
-    color: '#FFFFFF',
+    color: COLORS.WHITE,
     paddingVertical: 10,
     fontSize: 16,
+    fontFamily: FONTS.Regular
   },
   registerButtonTextStyle: {
-    color: '#F5A922',
+    color: COLORS.PRIMARY,
     paddingVertical: 10,
     fontSize: 16,
+    fontFamily: FONTS.Regular
   },
   headerView: {
     flexDirection: 'row',
@@ -347,18 +354,18 @@ const styles = StyleSheet.create({
   },
   headerText: {
     marginTop: 12,
-    fontSize: 18,
-    color: '#F5A922',
+    fontSize: 24,
+    color: COLORS.PRIMARY,
     textAlign: 'center',
-    fontWeight: 'bold',
+    fontFamily: FONTS.Bold,
   },
   headerTextView: {marginLeft: 30, marginTop: 10},
-  headerTexts: {color: '#999999', fontSize: 14},
-  subheaderText: {color: '#37474F', fontSize: 14, fontWeight: 'bold'},
+  headerTexts: {color: COLORS.SUBTEXT, fontSize: 14, fontFamily: FONTS.Regular},
+  subheaderText: {color: COLORS.TEXTCOLOR, fontSize: 14, fontFamily: FONTS.Bold},
   subheaderView: {marginTop: 5, marginLeft: 30, marginBottom: 10},
   headerTextView1: {marginLeft: 30},
-  headerTexts1: {color: '#999999', fontSize: 14},
-  subheaderText1: {color: '#37474F', fontSize: 14, fontWeight: 'bold'},
+  headerTexts1: {color: COLORS.SUBTEXT, fontSize: 14},
+  subheaderText1: {color: COLORS.TEXTCOLOR, fontSize: 14, fontFamily: FONTS.Bold},
   subheaderView1: {marginTop: 5, marginLeft: 30},
   imageView: {
     alignItems: 'center',
@@ -367,7 +374,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     height: 180,
     width: 180,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.WHITE,
     borderRadius: 10,
     elevation: 4,
   },

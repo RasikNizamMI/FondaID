@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, FlatList } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
+import {COLORS, FONTS} from '../assets/Colors';
 
 const NotificationScreen = () => {
 
@@ -43,13 +44,13 @@ const NotificationScreen = () => {
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
            
-      <Image source={require('../images/infoIcon.png')} style={styles.icon} />
+      <Image source={require('../assets/images/infoIcon.png')} style={styles.icon} />
       <View style={styles.notificationInfo}>
         
         <Text style={styles.content}>{item.content}</Text>
         <Text style={styles.time}>{item.time}</Text>
       </View>
-      <Image source={require('../images/exit.png')} style={{
+      <Image source={require('../assets/images/exit.png')} style={{
     width: 24,
     height: 24,
       position: 'relative',

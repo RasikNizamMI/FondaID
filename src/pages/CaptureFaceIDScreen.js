@@ -17,6 +17,8 @@ import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
 import {postRequest, putRequest} from '../Utils/apiUtils';
 import {API_ENDPOINTS} from '../Utils/apiConfig';
+import {COLORS, FONTS} from '../assets/Colors';
+import CommonModal from '../component/CommonModal';
 
 const CaptureFaceIDScreen = ({navigation}) => {
   const [filePath, setFilePath] = useState({});
@@ -34,6 +36,11 @@ const CaptureFaceIDScreen = ({navigation}) => {
   const [userRefID, setuserRefID] = useState('');
   const [loading, setLoading] = useState(false);
   const [apiResponseMessage, setApiResponseMessage] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalImage, setModalImage] = useState('');
+  const [modalColor, setModalColor] = useState('');
+  const [modalHeader, setModalHeader] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const handleSkip = () => {
     navigation.goBack(null);
   };
@@ -53,11 +60,19 @@ const CaptureFaceIDScreen = ({navigation}) => {
         if (response.statusCode === 200) {
           console.log('12345');
           setData('fondaId',response.fondaId);
-          Alert.alert(response.message);
-          navigation.navigate('SubmitSuccessScreen');
+          setModalVisible(true);
+        setErrorMessage(response.message);
+        setModalColor(COLORS.PRIMARY);
+        setModalImage(require('../assets/images/sucess.png'))
+        setModalHeader('Success')
+         
         } else {
           console.log('12345678');
-          Alert.alert(response.message);
+           setErrorMessage(response.message);
+           setModalVisible(true);
+        setModalColor(COLORS.ERROR);
+        setModalImage(require('../assets/images/error.png'))
+        setModalHeader('Error')
         }
       })
       .catch(error => {
@@ -186,11 +201,20 @@ const CaptureFaceIDScreen = ({navigation}) => {
     });
   };
 
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
+  const sucess = () => {
+    setModalVisible(false);
+    navigation.navigate('SubmitSuccessScreen');
+  }
+
   return (
     <View style={styles.mainBody}>
       {loading ? (
         // Render the loader or loading indicator here
-        <ActivityIndicator size="large" color="#F5A922" />
+        <ActivityIndicator size="large" color={COLORS.PRIMARY} />
       ) : (
         <ScrollView
           contentContainerStyle={{flexGrow: 1}}
@@ -204,7 +228,7 @@ const CaptureFaceIDScreen = ({navigation}) => {
                 style={styles.headerIcon}
                 name="chevron-left"
                 size={25}
-                color={'#F5A922'}
+                color={COLORS.PRIMARY}
               />
               <Text style={styles.headerText}>Capture Face ID</Text>
             </View>
@@ -224,7 +248,7 @@ const CaptureFaceIDScreen = ({navigation}) => {
                   />
                 ) : (
                   <Image
-                    source={require('../images/camera.png')}
+                    source={require('../assets/images/camera.png')}
                     style={styles.uploadImage}
                   />
                 )}
@@ -254,6 +278,8 @@ const CaptureFaceIDScreen = ({navigation}) => {
               </View>
             </TouchableOpacity>
           </View>
+          <CommonModal visible={modalVisible} onClose={modalHeader == 'Success' ? sucess : closeModal} message={errorMessage} header={modalHeader} color={modalColor} imageSource={modalImage}>
+      </CommonModal>
         </ScrollView>
       )}
     </View>
@@ -298,7 +324,7 @@ const styles = StyleSheet.create({
     borderColor: '#FFFFFF',
     height: 50,
     alignItems: 'center',
-    borderRadius: 0,
+    borderRadius: 10,
     marginLeft: 35,
     marginRight: 35,
     marginTop: 10,

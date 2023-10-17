@@ -2,6 +2,7 @@ import React, {useEffect} from 'react';
 import {Image, StyleSheet, View} from 'react-native';
 import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
 import { loadAndroidRawResource } from 'react-native-svg/lib/typescript/LocalSvg';
+import {COLORS, FONTS} from '../assets/Colors';
 
 const SplashScreen = ({navigation}) => {
   const checkAccessKey = async () => {
@@ -10,13 +11,8 @@ const SplashScreen = ({navigation}) => {
       const storedUserOnboard = await getData('onboard');
       console.log(storedUserFondaID);
       console.log(storedUserOnboard);
-      if (storedUserFondaID !== null && storedUserOnboard !== null) {
+      if ( storedUserOnboard !== null) {
         console.log("11111")
-        setTimeout(() => {
-          navigation.replace('Home');
-        }, 2000); // Delay navigation for 2 seconds (adjust as needed)
-      } else if (storedUserFondaID == null && storedUserOnboard !== null){
-        console.log('22222')
         setTimeout(() => {
           navigation.replace('Auth');
         }, 2000); // Delay navigation for 2 seconds (adjust as needed)
@@ -44,7 +40,7 @@ const SplashScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../images/splashScreen.png')}
+        source={require('../assets/images/splashScreen.png')}
         style={styles.image}
       />
     </View>

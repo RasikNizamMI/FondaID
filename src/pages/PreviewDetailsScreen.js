@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {COLORS, FONTS} from '../assets/Colors';
 
 const PreviewDetailsScreen = ({navigation}) => {
   const [startDate, setStartDate] = useState(new Date());
@@ -150,7 +151,7 @@ const PreviewDetailsScreen = ({navigation}) => {
           <View style={{flexDirection: 'row'}}>
             <View style={styles.imageView}>
               <Image
-                source={require('../images/faceIdIcon.png')}
+                source={require('../assets/images/faceIdIcon.png')}
                 style={styles.images}
               />
             </View>
@@ -192,7 +193,7 @@ const PreviewDetailsScreen = ({navigation}) => {
             </View>
             <View style={{marginLeft: 20}}>
               <Image
-                source={require('../images/editIcon.png')}
+                source={require('../assets/images/editIcon.png')}
                 style={styles.editImages}
               />
             </View>
@@ -211,7 +212,7 @@ const PreviewDetailsScreen = ({navigation}) => {
             </View>
             <View style={{marginLeft: 20}}>
               <Image
-                source={require('../images/editIcon.png')}
+                source={require('../assets/images/editIcon.png')}
                 style={styles.editImages}
               />
             </View>
@@ -239,7 +240,7 @@ const PreviewDetailsScreen = ({navigation}) => {
                   <View>
                     <View style={{flexDirection: 'row'}}>
                       <Image
-                        source={require('../images/document.png')}
+                        source={require('../assets/images/document.png')}
                         style={{
                           height: 40,
                           width: 40,
@@ -350,7 +351,7 @@ const styles = StyleSheet.create({
     borderColor: '#FFFFFF',
     height: 50,
     alignItems: 'center',
-    borderRadius: 0,
+    borderRadius: 10,
     marginLeft: 35,
     marginRight: 35,
     marginTop: 10,

@@ -1,10 +1,13 @@
 // DocumentDetails.js
 
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, Text, Image, StyleSheet, TouchableOpacity, Modal } from 'react-native';
+import { View, ScrollView, Text, Image, StyleSheet, TouchableOpacity, Modal,} from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import {postRequest, getRequest} from '../Utils/apiUtils';
 import {API_ENDPOINTS} from '../Utils/apiConfig';
+import {COLORS, FONTS} from '../assets/Colors';
+import { WebView } from 'react-native-webview';
+import Share from 'react-native-share';
 
 const getDisplayName = doc_type => {
   switch (doc_type) {
@@ -53,16 +56,39 @@ setdocType(doc_type);
     getDocumentDetails(id);
   }, [id]);
 
-  
+  function LoadingIndicatorView() {
+    return <ActivityIndicator color='#F5A922' size='large' />
+  }
+
+  const handleShare = async () => {
+    try {
+      const imageUrl = API_ENDPOINTS.GETDOCUMENTQR + id; // Replace with your image URL
+      const options = {
+        url: imageUrl,
+      };
+      await Share.open(options);
+    } catch (error) {
+      console.error('Error sharing:', error.message);
+    }
+  };
+
+  // const handleShare = async () => {
+  //   try {
+  //     const messageToShare = doc_type;
+  //     const imageUrl =  API_ENDPOINTS.GETDOCUMENTPREVIEW + id; // Replace with your image URL
+  //     await Share.share({
+  //       message: messageToShare,
+  //       url: imageUrl, // Add the image URL here
+  //     });
+  //   } catch (error) {
+  //     console.error('Error sharing:', error.message);
+  //   }
+  // };
 
 
   return (
-    <View style={styles.mainBody}>
-      <ScrollView
-        contentContainerStyle={{flexGrow: 1}}
-        keyboardShouldPersistTaps="handled">
-        <View>
-          <View style={styles.headerView}>
+    <View style={{flex: 1,marginTop: 10}}>
+    <View style={styles.headerView}>
             <Feather
               onPress={() => {
                 navigation.goBack(null);
@@ -74,41 +100,48 @@ setdocType(doc_type);
             />
             <Text style={styles.headerText}>{displayName}</Text>
           </View>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: '#ffffff',
-              borderRadius: 10,
-              borderWidth: 2,
-              borderColor: '#ffffff',
-              margin: 30,
-              elevation: 4
-            }}>
-            <Image
+          <View style={{flex:1,marginLeft: 30, 
+              marginRight: 30,elevation: 4, backgroundColor: COLORS.WHITE}}>
+                <View style={{justifyContent: 'center',
+              alignItems: 'center',}}> 
+              <View style={{flexDirection: 'row',  justifyContent: 'space-around',justifyContent: 'center',
+              alignItems: 'center',}}>
+
+              
+                <Image
               source={{ uri: API_ENDPOINTS.GETDOCUMENTQR + id}}
               style={{
-                marginTop: 20,
-                width: 225,
-                height: 225,
+                marginTop: 10,
+                width: 200,
+                height: 200,
                 resizeMode: 'contain',
-                marginBottom: 20,
+                marginLeft: 70
               }}
             />
-            <Text style={{marginTop: 'auto', marginBottom: 20, fontSize: 12, margin: 30, textAlign: 'center'}}>
-            Scan the above QR code to verify the above document.
-            </Text>
+             <View style={styles.iconContainer}>
+
+          <TouchableOpacity onPress={handleShare}>
+            <View style={styles.copyView}>
+              <Image
+                source={require('../assets/images/shareIcon.png')}
+                style={styles.shareImage}
+              />
+            </View>
+          </TouchableOpacity>
           </View>
         </View>
-      </ScrollView>
-      <TouchableOpacity
-        style={styles.bioButtonStyle}
-        activeOpacity={0.5}
-        onPress={() => navigation.navigate('BioDetailsScreen', { id: userId, doc_type: docType })}>
-        <Text style={styles.bioButtonTextStyle}>BioSeal Details</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
+            <Text style={{marginTop: 'auto', marginBottom: 10, fontSize: 12, textAlign: 'center', fontFamily: FONTS.Regular, marginLeft: 10, marginRight: 10, color: COLORS.TEXTCOLOR}}>
+            Scan the above QR code to verify the above document.
+            </Text>
+            </View>
+  <WebView
+       originWhitelist={['*']}
+       source={{ uri: API_ENDPOINTS.GETDOCUMENTPREVIEW + id}}  
+       renderLoading={this.LoadingIndicatorView}
+       startInLoadingState={true}
+     />
+     </View>
+     <TouchableOpacity
         style={styles.buttonStyle}
         activeOpacity={0.5}
         onPress={() => {
@@ -116,7 +149,7 @@ setdocType(doc_type);
           }}>
         <Text style={styles.buttonTextStyle}>Back</Text>
       </TouchableOpacity>
-    </View>
+     </View>
   );
 };
 
@@ -143,16 +176,16 @@ const styles = StyleSheet.create({
   },
   headerText: {
     marginTop: 12,
-    fontSize: 18,
-    color: '#F5A922',
+    fontSize: 24,
+    color: COLORS.PRIMARY,
     textAlign: 'center',
-    fontWeight: 'bold',
+    fontFamily: FONTS.Bold
   },
   buttonStyle: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.WHITE,
     borderWidth: 1,
-    color: '#FFFFFF',
-    borderColor: '#F5A922',
+    color: COLORS.WHITE,
+    borderColor: COLORS.PRIMARY,
     height: 50,
     alignItems: 'center',
     borderRadius: 10,
@@ -163,15 +196,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonTextStyle: {
-    color: '#F5A922',
+    color: COLORS.PRIMARY,
     paddingVertical: 10,
     fontSize: 16,
   },
   bioButtonStyle: {
-    backgroundColor: '#F5A922',
+    backgroundColor: COLORS.PRIMARY,
     borderWidth: 1,
-    color: '#F5A922',
-    borderColor: '#F5A922',
+    color: COLORS.PRIMARY,
+    borderColor: COLORS.PRIMARY,
     height: 50,
     alignItems: 'center',
     borderRadius: 10,
@@ -182,7 +215,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   bioButtonTextStyle: {
-    color: '#FFFFFF',
+    color: COLORS.WHITE,
     paddingVertical: 10,
     fontSize: 16,
   },
@@ -197,5 +230,25 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     alignItems: 'center',
+  },
+  iconContainer: {flexDirection: 'column', marginRight: 20},
+  copyView: {
+    marginTop: 10,
+    width: 40,
+    height: 40,
+    backgroundColor: COLORS.WHITE,
+    borderWidth: 1,
+    color: COLORS.WHITE,
+    borderColor: COLORS.WHITE,
+    borderRadius: 10,
+    elevation: 4,
+    marginLeft: 20
+  },
+  shareImage: {
+    width: 20,
+    height: 20,
+    resizeMode: 'contain',
+    alignSelf: 'center',
+    marginTop: 7,
   },
 });

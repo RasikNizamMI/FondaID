@@ -19,6 +19,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
 import {useClipboard} from '@react-native-community/clipboard';
+import {COLORS, FONTS} from '../assets/Colors';
 
 const SubmitSuccess = ({navigation}) => {
   const [useDocumentNumber, setUseDocumentNumber] = useState('');
@@ -119,7 +120,7 @@ const SubmitSuccess = ({navigation}) => {
               marginTop: 30,
             }}>
             <Image
-              source={require('../images/successImg.png')}
+              source={require('../assets/images/successImg.png')}
               style={{
                 height: 180,
                 width: 250,
@@ -171,7 +172,7 @@ const SubmitSuccess = ({navigation}) => {
                     elevation: 4,
                   }}>
                   <Image
-                    source={require('../images/copyIcon.png')}
+                    source={require('../assets/images/copyIcon.png')}
                     style={{
                       width: 20,
                       height: 20,
@@ -197,7 +198,7 @@ const SubmitSuccess = ({navigation}) => {
                     elevation: 4,
                   }}>
                   <Image
-                    source={require('../images/shareIcon.png')}
+                    source={require('../assets/images/shareIcon.png')}
                     style={{
                       width: 20,
                       height: 20,
@@ -294,7 +295,7 @@ const styles = StyleSheet.create({
     borderColor: '#FFFFFF',
     height: 50,
     alignItems: 'center',
-    borderRadius: 0,
+    borderRadius: 10,
     marginLeft: 35,
     marginRight: 35,
     marginTop: 10,

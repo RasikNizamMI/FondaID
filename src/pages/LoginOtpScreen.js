@@ -18,6 +18,8 @@ import {
 import { API_ENDPOINTS } from '../Utils/apiConfig';
 import { getRequest, postRequest } from '../Utils/apiUtils';
 import { getData, setData } from '../Utils/AsyncStorageUtil';
+import {COLORS, FONTS} from '../assets/Colors';
+import CommonModal from '../component/CommonModal';
 
 const CELL_COUNT = 6;
 
@@ -31,6 +33,10 @@ const LoginOtpScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [userFondaID, setUserFondaID] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalImage, setModalImage] = useState('');
+  const [modalColor, setModalColor] = useState('');
+  const [modalHeader, setModalHeader] = useState('');
 
   useEffect(() => {
     const loadRememberedCredentials = async () => {
@@ -60,11 +66,21 @@ const LoginOtpScreen = ({ navigation }) => {
       if (response.responseCode === 'F200') {
         console.log(response)
         handleUser();
+        // setModalVisible(true);
+        // setErrorMessage(response.responseMessage);
+        // setModalColor(COLORS.PRIMARY);
+        // setModalImage(require('../assets/images/sucess.png'))
+        // setModalHeader('Success')
       } else {
-        setErrorMessage("OTP invalid")
+        setModalVisible(true);
         setErrorMessage(response.responseMessage);
+        setModalColor(COLORS.ERROR);
+        setModalImage(require('../assets/images/error.png'))
+        setModalHeader('Error')
       }
     } catch (error) {
+      setModalVisible(true);
+
       console.log('error', error);
       setErrorMessage('OTP invalid');
     } finally {
@@ -77,7 +93,7 @@ const LoginOtpScreen = ({ navigation }) => {
 
     try {
       const response = await getRequest(API_ENDPOINTS.GETUSER+userRefID);
-      console.log(JSON.stringify(response.fonda_id));
+      console.log(JSON.stringify(response));
       setUserFondaID(response.fonda_id)
       setData('fonda_ID', response.fonda_id)
       setData('_id', response._id);
@@ -91,11 +107,13 @@ const LoginOtpScreen = ({ navigation }) => {
       setData('nationality', response.nationality);
       setData('nativeCountry', response.native_country);
       setData('gender', response.gender);
+      setData('nationalityCode', response.nationality_country_code);
+      setData('nativeCode', response.native_country_code)
       navigation.navigate('Home', {screen: 'Dashboard'})
       
     } catch (error) {
       console.log('error', error);
-      setErrorMessage('Please check credentials');
+      setModalVisible(true);
     } finally {
       setLoading(false);
     }
@@ -113,9 +131,17 @@ const LoginOtpScreen = ({ navigation }) => {
       const response = await postRequest(API_ENDPOINTS.LOGINRESENDOTP, requestBody);
 
       if (response.responseCode === 'F200') {
-        Alert.alert(response.responseMessage);
-      } else {
+        setModalVisible(true);
         setErrorMessage(response.responseMessage);
+        setModalColor(COLORS.PRIMARY);
+        setModalImage(require('../assets/images/sucess.png'))
+        setModalHeader('Success')
+      } else {
+        setModalVisible(true);
+        setErrorMessage(response.responseMessage);
+        setModalColor(COLORS.ERROR);
+        setModalImage(require('../assets/images/error.png'))
+        setModalHeader('Error')
       }
     } catch (error) {
       console.log('error', error);
@@ -125,14 +151,23 @@ const LoginOtpScreen = ({ navigation }) => {
     }
   };
 
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
+  const sucess = () => {
+    setModalVisible(false);
+    navigation.navigate('Home', {screen: 'Dashboard'})
+  };
+
   return (
     <View style={styles.mainBody}>
       {loading ? (
-        <ActivityIndicator size="large" color="#F5A922" />
+        <ActivityIndicator size="large" color={COLORS.PRIMARY} />
       ) : (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
           <View style={styles.container}>
-            <Image source={require('../images/otpImg.png')} style={styles.image} />
+            <Image source={require('../assets/images/otpImg.png')} style={styles.image} />
             <Text style={styles.headerText}>Verify your phone number</Text>
             <Text style={styles.subHeadingText}>
               Please enter the 6-digit code sent to
@@ -158,12 +193,12 @@ const LoginOtpScreen = ({ navigation }) => {
                       lineHeight: 50,
                       fontSize: 24,
                       borderWidth: 2,
-                      borderColor: '#F5A922',
+                      borderColor: COLORS.PRIMARY,
                       textAlign: 'center',
                       borderRadius: 10,
-                      color: '#FFFFFF',
+                      color: COLORS.WHITE,
                       margin: 5,
-                      backgroundColor: symbol ? '#F5A922' : '#FFFFFF',
+                      backgroundColor: symbol ? COLORS.PRIMARY : COLORS.WHITE,
                     },
                     isFocused && styles.focusCell,
                   ]}
@@ -188,9 +223,8 @@ const LoginOtpScreen = ({ navigation }) => {
               <Text style={styles.confirmButtonText}>Confirm</Text>
             </TouchableOpacity>
 
-            {errorMessage ? (
-              <Text style={styles.errorText}>{errorMessage}</Text>
-            ) : null}
+            <CommonModal visible={modalVisible} onClose={closeModal} message={errorMessage} header={modalHeader} color={modalColor} imageSource={modalImage}>
+      </CommonModal>
           </View>
         </ScrollView>
       )}
@@ -217,23 +251,26 @@ const styles = StyleSheet.create({
     margin: 30,
   },
   headerText: {
-    color: '#F5A922',
+    color: COLORS.PRIMARY,
     fontSize: 24,
-    fontWeight: 'bold',
     textAlign: 'center',
+    fontFamily: FONTS.Bold
   },
   subHeadingText: {
     marginTop: 20,
-    color: '#37474F',
+    color: COLORS.TEXTCOLOR,
     textAlign: 'center',
     fontSize: 16,
+    fontFamily: FONTS.Regular
   },
   subMobileHeaderText: {
-    color: '#F5A922',
+    color: COLORS.PRIMARY,
     marginTop: 5,
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
+    fontFamily: FONTS.Bold
+
   },
   codeFiledRoot: {marginTop: 30, marginRight: 30, marginLeft: 30},
   cell: {
@@ -244,7 +281,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     textAlign: 'center',
     borderRadius: 10,
-    color: '#FFFFFF',
+    color: COLORS.WHITE,
   },
   resendCodeContainer: {
     flexDirection: 'row',
@@ -253,18 +290,20 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   resendCodeText: {
-    color: '#37474F',
+    color: COLORS.TEXTCOLOR,
     fontSize: 16,
+    fontFamily: FONTS.Regular,
   },
   resendCodeLink: {
-    color: '#F5A922',
+    color: COLORS.PRIMARY,
     fontSize: 16,
     marginLeft: 10,
+    fontFamily: FONTS.Bold,
   },
   confirmButton: {
-    backgroundColor: '#F5A922',
+    backgroundColor: COLORS.PRIMARY,
     borderWidth: 1,
-    borderColor: '#F5A922',
+    borderColor: COLORS.PRIMARY,
     height: 50,
     alignItems: 'center',
     borderRadius: 0,
@@ -274,12 +313,14 @@ const styles = StyleSheet.create({
     elevation: 4,
     marginBottom: 30,
     marginTop: 30,
-    width: '85%'
+    width: '85%',
+    borderRadius: 10,
   },
   confirmButtonText: {
-    color: '#FFFFFF',
+    color: COLORS.WHITE,
     paddingVertical: 10,
     fontSize: 16,
+    fontFamily: FONTS.Regular
   },
   focusCell: {
     borderColor: '#F5A922',

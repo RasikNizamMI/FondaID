@@ -14,6 +14,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import {SelectList} from 'react-native-dropdown-select-list';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {COLORS, FONTS} from '../assets/Colors';
 
 const UploadDocumentScreen = ({navigation}) => {
   const [useDocumentNumber, setUseDocumentNumber] = useState('');
@@ -229,7 +230,7 @@ const UploadDocumentScreen = ({navigation}) => {
               <View style={styles.datePickerViews}>
                 <Text style={styles.datePickerText}>{selectedStartDate}</Text>
                 <Image
-                  source={require('../images/Date.png')}
+                  source={require('../assets/images/Date.png')}
                   // tintColor={Colors.primaryColor}
                   style={styles.datePickerIcon}></Image>
               </View>
@@ -251,7 +252,7 @@ const UploadDocumentScreen = ({navigation}) => {
               <View style={styles.datePickerViews}>
                 <Text style={styles.datePickerText}>{selectedEndDate}</Text>
                 <Image
-                  source={require('../images/Date.png')}
+                  source={require('../assets/images/Date.png')}
                   // tintColor={Colors.primaryColor}
                   style={styles.datePickerIcon}></Image>
               </View>
@@ -273,7 +274,7 @@ const UploadDocumentScreen = ({navigation}) => {
                 />
               ) : (
                 <Image
-                  source={require('../images/camera.png')}
+                  source={require('../assets/images/camera.png')}
                   style={styles.uploadImage}
                 />
               )}
@@ -282,7 +283,7 @@ const UploadDocumentScreen = ({navigation}) => {
           <TouchableOpacity onPress={handleUploadImage}>
             <View style={styles.uploadImageView}>
                 <Image
-                  source={require('../images/camera.png')}
+                  source={require('../assets/images/camera.png')}
                   style={styles.uploadImage}
                 />
             </View>
@@ -305,7 +306,7 @@ const UploadDocumentScreen = ({navigation}) => {
               <View>
                 <View style={{flexDirection: 'row'}}>
                   <Image
-                    source={require('../images/document.png')}
+                    source={require('../assets/images/document.png')}
                     style={{
                       height: 40,
                       width: 40,
@@ -454,7 +455,7 @@ const styles = StyleSheet.create({
     borderColor: '#FFFFFF',
     height: 50,
     alignItems: 'center',
-    borderRadius: 0,
+    borderRadius: 10,
     marginLeft: 35,
     marginRight: 35,
     marginTop: 10,

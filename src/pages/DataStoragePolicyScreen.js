@@ -9,6 +9,7 @@ import {
   Linking,
 } from 'react-native';
 import { setData, getData } from '../Utils/AsyncStorageUtil';
+import {COLORS, FONTS} from '../assets/Colors';
 
 const DataStoragePolicyScreen = ({navigation}) => {
   const [dataStorageEnabled, setDataStorageEnabled] = useState(false);
@@ -129,7 +130,7 @@ const DataStoragePolicyScreen = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1A2E35',
+    backgroundColor: COLORS.MAINLYBLUE,
     padding: 16,
     flexGrow: 1,
   },

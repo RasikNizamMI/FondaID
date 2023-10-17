@@ -19,6 +19,8 @@ import {API_ENDPOINTS} from '../Utils/apiConfig';
 import {setData} from '../Utils/AsyncStorageUtil';
 import {Picker} from '@react-native-picker/picker';
 import {SelectList} from 'react-native-dropdown-select-list';
+import {COLORS, FONTS} from '../assets/Colors';
+import CommonModal from '../component/CommonModal';
 
 const RegisterScreen = ({navigation}) => {
   const [formValues, setFormValues] = useState({
@@ -44,6 +46,11 @@ const RegisterScreen = ({navigation}) => {
   const [countryCodeNative, setCountryCodeNative] = useState('');
   const [selectedStartDate, setSelectedStartDate] = useState('Date of Birth');
   const [selectedDocumentType, setSelectedDocumentType] = useState({ key: '', value: '' });
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalImage, setModalImage] = useState('');
+  const [modalColor, setModalColor] = useState('');
+  const [modalHeader, setModalHeader] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const documentTypes = [
     {key: 'M', value: 'Male'},
     {key: 'F', value: 'Female'},
@@ -316,7 +323,9 @@ const RegisterScreen = ({navigation}) => {
     return codeMappings[twoDigitCode] || twoDigitCode;
   };
 
-  const threeDigitCode = convertToThreeDigitCode(countryCodeNationality);
+  const threeDigitCodeNationality = convertToThreeDigitCode(countryCodeNationality);
+
+  const threeDigitCodeNativeCountry = convertToThreeDigitCode(countryCodeNative);
 
   const handleCountryPicker = () => {
     setShowNativeCountryPicker(false);
@@ -367,25 +376,25 @@ const RegisterScreen = ({navigation}) => {
       return;
     }
 
-    if (!validateAlphabets(formValues.firstName)) {
-      setApiResponseMessage('First Name should be alphabets');
-      return;
-    }
+    // if (!validateAlphabets(formValues.firstName)) {
+    //   setApiResponseMessage('First Name should be alphabets');
+    //   return;
+    // }
 
-    if (!validateAlphabets(formValues.surName)) {
-      setApiResponseMessage('Sur Name should be alphabets');
-      return;
-    }
+    // if (!validateAlphabets(formValues.surName)) {
+    //   setApiResponseMessage('Sur Name should be alphabets');
+    //   return;
+    // }
 
-    if (!validateAlphabets(formValues.birthName)) {
-      setApiResponseMessage('Birth Name should be alphabets');
-      return;
-    }
+    // if (!validateAlphabets(formValues.birthName)) {
+    //   setApiResponseMessage('Birth Name should be alphabets');
+    //   return;
+    // }
 
-    if (!validateAlphabets(formValues.placeOfBirth)) {
-      setApiResponseMessage('Place Of Birth should be alphabets');
-      return;
-    }
+    // if (!validateAlphabets(formValues.placeOfBirth)) {
+    //   setApiResponseMessage('Place Of Birth should be alphabets');
+    //   return;
+    // }
 
     if (!validatePhoneNumber(formValues.phoneNumber)) {
       setApiResponseMessage('Please enter a 10-digit phone number');
@@ -398,8 +407,14 @@ const RegisterScreen = ({navigation}) => {
     }
 
     setLoading(true);
-
+    console.log( formValues.nationality);
+    const callingCodeString = formValues.nationality.callingCode.toString();
+    console.log(callingCodeString);
     const formattedStartDate = formatDate(startDate);
+
+    const headers = {
+      'Content-Type': 'application/json',
+    };
 
     const requestBody = {
       first_name: formValues.firstName,
@@ -409,18 +424,22 @@ const RegisterScreen = ({navigation}) => {
       email_id: formValues.email,
       place_of_birth: formValues.placeOfBirth,
       phone_number: formValues.phoneNumber,
+      phone_number_country_code: callingCodeString,
       nationality: formValues.nationality.name,
-      native_country: threeDigitCode,
+      nationality_country_code: threeDigitCodeNationality,
+      native_country: formValues.nativeCountry.name,
+      native_country_code: threeDigitCodeNativeCountry,
       gender: selectedDocumentType.key,
     };
-    console.log(threeDigitCode);
     console.log(JSON.stringify(requestBody));
-    postRequest(API_ENDPOINTS.REGISTERVERIFYOTP, requestBody)
+    postRequest(API_ENDPOINTS.REGISTERVERIFYOTP, requestBody,
+      headers,)
       .then(response => {
         console.log(JSON.stringify(response));
         if (
-          response.Status.responseCode === 'F200'
+          response.responseCode === 'F200'
         ) {
+          console.log("1234")
           setData('refID', response.refId);
           setData('emailID', formValues.email);
           setData('phoneNumber', formValues.phoneNumber);
@@ -433,13 +452,27 @@ const RegisterScreen = ({navigation}) => {
           setData('nativeCountry', formValues.nativeCountry.name);
           setData('gender', selectedDocumentType.key);
           setData('nationalityCode', countryCodeNationality);
-          navigation.navigate('OTPVerificationScreen');
+          // navigation.navigate('OTPVerificationScreen');
+          setModalVisible(true);
+          setErrorMessage(response.responseMessage);
+          setModalColor(COLORS.PRIMARY);
+          setModalImage(require('../assets/images/sucess.png'));
+          setModalHeader('Success');
         } else {
-          setApiResponseMessage(response.Status.responseMessage);
+          setModalVisible(true);
+          setModalColor(COLORS.ERROR);
+          setModalImage(require('../assets/images/error.png'))
+          setModalHeader('Error');
+          setErrorMessage(response.responseMessage);
+          setApiResponseMessage(response.responseMessage);
         }
       })
       .catch(error => {
-        setApiResponseMessage('User already exists with same mail id or phone number!')
+        setModalVisible(true);
+          setModalColor(COLORS.ERROR);
+          setModalImage(require('../assets/images/error.png'))
+          setModalHeader('Error')
+        setApiResponseMessage(error)
         console.log('POST error:', error);
       })
       .finally(() => {
@@ -465,13 +498,23 @@ const RegisterScreen = ({navigation}) => {
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
+    return `${month}/${day}/${year}`;
   };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
+  const sucess = () => {
+    setModalVisible(false);
+    navigation.navigate('OTPVerificationScreen');
+  };
+
 
   return (
     <View style={styles.mainBody}>
       {loading ? (
-        <ActivityIndicator size="large" color="#F5A922" />
+        <ActivityIndicator size="large" color={COLORS.PRIMARY} />
       ) : (
         <ScrollView
           contentContainerStyle={{flexGrow: 1}}
@@ -483,7 +526,7 @@ const RegisterScreen = ({navigation}) => {
                 style={styles.headerIcon}
                 name="chevron-left"
                 size={25}
-                color={'#F5A922'}
+                color={COLORS.PRIMARY}
               />
               <Text style={styles.headerText}>Register Fonda Account</Text>
             </View>
@@ -503,6 +546,7 @@ const RegisterScreen = ({navigation}) => {
                 keyboardType="default"
                 returnKeyType="next"
                 blurOnSubmit={false}
+                maxLength={200}
               />
             </View>
 
@@ -521,6 +565,7 @@ const RegisterScreen = ({navigation}) => {
                 keyboardType="default"
                 returnKeyType="next"
                 blurOnSubmit={false}
+                maxLength={200}
               />
             </View>
 
@@ -539,6 +584,7 @@ const RegisterScreen = ({navigation}) => {
                 keyboardType="default"
                 returnKeyType="next"
                 blurOnSubmit={false}
+                maxLength={200}
               />
             </View>
 
@@ -549,8 +595,8 @@ const RegisterScreen = ({navigation}) => {
                 placeholder={selectedDocumentType.key === '' ? "Choose Gender" : documentTypes.find(item => item.key === selectedDocumentType.key).value}
                 boxStyles={styles.dropdowmBox}
                 dropdownStyles={styles.dropdown}
-                inputStyles={{fontSize: 14, color: '#37474F'}}
-                dropdownTextStyles={{fontSize: 14, color: '#37474F'}}
+                inputStyles={{fontSize: 14, color: COLORS.TEXTCOLOR,  fontFamily: FONTS.Regular,}}
+                dropdownTextStyles={{fontSize: 14, fontFamily: FONTS.Regular,color: COLORS.TEXTCOLOR}}
                 setSelected={(key,value) => setSelectedDocumentType({ key : key, value: value })} // Set the selected document type
                 data={documentTypes}
                 save="key" // Save the key of the selected item
@@ -577,7 +623,7 @@ const RegisterScreen = ({navigation}) => {
                       {selectedStartDate}
                     </Text>
                     <Image
-                      source={require('../images/Date.png')}
+                      source={require('../assets/images/Date.png')}
                       // tintColor={Colors.primaryColor}
                       style={styles.datePickerIcon}></Image>
                   </View>
@@ -598,7 +644,7 @@ const RegisterScreen = ({navigation}) => {
                       : 'Select Nationality'}
                   </Text>
                   </View>
-                  <Feather name="chevron-down" size={30} color={'#999999'} />
+                  <Feather name="chevron-down" size={15} color={'#999999'} />
                 </View>
               </TouchableOpacity>
               {showCountryPicker && (
@@ -637,6 +683,7 @@ const RegisterScreen = ({navigation}) => {
                 keyboardType="default"
                 returnKeyType="next"
                 blurOnSubmit={false}
+                maxLength={200}
               />
             </View>
 
@@ -653,7 +700,7 @@ const RegisterScreen = ({navigation}) => {
                       : 'Select Native Country'}
                   </Text>
                   </View>
-                  <Feather name="chevron-down" size={30} color={'#999999'} />
+                  <Feather name="chevron-down" size={15} color={'#999999'} />
                 </View>
               </TouchableOpacity>
               {showNativeCountryPicker && (
@@ -693,6 +740,7 @@ const RegisterScreen = ({navigation}) => {
                 keyboardType="default"
                 returnKeyType="next"
                 blurOnSubmit={false}
+                maxLength={200}
               />
             </View>
 
@@ -711,6 +759,7 @@ const RegisterScreen = ({navigation}) => {
                 keyboardType="default"
                 returnKeyType="next"
                 blurOnSubmit={false}
+                maxLength={200}
               />
             </View>
 
@@ -737,12 +786,19 @@ const RegisterScreen = ({navigation}) => {
                   style={styles.scannerImage}
                   name="chevron-left"
                   size={25}
-                  color={'#F5A922'}
+                  color={COLORS.PRIMARY}
                 />
                 <Text style={styles.registerButtonTextStyle}>Back</Text>
               </View>
             </TouchableOpacity>
           </View>
+          <CommonModal
+            visible={modalVisible}
+            onClose={modalHeader == 'Success' ? sucess : closeModal}
+            message={errorMessage}
+            header={modalHeader}
+            color={modalColor}
+            imageSource={modalImage}></CommonModal>
         </ScrollView>
       )}
     </View>
@@ -764,16 +820,17 @@ const styles = StyleSheet.create({
   },
   headerIcon: {
     marginLeft: 16,
-    marginTop: 2.5,
     position: 'absolute',
     left: 0,
+    top: 18
   },
   headerText: {
+    marginLeft: 10,
     marginTop: 12,
-    fontSize: 18,
-    color: '#F5A922',
+    fontSize: 24,
+    color: COLORS.PRIMARY,
     textAlign: 'center',
-    fontWeight: 'bold',
+    fontFamily: FONTS.Bold
   },
   formSection: {
     marginTop: 20,
@@ -781,16 +838,21 @@ const styles = StyleSheet.create({
     marginRight: 35,
   },
   formLabel: {
-    color: '#37474F',
+    color: COLORS.TEXTCOLOR,
+    fontFamily: FONTS.Regular,
+    fontSize: 14,
   },
   inputStyle: {
     flex: 1,
-    color: '#37474F',
+    color: COLORS.TEXTCOLOR,
     paddingLeft: 15,
     paddingRight: 15,
     elevation: 4,
-    backgroundColor: '#ffffff',
+    backgroundColor: COLORS.WHITE,
     borderRadius: 10,
+    fontFamily: FONTS.Regular,
+    fontSize: 14,
+    marginTop: 10,
   },
   countryPickerButton: {
     flexDirection: 'row',
@@ -798,17 +860,19 @@ const styles = StyleSheet.create({
     marginTop: 5,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#FFFFFF',
-    color: '#37474F',
+    borderColor: COLORS.WHITE,
+    color: COLORS.TEXTCOLOR,
     paddingLeft: 15,
     paddingRight: 5,
     elevation: 4,
-    backgroundColor: '#ffffff',
+    backgroundColor: COLORS.WHITE,
     borderRadius: 10,
     justifyContent: 'space-between',
   },
   placeholderText: {
-    color: '#37474F',
+    color: COLORS.TEXTCOLOR,
+    fontFamily: FONTS.Regular,
+    fontSize: 14,
   },
   datePickerView: {
     flexDirection: 'row',
@@ -816,8 +880,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     marginTop: 15,
-    borderColor: '#FFFFFF',
-    backgroundColor: '#FFFFFF',
+    borderColor: COLORS.WHITE,
+    backgroundColor: COLORS.WHITE,
     elevation: 4,
     height: 50,
     borderRadius: 10,
@@ -832,21 +896,21 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: 5,
     textAlign: 'left',
-    color: '#37474F',
+    color: COLORS.TEXTCOLOR,
     marginLeft: 16,
+    fontFamily: FONTS.Regular,
   },
   datePickerIcon: {
     height: 25,
     width: 25,
     marginLeft: 10,
     marginRight: 10,
-    marginTop: 10,
   },
   buttonStyle: {
-    backgroundColor: '#F5A922',
+    backgroundColor: COLORS.PRIMARY,
     borderWidth: 0,
-    color: '#FFFFFF',
-    borderColor: '#F5A922',
+    color: COLORS.WHITE,
+    borderColor: COLORS.PRIMARY,
     height: 50,
     alignItems: 'center',
     borderRadius: 10,
@@ -855,18 +919,19 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   buttonTextStyle: {
-    color: '#FFFFFF',
+    color: COLORS.WHITE,
     paddingVertical: 10,
     fontSize: 16,
+    fontFamily: FONTS.Regular
   },
   registerButtonStyle: {
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.WHITE,
     borderWidth: 1,
-    color: '#FFFFFF',
-    borderColor: '#FFFFFF',
+    color: COLORS.WHITE,
+    borderColor: COLORS.WHITE,
     height: 50,
     alignItems: 'center',
-    borderRadius: 0,
+    borderRadius: 10,
     marginLeft: 35,
     marginRight: 35,
     marginTop: 10,
@@ -875,9 +940,10 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   registerButtonTextStyle: {
-    color: '#F5A922',
+    color: COLORS.PRIMARY,
     paddingVertical: 10,
     fontSize: 16,
+    fontFamily: FONTS.Regular
   },
   scannerView: {
     alignSelf: 'center',
@@ -903,6 +969,7 @@ const styles = StyleSheet.create({
   apiResponseText: {
     color: '#FF0000',
     fontSize: 16,
+    fontFamily: FONTS.Regular
   },
 
   genderPickerContainer: {
@@ -911,14 +978,14 @@ const styles = StyleSheet.create({
   },
   dropdowmBox: {
     marginTop: 10,
-    borderColor: '#FFFFFF',
-    backgroundColor: '#FFFFFF',
+    borderColor: COLORS.WHITE,
+    backgroundColor: COLORS.WHITE,
     elevation: 4,
   },
   dropdown: {
     marginTop: 10,
-    borderColor: '#FFFFFF',
-    backgroundColor: '#FFFFFF',
+    borderColor: COLORS.WHITE,
+    backgroundColor: COLORS.WHITE,
     elevation: 4,
   },
 });

@@ -14,6 +14,8 @@ import {getData} from '../Utils/AsyncStorageUtil';
 import {postRequest} from '../Utils/apiUtils';
 import {API_ENDPOINTS} from '../Utils/apiConfig';
 import {convertImageToBase64} from 'react-native-image-base64';
+import {COLORS, FONTS} from '../assets/Colors';
+import CommonModal from '../component/CommonModal';
 
 const ConfirmDocument = ({navigation}) => {
   const [userDocument, setUserDocument] = useState('');
@@ -36,6 +38,11 @@ const ConfirmDocument = ({navigation}) => {
   const [apiResponseMessage, setApiResponseMessage] = useState('');
   const [userUploadImageBase64, setUserUploadImageBase64] = useState('');
   const [userFondaID, setUserFondaID] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalImage, setModalImage] = useState('');
+  const [modalColor, setModalColor] = useState('');
+  const [modalHeader, setModalHeader] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     const loadRememberedCredentials = async () => {
@@ -53,10 +60,12 @@ const ConfirmDocument = ({navigation}) => {
         const storedUserDateOfBirth = await getData('dateOfBirth');
         const storedUserPlaceOfBirth = await getData('placeOfBirth');
         const storedUserNationality = await getData('nationality');
-        const storedUserNativeCountry = await getData('nativeCountry');
+        const storedUserNativeCountry = await getData('nationalityCode');
         const storeUserGender = await getData('gender');
         const storeUserCountryCode = await getData('nationalityCode');
-        const storedUserUploadImageBase64 = await getData('addDoUploadImgBase64'); 
+        const storedUserUploadImageBase64 = await getData(
+          'addDoUploadImgBase64',
+        );
         const storedUserFondaID = await getData('fondaId');
         setUserDocument(storedUserDocument);
         setUserDateOfIssue(storedUserDateOfIssue);
@@ -74,8 +83,8 @@ const ConfirmDocument = ({navigation}) => {
         setUserNativeCountry(storedUserNativeCountry);
         setUserGender(storeUserGender);
         setUserCountyCode(storeUserCountryCode);
-         setUserUploadImageBase64(storedUserUploadImageBase64);
-         setUserFondaID(storedUserFondaID);
+        setUserUploadImageBase64(storedUserUploadImageBase64);
+        setUserFondaID(storedUserFondaID);
 
         if (userDocument === 'passport') {
           console.log('Passport');
@@ -87,7 +96,7 @@ const ConfirmDocument = ({navigation}) => {
     loadRememberedCredentials();
   }, []);
 
-  const formatDateOfBirth = (dateOfBirth) => {
+  const formatDateOfBirth = dateOfBirth => {
     const date = new Date(dateOfBirth);
     const day = date.getDate().toString().padStart(2, '0');
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -111,120 +120,137 @@ const ConfirmDocument = ({navigation}) => {
         doc_type: userDocument,
         doc_date_of_issue: userDateOfIssue,
         doc_date_of_expiration: userDateOfExpiry,
-        face_image: "imageToProcess",
-        face_template: "imageToProcess"
-    },
-    images: {
-      imageToProcess: userUploadImageBase64
-  }
+        face_image: 'imageToProcess',
+        face_template: 'imageToProcess',
+      },
+      images: {
+        imageToProcess: userUploadImageBase64,
+      },
     };
-    console.log("RequestBody-------"+API_ENDPOINTS.UPLOADDOCUMENT)
-    console.log("RequestBody-------"+JSON.stringify(requestBody))
+    console.log('RequestBody-------' + API_ENDPOINTS.UPLOADDOCUMENT);
+    console.log('RequestBody-------' + JSON.stringify(requestBody));
     postRequest(API_ENDPOINTS.UPLOADDOCUMENT, requestBody)
       .then(response => {
-        console.log(response)
-       if (response.responseCode === 'F200') {
-          // Display a success alert
-          Alert.alert('Success', response.message, [
-            {
-              text: 'OK',
-              onPress: () => {
-                // Navigate to the 'SubmitSuccess' screen
-                navigation.navigate('SubmitSuccess');
-              },
-            },
-          ]);
+        console.log(response);
+        if (response.responseCode === 'F200') {
+          console.log(response);
+          setModalVisible(true);
+          setErrorMessage(response.message);
+          setModalColor(COLORS.PRIMARY);
+          setModalImage(require('../assets/images/sucess.png'));
+          setModalHeader('Success');
         } else {
-          // Display an error alert
-          Alert.alert('Error', response.message, [
-            {
-              text: 'OK',
-              onPress: () => {
-                // Handle the error as needed
-              },
-            },
-          ]);
+          console.log(response);
+          setModalVisible(true);
+          setErrorMessage(response.message);
+          setModalColor(COLORS.ERROR);
+          setModalImage(require('../assets/images/error.png'));
+          setModalHeader('Error');
         }
       })
       .catch(error => {
-        console.log('error' + error);
+        console.log("123456765432")
+        setModalVisible(true);
+          setErrorMessage('No face Detected');
+          setModalColor(COLORS.ERROR);
+          setModalImage(require('../assets/images/error.png'));
+          setModalHeader('Error');
       })
       .finally(() => {
         setLoading(false);
       });
   };
 
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+  const handleSkip = () => {
+    navigation.goBack(null);
+  };
+
+  const sucess = () => {
+    setModalVisible(false);
+    navigation.navigate('SubmitSuccess');
+  };
+
   return (
     <View style={styles.mainBody}>
       {loading ? (
-        <ActivityIndicator size="large" color="#F5A922" />
+        <ActivityIndicator size="large" color={COLORS.PRIMARY} />
       ) : (
-      <ScrollView
-        contentContainerStyle={{flexGrow: 1}}
-        keyboardShouldPersistTaps="handled">
-        <View>
-          <View style={styles.headerView}>
-            <Feather
-              onPress={() => {
-                navigation.goBack(null);
-              }}
-              style={styles.headerIcon}
-              name="chevron-left"
-              size={25}
-              color={'#F5A922'}
-            />
-            <Text style={styles.headerText}>Document Preview</Text>
-          </View>
+        <ScrollView
+          contentContainerStyle={{flexGrow: 1}}
+          keyboardShouldPersistTaps="handled">
+          <View>
+            <View style={styles.headerView}>
+              <Feather
+                onPress={() => {
+                  navigation.goBack(null);
+                }}
+                style={styles.headerIcon}
+                name="chevron-left"
+                size={25}
+                color={COLORS.PRIMARY}
+              />
+              <Text style={styles.headerText}>Document Preview</Text>
+            </View>
 
-          <View style={styles.headerTextView}>
-            <Text style={styles.headerTexts}>Document Type</Text>
-          </View>
-          <View style={styles.subheaderView}>
-            <Text style={styles.subheaderText}>{userDocument}</Text>
-          </View>
+            <View style={styles.headerTextView}>
+              <Text style={styles.headerTexts}>Document Type</Text>
+            </View>
+            <View style={styles.subheaderView}>
+              <Text style={styles.subheaderText}>{userDocument}</Text>
+            </View>
 
-          <View style={styles.headerTextView}>
-            <Text style={styles.headerTexts}>Document Number</Text>
-          </View>
-          <View style={styles.subheaderView}>
-            <Text style={styles.subheaderText}>{userDocumentNumber}</Text>
-          </View>
+            <View style={styles.headerTextView}>
+              <Text style={styles.headerTexts}>Document Number</Text>
+            </View>
+            <View style={styles.subheaderView}>
+              <Text style={styles.subheaderText}>{userDocumentNumber}</Text>
+            </View>
 
-          <View style={styles.headerTextView}>
-            <Text style={styles.headerTexts}>Date of Issue</Text>
-          </View>
-          <View style={styles.subheaderView}>
-            <Text style={styles.subheaderText}>{userDateOfIssue}</Text>
-          </View>
+            <View style={styles.headerTextView}>
+              <Text style={styles.headerTexts}>Date of Issue</Text>
+            </View>
+            <View style={styles.subheaderView}>
+              <Text style={styles.subheaderText}>{userDateOfIssue}</Text>
+            </View>
 
-          <View style={styles.headerTextView}>
-            <Text style={styles.headerTexts}>Date of Expiry</Text>
-          </View>
-          <View style={styles.subheaderView}>
-            <Text style={styles.subheaderText}>{userDateOfExpiry}</Text>
-          </View>
+            <View style={styles.headerTextView}>
+              <Text style={styles.headerTexts}>Date of Expiry</Text>
+            </View>
+            <View style={styles.subheaderView}>
+              <Text style={styles.subheaderText}>{userDateOfExpiry}</Text>
+            </View>
 
-          <View style={styles.headerTextView}>
-            <Text style={styles.headerTexts}>Document Preview</Text>
-          </View>
-          <View style={styles.imageView}>
-            <Image source={{uri: userUploadImage}} style={styles.images} />
-          </View>
+            <View style={styles.headerTextView}>
+              <Text style={styles.headerTexts}>Document Preview</Text>
+            </View>
+            <View style={styles.imageView}>
+              <Image source={{uri: userUploadImage}} style={styles.images} />
+            </View>
 
-          <TouchableOpacity
-            style={styles.buttonStyle}
-            activeOpacity={0.5}
-            onPress={handletoSubmitDoc}>
-            <Text style={styles.buttonTextStyle}>Submit Document</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.registerButtonStyle}
-            activeOpacity={0.5}
-            onPress={() => navigation.navigate('RegisterScreen')}>
-            <Text style={styles.registerButtonTextStyle}>Skip</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+            <TouchableOpacity
+              style={styles.buttonStyle}
+              activeOpacity={0.5}
+              onPress={handletoSubmitDoc}>
+              <Text style={styles.buttonTextStyle}>Submit Document</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.registerButtonStyle}
+              activeOpacity={0.5}
+              onPress={handleSkip}>
+              <Text style={styles.registerButtonTextStyle}>Skip</Text>
+            </TouchableOpacity>
+          </View>
+          <CommonModal
+            visible={modalVisible}
+            onClose={modalHeader == 'Success' ? sucess : closeModal}
+            message={errorMessage}
+            header={modalHeader}
+            color={modalColor}
+            imageSource={modalImage}></CommonModal>
+        </ScrollView>
       )}
     </View>
   );
@@ -240,10 +266,10 @@ const styles = StyleSheet.create({
     alignContent: 'center',
   },
   buttonStyle: {
-    backgroundColor: '#F5A922',
+    backgroundColor: COLORS.PRIMARY,
     borderWidth: 0,
-    color: '#FFFFFF',
-    borderColor: '#F5A922',
+    color: COLORS.WHITE,
+    borderColor: COLORS.PRIMARY,
     height: 50,
     alignItems: 'center',
     borderRadius: 10,
@@ -252,13 +278,13 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   registerButtonStyle: {
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.WHITE,
     borderWidth: 1,
-    color: '#FFFFFF',
-    borderColor: '#FFFFFF',
+    color: COLORS.WHITE,
+    borderColor: COLORS.WHITE,
     height: 50,
     alignItems: 'center',
-    borderRadius: 0,
+    borderRadius: 10,
     marginLeft: 35,
     marginRight: 35,
     marginTop: 10,
@@ -267,12 +293,13 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   buttonTextStyle: {
-    color: '#FFFFFF',
+    color: COLORS.WHITE,
     paddingVertical: 10,
     fontSize: 16,
+    fontFamily: FONTS.Regular,
   },
   registerButtonTextStyle: {
-    color: '#F5A922',
+    color: COLORS.PRIMARY,
     paddingVertical: 10,
     fontSize: 16,
   },
@@ -290,14 +317,18 @@ const styles = StyleSheet.create({
   },
   headerText: {
     marginTop: 12,
-    fontSize: 18,
-    color: '#F5A922',
+    fontSize: 24,
+    color: COLORS.PRIMARY,
     textAlign: 'center',
-    fontWeight: 'bold',
+    fontFamily: FONTS.Bold,
   },
   headerTextView: {marginTop: 20, marginLeft: 30, marginRight: 30},
-  headerTexts: {color: '#999999', fontSize: 14},
-  subheaderText: {color: '#37474F', fontSize: 14, fontWeight: 'bold'},
+  headerTexts: {color: COLORS.SUBTEXT, fontSize: 14, fontFamily: FONTS.Regular},
+  subheaderText: {
+    color: COLORS.TEXTCOLOR,
+    fontSize: 14,
+    fontFamily: FONTS.Bold,
+  },
   subheaderView: {marginTop: 5, marginLeft: 30, marginRight: 30},
   imageView: {
     alignItems: 'center',
@@ -305,7 +336,7 @@ const styles = StyleSheet.create({
     marginLeft: 30,
     marginTop: 15,
     height: 300,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.WHITE,
     elevation: 4,
   },
   images: {

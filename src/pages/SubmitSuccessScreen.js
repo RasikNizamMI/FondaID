@@ -16,10 +16,17 @@ import {
 import Feather from 'react-native-vector-icons/Feather';
 import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
 import {useClipboard} from '@react-native-community/clipboard';
+import {COLORS, FONTS} from '../assets/Colors';
+import CommonModal from '../component/CommonModal';
 
 const SubmitSuccessScreen = ({navigation}) => {
   const [userFondaID, setUserFondaID] = useState('');
   const [data, setString] = useClipboard();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalImage, setModalImage] = useState('');
+  const [modalColor, setModalColor] = useState('');
+  const [modalHeader, setModalHeader] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     const loadRememberedCredentials = async () => {
@@ -55,8 +62,16 @@ const SubmitSuccessScreen = ({navigation}) => {
 
   const handleCopyToClipboard = () => {
     setString(userFondaID);
+    setModalVisible(true);
+          setErrorMessage("Fonda ID Coppied Successfully");
+          setModalColor(COLORS.PRIMARY);
+          setModalImage(require('../assets/images/sucess.png'));
+          setModalHeader('Success');
   };
 
+  const closeModal = () => {
+    setModalVisible(false);
+  };
 
   return (
     <View style={styles.mainBody}>
@@ -88,10 +103,10 @@ const SubmitSuccessScreen = ({navigation}) => {
             <Text
               style={{
                 marginTop: 12,
-                fontSize: 18,
+                fontSize: 24,
                 color: '#F5A922',
                 textAlign: 'center',
-                fontWeight: 'bold',
+                fontFamily: FONTS.Bold,
               }}>
               Success
             </Text>
@@ -104,7 +119,7 @@ const SubmitSuccessScreen = ({navigation}) => {
               marginTop: 30,
             }}>
             <Image
-              source={require('../images/SucessPic.png')}
+              source={require('../assets/images/SucessPic.png')}
               style={{
                 height: 180,
                 width: 250,
@@ -114,10 +129,10 @@ const SubmitSuccessScreen = ({navigation}) => {
           </View>
 
           <View style={{marginTop: 15, marginLeft: 30, alignItems: 'center'}}>
-            <Text style={{color: '#37474F', fontSize: 16}}>
+            <Text style={{color: '#37474F', fontSize: 18, fontFamily: FONTS.Medium}}>
               Your KYC Details & Documents are
             </Text>
-            <Text style={{color: '#37474F', fontSize: 16, marginTop: 10}}>
+            <Text style={{color: '#37474F', fontSize: 18, fontFamily: FONTS.Medium, marginTop: 10}}>
               verified successfully!
             </Text>
           </View>
@@ -158,7 +173,7 @@ const SubmitSuccessScreen = ({navigation}) => {
                     elevation: 4,
                   }}>
                   <Image
-                    source={require('../images/copyIcon.png')}
+                    source={require('../assets/images/copyIcon.png')}
                     style={{
                       width: 20,
                       height: 20,
@@ -184,7 +199,7 @@ const SubmitSuccessScreen = ({navigation}) => {
                     elevation: 4,
                   }}>
                   <Image
-                    source={require('../images/shareIcon.png')}
+                    source={require('../assets/images/shareIcon.png')}
                     style={{
                       width: 20,
                       height: 20,
@@ -199,7 +214,7 @@ const SubmitSuccessScreen = ({navigation}) => {
           </View>
 
           <View style={{marginTop: 15, marginLeft: 30, alignItems: 'center'}}>
-            <Text style={{color: '#37474F', fontSize: 14, textAlign: 'center'}}>
+            <Text style={{color: '#37474F', fontSize: 14, textAlign: 'center', fontFamily: FONTS.Medium}}>
               Note: You can use this Fonda ID on various platforms/applications
               as your Digital Identity!
             </Text>
@@ -211,15 +226,14 @@ const SubmitSuccessScreen = ({navigation}) => {
             onPress={handleLogin}>
             <Text style={styles.buttonTextStyle}>Login your Fonda Account</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.registerButtonStyle}
-            activeOpacity={0.5}
-            // onPress={handleSubmitPress}
-            onPress={handleUploadDoc}>
-            <Text style={styles.registerButtonTextStyle}>Skip</Text>
-          </TouchableOpacity>
-          <View></View>
         </View>
+        <CommonModal
+            visible={modalVisible}
+            onClose={closeModal}
+            message={errorMessage}
+            header={modalHeader}
+            color={modalColor}
+            imageSource={modalImage}></CommonModal>
       </ScrollView>
     </View>
   );
@@ -279,7 +293,7 @@ const styles = StyleSheet.create({
     borderColor: '#FFFFFF',
     height: 50,
     alignItems: 'center',
-    borderRadius: 0,
+    borderRadius:10,
     marginLeft: 35,
     marginRight: 35,
     marginTop: 10,
@@ -291,6 +305,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     paddingVertical: 10,
     fontSize: 16,
+    fontFamily: FONTS.Regular
   },
   registerButtonTextStyle: {
     color: '#F5A922',
@@ -333,7 +348,8 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   text: {
-    fontSize: 16,
+    fontSize: 18,
+    fontFamily: FONTS.Medium,
     textAlign: 'center',
     color: '#37474F',
     marginTop: 15,
@@ -342,6 +358,6 @@ const styles = StyleSheet.create({
     fontSize: 32,
     textAlign: 'center',
     color: '#F5A922',
-    fontWeight: 'bold',
+    fontFamily: FONTS.Bold
   },
 });

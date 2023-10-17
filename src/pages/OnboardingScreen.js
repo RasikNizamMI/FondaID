@@ -2,6 +2,7 @@ import React, {useRef} from 'react';
 import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import Swiper from 'react-native-swiper';
 import { setData, getData } from '../Utils/AsyncStorageUtil';
+import {COLORS, FONTS} from '../assets/Colors';
 
 const OnboardingScreen = ({ navigation }) => {
   const swiperRef = useRef(null);
@@ -28,7 +29,7 @@ const OnboardingScreen = ({ navigation }) => {
     >
       <View style={styles.slide}>
         <Image
-          source={require('../images/illustration.png')}
+          source={require('../assets/images/illustration.png')}
           style={styles.backgroundImage}
         />
         {/* Your content goes here */}
@@ -53,7 +54,7 @@ const OnboardingScreen = ({ navigation }) => {
             <View style={styles.arrowImageView}>
               <TouchableOpacity onPress={handleArrowClick}>
                 <Image
-                  source={require('../images/arrow.png')}
+                  source={require('../assets/images/arrow.png')}
                   style={styles.arrowImage}
                 />
               </TouchableOpacity>
@@ -63,7 +64,7 @@ const OnboardingScreen = ({ navigation }) => {
       </View>
       <View style={styles.slide}>
         <Image
-          source={require('../images/illustration1.png')}
+          source={require('../assets/images/illustration1.png')}
           style={styles.backgroundImage}
         />
         {/* Your content goes here */}
@@ -76,7 +77,7 @@ const OnboardingScreen = ({ navigation }) => {
           <View>
             <View style={styles.topImage}>
               {/* <Image
-                source={require('../images/illustration1.png')}
+                source={require('../assets/images/illustration1.png')}
                 style={styles.topImage}
               /> */}
             </View>
@@ -88,7 +89,7 @@ const OnboardingScreen = ({ navigation }) => {
             <View style={styles.arrowImageView}>
               <TouchableOpacity onPress={handleArrowClick}>
                 <Image
-                  source={require('../images/arrow.png')}
+                  source={require('../assets/images/arrow.png')}
                   style={styles.arrowImage}
                 />
               </TouchableOpacity>
@@ -98,7 +99,7 @@ const OnboardingScreen = ({ navigation }) => {
       </View>
       <View style={styles.slide}>
         <Image
-          source={require('../images/illustration2.png')}
+          source={require('../assets/images/illustration2.png')}
           style={styles.backgroundImage}
         />
         {/* Your content goes here */}
@@ -128,7 +129,7 @@ const OnboardingScreen = ({ navigation }) => {
             <View style={styles.arrowImageView}>
               <TouchableOpacity onPress={handleArrowClick}>
                 <Image
-                  source={require('../images/arrow.png')}
+                  source={require('../assets/images/arrow.png')}
                   style={styles.arrowImage}
                 />
               </TouchableOpacity>
@@ -138,7 +139,7 @@ const OnboardingScreen = ({ navigation }) => {
       </View>
       <View style={styles.slide}>
         <Image
-          source={require('../images/illustration3.png')}
+          source={require('../assets/images/illustration3.png')}
           style={styles.backgroundImage}
         />
         {/* Your content goes here */}
@@ -221,7 +222,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   skipText: {
-    color: '#37474F',
+    color: COLORS.TEXTCOLOR,
+    fontFamily: FONTS.Regular,
     fontSize: 24,
     alignSelf: 'flex-end',
     textAlign: 'right',
@@ -234,14 +236,16 @@ const styles = StyleSheet.create({
   },
   topImage: {width: '70%', resizeMode: 'contain', height: '60%'},
   text1View: {
-    color: '#37474F',
+    color: COLORS.TEXTCOLOR,
     fontSize: 28,
     marginLeft: 30,
+    fontFamily: FONTS.Medium
   },
   text2View: {
-    color: '#F5A922',
+    color: COLORS.PRIMARY,
     fontSize: 28,
     marginLeft: 30,
+    fontFamily: FONTS.Bold,
   },
   arrowImageView: {
     alignItems: 'center',
@@ -254,10 +258,10 @@ const styles = StyleSheet.create({
     height: 60,
   },
   buttonStyle: {
-    backgroundColor: '#F5A922',
+    backgroundColor: COLORS.PRIMARY,
     borderWidth: 0,
-    color: '#FFFFFF',
-    borderColor: '#F5A922',
+    color: COLORS.WHITE,
+    borderColor: COLORS.PRIMARY,
     height: 50,
     alignItems: 'center',
     marginLeft: 35,
@@ -267,7 +271,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   buttonTextStyle: {
-    color: '#FFFFFF',
+    color: COLORS.WHITE,
     paddingVertical: 15,
     fontSize: 16,
   },

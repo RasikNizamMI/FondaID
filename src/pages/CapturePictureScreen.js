@@ -14,6 +14,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import {SelectList} from 'react-native-dropdown-select-list';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {COLORS, FONTS} from '../assets/Colors';
 
 const CapturePictureScreen = ({navigation}) => {
   const [useDocumentNumber, setUseDocumentNumber] = useState('');
@@ -184,7 +185,7 @@ const CapturePictureScreen = ({navigation}) => {
                 />
               ) : (
                 <Image
-                  source={require('../images/CapturePicture.png')}
+                  source={require('../assets/images/CapturePicture.png')}
                   style={styles.uploadImage}
                 />
               )}
@@ -250,7 +251,7 @@ const styles = StyleSheet.create({
     borderColor: '#FFFFFF',
     height: 50,
     alignItems: 'center',
-    borderRadius: 0,
+    borderRadius: 10,
     marginLeft: 35,
     marginRight: 35,
     marginTop: 10,
