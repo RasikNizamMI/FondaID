@@ -21,6 +21,7 @@ import {Picker} from '@react-native-picker/picker';
 import {SelectList} from 'react-native-dropdown-select-list';
 import {COLORS, FONTS} from '../assets/Colors';
 import CommonModal from '../component/CommonModal';
+import PhoneInput from 'react-native-phone-number-input';
 
 const RegisterScreen = ({navigation}) => {
   const [formValues, setFormValues] = useState({
@@ -51,6 +52,7 @@ const RegisterScreen = ({navigation}) => {
   const [modalColor, setModalColor] = useState('');
   const [modalHeader, setModalHeader] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [callingCodeValue, setCallingCodeValue] = useState('+1');
   const documentTypes = [
     {key: 'M', value: 'Male'},
     {key: 'F', value: 'Female'},
@@ -408,7 +410,7 @@ const RegisterScreen = ({navigation}) => {
 
     setLoading(true);
     console.log( formValues.nationality);
-    const callingCodeString = formValues.nationality.callingCode.toString();
+    const callingCodeString = callingCodeValue.toString();
     console.log(callingCodeString);
     const formattedStartDate = formatDate(startDate);
 
@@ -728,19 +730,45 @@ const RegisterScreen = ({navigation}) => {
             {/* Phone Number */}
             <View style={styles.formSection}>
               <Text style={styles.formLabel}>Phone Number</Text>
-              <TextInput
-                value={formValues.phoneNumber}
-                style={styles.inputStyle}
+              <PhoneInput
+                defaultValue={formValues.phoneNumber}
+                defaultCode="US"
+                layout="first"
                 onChangeText={text =>
                   setFormValues({...formValues, phoneNumber: text})
                 }
                 placeholder="Enter Phone Number"
-                placeholderTextColor="#37474F"
-                autoCapitalize="none"
-                keyboardType="default"
-                returnKeyType="next"
-                blurOnSubmit={false}
-                maxLength={200}
+                containerStyle={{
+                  height: 50,
+                  width: '100%',
+                  color: COLORS.TEXTCOLOR,
+                  elevation: 4,
+                  backgroundColor: COLORS.WHITE,
+                  borderRadius: 10,
+                }}
+                textContainerStyle={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  paddingLeft: 0,
+                  fontFamily: FONTS.Regular,
+                  fontSize: 14,
+                  borderRadius: 10,
+                }}
+                textInputStyle={{
+                  flex: 1,
+                  fontSize: 14,
+                  paddingVertical: 0,
+                  fontFamily: FONTS.Regular,
+                  alignItems: 'center',
+                }}
+                flagButtonStyle={{width: 50, marginLeft: 10}}
+                onChangeCountry={countryData => {
+                  const callingCode = countryData.callingCode;
+                  console.log(callingCode);
+                  setCallingCodeValue(callingCode);
+                }}
               />
             </View>
 

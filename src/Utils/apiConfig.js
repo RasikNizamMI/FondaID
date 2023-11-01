@@ -1,5 +1,5 @@
 const API_BASE_URL = 'https://fonda.dturn.net/';
-const API_BASE_BIO_URL = 'https://bioseal.id3.eu/';
+const API_BASE_BIO_URL = 'http://vps-35c5bf77.vps.ovh.net:8000/';
 
 export const API_ENDPOINTS = {
   REGISTER: `${API_BASE_URL}user`,
@@ -19,5 +19,7 @@ export const API_ENDPOINTS = {
   LOGINRESENDOTP: `${API_BASE_URL}v1/user/login/resend/otp`,
   GETUSER: `${API_BASE_URL}v1/user?user_id=`,
   GETDOCUMENTQR: `${API_BASE_URL}v1/document/qrcode?ref_id=`,
-  GETDOCUMENTPREVIEW:  `${API_BASE_URL}v1/document/verify/qrcode?ref_id=`,
+  GETDOCUMENTPREVIEW: `${API_BASE_URL}v1/document/verify/qrcode?ref_id=`,
+  NOTIFICATION: `${API_BASE_BIO_URL}v1/user/notification?fonda_id=`,
+  UPDATENOTIFICATION: `${API_BASE_BIO_URL}v1/user/notification/update/status`,
 };
