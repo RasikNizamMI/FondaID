@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
   View,
@@ -15,18 +15,22 @@ import {
   useBlurOnFulfill,
   useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
-import { API_ENDPOINTS } from '../Utils/apiConfig';
-import { getRequest, postRequest } from '../Utils/apiUtils';
-import { getData, setData } from '../Utils/AsyncStorageUtil';
+import {API_ENDPOINTS} from '../Utils/apiConfig';
+import {getRequest, postRequest} from '../Utils/apiUtils';
+import {getData, setData} from '../Utils/AsyncStorageUtil';
 import {COLORS, FONTS} from '../assets/Colors';
 import CommonModal from '../component/CommonModal';
+import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const CELL_COUNT = 6;
 
-const LoginOtpScreen = ({ navigation }) => {
+const LoginOtpScreen = ({navigation}) => {
   const [value, setValue] = useState('');
-  const ref = useBlurOnFulfill({ value, cellCount: CELL_COUNT });
-  const [props, getCellOnLayoutHandler] = useClearByFocusCell({ value, setValue });
+  const ref = useBlurOnFulfill({value, cellCount: CELL_COUNT});
+  const [props, getCellOnLayoutHandler] = useClearByFocusCell({
+    value,
+    setValue,
+  });
 
   const [userPhoneNo, setUserPhoneNo] = useState('');
   const [userRefID, setUserRefID] = useState('');
@@ -61,11 +65,15 @@ const LoginOtpScreen = ({ navigation }) => {
       login_otp: value,
     };
     try {
-      const response = await postRequest(API_ENDPOINTS.LOGINVERIFYOTP, requestBody);
-      console.log(response)
+      const response = await postRequest(
+        API_ENDPOINTS.LOGINVERIFYOTP,
+        requestBody,
+      );
+      console.log(response);
       if (response.responseCode === 'F200') {
-        console.log(response)
-        handleUser();
+        console.log(response);
+        setData('jwt_token', response.token);
+        handleUser(response.token);
         // setModalVisible(true);
         // setErrorMessage(response.responseMessage);
         // setModalColor(COLORS.PRIMARY);
@@ -75,8 +83,8 @@ const LoginOtpScreen = ({ navigation }) => {
         setModalVisible(true);
         setErrorMessage(response.responseMessage);
         setModalColor(COLORS.ERROR);
-        setModalImage(require('../assets/images/error.png'))
-        setModalHeader('Error')
+        setModalImage(require('../assets/images/error.png'));
+        setModalHeader('Error');
       }
     } catch (error) {
       setModalVisible(true);
@@ -88,14 +96,21 @@ const LoginOtpScreen = ({ navigation }) => {
     }
   };
 
- const handleUser = async () => {
-  setLoading(true);
-
+  const handleUser = async accessToken => {
+    setLoading(true);
+    const headers = {
+      'Content-Type': 'application/json',
+      'access-token': accessToken,
+    };
     try {
-      const response = await getRequest(API_ENDPOINTS.GETUSER+userRefID);
+      const response = await getRequest(
+        API_ENDPOINTS.GETUSER + userRefID,
+        {},
+        headers,
+      );
       console.log(JSON.stringify(response));
-      setUserFondaID(response.fonda_id)
-      setData('fonda_ID', response.fonda_id)
+      setUserFondaID(response.fonda_id);
+      setData('fonda_ID', response.fonda_id);
       setData('_id', response._id);
       setData('emailID', response.email_id);
       setData('phoneNumber', response.phone_number);
@@ -108,17 +123,15 @@ const LoginOtpScreen = ({ navigation }) => {
       setData('nativeCountry', response.native_country);
       setData('gender', response.gender);
       setData('nationalityCode', response.nationality_country_code);
-      setData('nativeCode', response.native_country_code)
-      navigation.navigate('Home', {screen: 'Dashboard'})
-      
+      setData('nativeCode', response.native_country_code);
+      navigation.navigate('Home', {screen: 'Dashboard'});
     } catch (error) {
       console.log('error', error);
       setModalVisible(true);
     } finally {
       setLoading(false);
     }
-  }
-
+  };
 
   const handleLogin = async () => {
     setLoading(true);
@@ -128,20 +141,23 @@ const LoginOtpScreen = ({ navigation }) => {
     };
 
     try {
-      const response = await postRequest(API_ENDPOINTS.LOGINRESENDOTP, requestBody);
+      const response = await postRequest(
+        API_ENDPOINTS.LOGINRESENDOTP,
+        requestBody,
+      );
 
       if (response.responseCode === 'F200') {
         setModalVisible(true);
         setErrorMessage(response.responseMessage);
         setModalColor(COLORS.PRIMARY);
-        setModalImage(require('../assets/images/sucess.png'))
-        setModalHeader('Success')
+        setModalImage(require('../assets/images/sucess.png'));
+        setModalHeader('Success');
       } else {
         setModalVisible(true);
         setErrorMessage(response.responseMessage);
         setModalColor(COLORS.ERROR);
-        setModalImage(require('../assets/images/error.png'))
-        setModalHeader('Error')
+        setModalImage(require('../assets/images/error.png'));
+        setModalHeader('Error');
       }
     } catch (error) {
       console.log('error', error);
@@ -157,7 +173,7 @@ const LoginOtpScreen = ({ navigation }) => {
 
   const sucess = () => {
     setModalVisible(false);
-    navigation.navigate('Home', {screen: 'Dashboard'})
+    navigation.navigate('Home', {screen: 'Dashboard'});
   };
 
   return (
@@ -165,49 +181,53 @@ const LoginOtpScreen = ({ navigation }) => {
       {loading ? (
         <ActivityIndicator size="large" color={COLORS.PRIMARY} />
       ) : (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          contentContainerStyle={{flexGrow: 1}}
+          keyboardShouldPersistTaps="handled">
           <View style={styles.container}>
-            <Image source={require('../assets/images/otpImg.png')} style={styles.image} />
+            <Image
+              source={require('../assets/images/otpImg.png')}
+              style={styles.image}
+            />
             <Text style={styles.headerText}>Verify your phone number</Text>
             <Text style={styles.subHeadingText}>
               Please enter the 6-digit code sent to
             </Text>
             <Text style={styles.subMobileHeaderText}>{userPhoneNo}</Text>
-            <View>
-            <CodeField
-              ref={ref}
-              {...props}
-              value={value}
-              onChangeText={setValue}
-              cellCount={6}
-              rootStyle={styles.codeFiledRoot}
-              keyboardType="number-pad"
-              textContentType="oneTimeCode"
-              renderCell={({ index, symbol, isFocused }) => (
-                <Text
-                  key={index}
-                  style={[
-                    {
-                      width: 50,
-                      height: 50,
-                      lineHeight: 50,
-                      fontSize: 24,
-                      borderWidth: 2,
-                      borderColor: COLORS.PRIMARY,
-                      textAlign: 'center',
-                      borderRadius: 10,
-                      color: COLORS.WHITE,
-                      margin: 5,
-                      backgroundColor: symbol ? COLORS.PRIMARY : COLORS.WHITE,
-                    },
-                    isFocused && styles.focusCell,
-                  ]}
-                  onLayout={getCellOnLayoutHandler(index)}
-                >
-                  {symbol || (isFocused ? <Cursor /> : null)}
-                </Text>
-              )}
-            />
+            <View style={{marginLeft: 10, marginRight: 10}}>
+              <CodeField
+                ref={ref}
+                {...props}
+                value={value}
+                onChangeText={setValue}
+                cellCount={6}
+                rootStyle={styles.codeFiledRoot}
+                keyboardType="number-pad"
+                textContentType="oneTimeCode"
+                renderCell={({index, symbol, isFocused}) => (
+                  <Text
+                    key={index}
+                    style={[
+                      {
+                        width: 50,
+                        height: 50,
+                        lineHeight: 50,
+                        fontSize: 24,
+                        borderWidth: 2,
+                        borderColor: COLORS.PRIMARY,
+                        textAlign: 'center',
+                        borderRadius: 10,
+                        color: COLORS.WHITE,
+                        margin: 5,
+                        backgroundColor: symbol ? COLORS.PRIMARY : COLORS.WHITE,
+                      },
+                      isFocused && styles.focusCell,
+                    ]}
+                    onLayout={getCellOnLayoutHandler(index)}>
+                    {symbol || (isFocused ? <Cursor /> : null)}
+                  </Text>
+                )}
+              />
             </View>
             <View style={styles.resendCodeContainer}>
               <Text style={styles.resendCodeText}>Didn’t receive a code?</Text>
@@ -218,13 +238,17 @@ const LoginOtpScreen = ({ navigation }) => {
             <TouchableOpacity
               style={styles.confirmButton}
               activeOpacity={0.5}
-              onPress={handleOtpConfirm}
-            >
+              onPress={handleOtpConfirm}>
               <Text style={styles.confirmButtonText}>Confirm</Text>
             </TouchableOpacity>
 
-            <CommonModal visible={modalVisible} onClose={closeModal} message={errorMessage} header={modalHeader} color={modalColor} imageSource={modalImage}>
-      </CommonModal>
+            <CommonModal
+              visible={modalVisible}
+              onClose={closeModal}
+              message={errorMessage}
+              header={modalHeader}
+              color={modalColor}
+              imageSource={modalImage}></CommonModal>
           </View>
         </ScrollView>
       )}
@@ -232,7 +256,7 @@ const LoginOtpScreen = ({ navigation }) => {
   );
 };
 
-export default LoginOtpScreen;
+export default withInternetConnectivity(LoginOtpScreen);
 
 const styles = StyleSheet.create({
   mainBody: {
@@ -254,14 +278,14 @@ const styles = StyleSheet.create({
     color: COLORS.PRIMARY,
     fontSize: 24,
     textAlign: 'center',
-    fontFamily: FONTS.Bold
+    fontFamily: FONTS.Bold,
   },
   subHeadingText: {
     marginTop: 20,
     color: COLORS.TEXTCOLOR,
     textAlign: 'center',
     fontSize: 16,
-    fontFamily: FONTS.Regular
+    fontFamily: FONTS.Regular,
   },
   subMobileHeaderText: {
     color: COLORS.PRIMARY,
@@ -269,8 +293,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
-    fontFamily: FONTS.Bold
-
+    fontFamily: FONTS.Bold,
   },
   codeFiledRoot: {marginTop: 30, marginRight: 30, marginLeft: 30},
   cell: {
@@ -320,7 +343,7 @@ const styles = StyleSheet.create({
     color: COLORS.WHITE,
     paddingVertical: 10,
     fontSize: 16,
-    fontFamily: FONTS.Regular
+    fontFamily: FONTS.Regular,
   },
   focusCell: {
     borderColor: '#F5A922',

@@ -17,6 +17,7 @@ import {postRequest} from '../Utils/apiUtils';
 import {API_ENDPOINTS} from '../Utils/apiConfig';
 import {COLORS, FONTS} from '../assets/Colors';
 import CommonModal from '../component/CommonModal';
+import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 import {
   CodeField,
@@ -574,7 +575,7 @@ const OTPVerificationScreen = ({navigation}) => {
     </View>
   );
 };
-export default OTPVerificationScreen;
+export default withInternetConnectivity(OTPVerificationScreen);
 
 const styles = StyleSheet.create({
   mainBody: {

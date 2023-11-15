@@ -7,6 +7,7 @@ import {postRequest, getRequest} from '../Utils/apiUtils';
 import {API_ENDPOINTS} from '../Utils/apiConfig';
 import { WebView } from 'react-native-webview';
 import {COLORS, FONTS} from '../assets/Colors';
+import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const getDisplayName = doc_type => {
   switch (doc_type) {
@@ -72,7 +73,7 @@ return (
   );
 };
 
-export default BioDetailsScreen;
+export default withInternetConnectivity(BioDetailsScreen);
 
 const styles = StyleSheet.create({
   mainBody: {

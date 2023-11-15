@@ -15,6 +15,7 @@ import {SelectList} from 'react-native-dropdown-select-list';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {COLORS, FONTS} from '../assets/Colors';
+import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const UploadDocumentScreen = ({navigation}) => {
   const [useDocumentNumber, setUseDocumentNumber] = useState('');
@@ -416,7 +417,7 @@ const UploadDocumentScreen = ({navigation}) => {
     </View>
   );
 };
-export default UploadDocumentScreen;
+export default withInternetConnectivity(UploadDocumentScreen);
 
 const styles = StyleSheet.create({
   mainBody: {

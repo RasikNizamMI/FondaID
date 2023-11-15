@@ -15,6 +15,7 @@ import {SelectList} from 'react-native-dropdown-select-list';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {COLORS, FONTS} from '../assets/Colors';
+import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const CapturePictureScreen = ({navigation}) => {
   const [useDocumentNumber, setUseDocumentNumber] = useState('');
@@ -212,7 +213,7 @@ const CapturePictureScreen = ({navigation}) => {
     </View>
   );
 };
-export default CapturePictureScreen;
+export default withInternetConnectivity(CapturePictureScreen);
 
 const styles = StyleSheet.create({
   mainBody: {

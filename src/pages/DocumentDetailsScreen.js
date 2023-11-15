@@ -1,13 +1,24 @@
 // DocumentDetails.js
 
-import React, { useState, useEffect } from 'react';
-import { View, ScrollView, Text, Image, StyleSheet, TouchableOpacity, Modal,} from 'react-native';
+import React, {useState, useEffect, useRef} from 'react';
+import {
+  View,
+  ScrollView,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  ActivityIndicator,
+} from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import {postRequest, getRequest} from '../Utils/apiUtils';
+import {postRequest, getRequest, putRequest} from '../Utils/apiUtils';
 import {API_ENDPOINTS} from '../Utils/apiConfig';
 import {COLORS, FONTS} from '../assets/Colors';
-import { WebView } from 'react-native-webview';
+import {WebView} from 'react-native-webview';
 import Share from 'react-native-share';
+import withInternetConnectivity from '../Utils/withInternetConnectivity';
+import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
 
 const getDisplayName = doc_type => {
   switch (doc_type) {
@@ -29,22 +40,33 @@ const getDisplayName = doc_type => {
 };
 
 const DocumentDetailsScreen = ({route, navigation}) => {
-  const {id, doc_type} = route.params;
+  const {id, doc_type, fonda_id} = route.params;
   const displayName = getDisplayName(doc_type);
-  const [userId, setuserId] = useState("");
-  const [docType, setdocType] = useState("");
+  const [userId, setuserId] = useState('');
+  const [docType, setdocType] = useState('');
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [jwtToken, setJwtToken] = useState('');
+  const [htmlContent, setHtmlContent] = useState('');
 
   useEffect(() => {
-setuserId(id);
-setdocType(doc_type);
-    const getDocumentDetails = async (id) => {
+    setuserId(id);
+    setdocType(doc_type);
+    const getDocumentDetails = async id => {
       setLoading(true);
-
+      const storedJwtToken = await getData('jwt_token');
+      setJwtToken(storedJwtToken);
+      const headers = {
+        'Content-Type': 'application/json',
+        'access-token': storedJwtToken,
+      };
       try {
-        const response = await getRequest(API_ENDPOINTS.GETDOCUMENTQR + id);
-        console.log(API_ENDPOINTS.GETDOCUMENTQR + id)
+        const response = await getRequest(
+          API_ENDPOINTS.GETDOCUMENTPREVIEW + id,
+          {},
+          headers,
+        );
+        setHtmlContent(response);
         // setDocuments(response);
       } catch (error) {
         console.error('GET error:', error);
@@ -57,8 +79,31 @@ setdocType(doc_type);
   }, [id]);
 
   function LoadingIndicatorView() {
-    return <ActivityIndicator color='#F5A922' size='large' />
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <ActivityIndicator size="large" color="#F5A922" />
+      </View>
+    );
   }
+
+  // const handleWebViewNavigationStateChange = (newNavState) => {
+  //   console.log('New Navigation State:', newNavState);
+
+  //   const url = newNavState.url || '';
+  //   if (url.startsWith(API_ENDPOINTS.GETDOCUMENTPREVIEW)) {
+  //     const injectScript = `
+  //       fetch('${url}', {
+  //         method: 'GET',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           'access-token': '${jwtToken}',
+  //         },
+  //       });
+  //     `;
+  //     console.log('Injecting Script:', injectScript);
+  //     webViewRef.current.injectJavaScript(injectScript);
+  //   }
+  // };
 
   const handleShare = async () => {
     try {
@@ -67,93 +112,134 @@ setdocType(doc_type);
         url: imageUrl,
       };
       await Share.open(options);
+      addNotification();
     } catch (error) {
       console.error('Error sharing:', error.message);
     }
   };
 
-  // const handleShare = async () => {
-  //   try {
-  //     const messageToShare = doc_type;
-  //     const imageUrl =  API_ENDPOINTS.GETDOCUMENTPREVIEW + id; // Replace with your image URL
-  //     await Share.share({
-  //       message: messageToShare,
-  //       url: imageUrl, // Add the image URL here
-  //     });
-  //   } catch (error) {
-  //     console.error('Error sharing:', error.message);
-  //   }
-  // };
+  const addNotification = async () => {
+    console.log('12345678909876543');
+    console.log(doc_type);
+    const headers = {
+      'Content-Type': 'application/json',
+      'access-token': jwtToken,
+    };
 
+    const requestBody = {
+      fonda_id: fonda_id,
+      message: 'You shared ' + doc_type + ' QR code',
+    };
+    console.log(API_ENDPOINTS.ADDNOTIFICATION, requestBody, headers);
+    putRequest(API_ENDPOINTS.ADDNOTIFICATION, requestBody, headers)
+      .then(response => {
+        console.log(JSON.stringify(response));
+      })
+      .catch(error => {
+        console.error('GET error:', error);
+      });
+  };
 
   return (
-    <View style={{flex: 1,marginTop: 10}}>
-    <View style={styles.headerView}>
-            <Feather
-              onPress={() => {
-                navigation.goBack(null);
-              }}
-              style={styles.headerIcon}
-              name="chevron-left"
-              size={25}
-              color={'#F5A922'}
-            />
-            <Text style={styles.headerText}>{displayName}</Text>
-          </View>
-          <View style={{flex:1,marginLeft: 30, 
-              marginRight: 30,elevation: 4, backgroundColor: COLORS.WHITE}}>
-                <View style={{justifyContent: 'center',
-              alignItems: 'center',}}> 
-              <View style={{flexDirection: 'row',  justifyContent: 'space-around',justifyContent: 'center',
-              alignItems: 'center',}}>
-
-              
-                <Image
-              source={{ uri: API_ENDPOINTS.GETDOCUMENTQR + id}}
+    <View style={{flex: 1, marginTop: 10}}>
+      <View style={styles.headerView}>
+        <Feather
+          onPress={() => {
+            navigation.goBack(null);
+          }}
+          style={styles.headerIcon}
+          name="chevron-left"
+          size={25}
+          color={'#F5A922'}
+        />
+        <Text style={styles.headerText}>{displayName}</Text>
+      </View>
+      <View
+        style={{
+          flex: 1,
+          marginLeft: 30,
+          marginRight: 30,
+          elevation: 4,
+          backgroundColor: COLORS.WHITE,
+          marginTop: 20,
+        }}>
+        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-around',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Image
+              source={{uri: API_ENDPOINTS.GETDOCUMENTQR + id}}
               style={{
                 marginTop: 10,
                 width: 200,
                 height: 200,
                 resizeMode: 'contain',
-                marginLeft: 70
+                marginLeft: 70,
               }}
             />
-             <View style={styles.iconContainer}>
-
-          <TouchableOpacity onPress={handleShare}>
-            <View style={styles.copyView}>
-              <Image
-                source={require('../assets/images/shareIcon.png')}
-                style={styles.shareImage}
-              />
+            <View style={styles.iconContainer}>
+              <TouchableOpacity onPress={handleShare}>
+                <View style={styles.copyView}>
+                  <Image
+                    source={require('../assets/images/shareIcon.png')}
+                    style={styles.shareImage}
+                  />
+                </View>
+              </TouchableOpacity>
             </View>
-          </TouchableOpacity>
           </View>
-        </View>
-            <Text style={{marginTop: 'auto', marginBottom: 10, fontSize: 12, textAlign: 'center', fontFamily: FONTS.Regular, marginLeft: 10, marginRight: 10, color: COLORS.TEXTCOLOR}}>
+          <Text
+            style={{
+              marginTop: 'auto',
+              marginBottom: 10,
+              fontSize: 12,
+              textAlign: 'center',
+              fontFamily: FONTS.Regular,
+              marginLeft: 10,
+              marginRight: 10,
+              color: COLORS.TEXTCOLOR,
+            }}>
             Scan the above QR code to verify the above document.
-            </Text>
-            </View>
-  <WebView
-       originWhitelist={['*']}
-       source={{ uri: API_ENDPOINTS.GETDOCUMENTPREVIEW + id}}  
-       renderLoading={this.LoadingIndicatorView}
-       startInLoadingState={true}
-     />
-     </View>
-     <TouchableOpacity
+          </Text>
+        </View>
+        {/* <WebView
+          ref={webViewRef}
+          originWhitelist={['*']}
+          source={{
+            uri: API_ENDPOINTS.GETDOCUMENTPREVIEW + id,
+          }}
+          renderLoading={LoadingIndicatorView}
+          startInLoadingState={true}
+          onNavigationStateChange={handleWebViewNavigationStateChange}
+          // Add other WebView props as needed
+        /> */}
+        <WebView
+          source={{html: htmlContent}}
+          renderLoading={this.LoadingIndicatorView}
+          startInLoadingState={true}
+          onError={syntheticEvent => {
+            const {nativeEvent} = syntheticEvent;
+            console.error('WebView error: ', nativeEvent);
+          }}
+        />
+      </View>
+      <TouchableOpacity
         style={styles.buttonStyle}
         activeOpacity={0.5}
         onPress={() => {
-            navigation.goBack(null);
-          }}>
+          navigation.goBack(null);
+        }}>
         <Text style={styles.buttonTextStyle}>Back</Text>
       </TouchableOpacity>
-     </View>
+    </View>
   );
 };
 
-export default DocumentDetailsScreen;
+export default withInternetConnectivity(DocumentDetailsScreen);
 
 const styles = StyleSheet.create({
   mainBody: {
@@ -170,7 +256,6 @@ const styles = StyleSheet.create({
   },
   headerIcon: {
     marginLeft: 16,
-    marginTop: 2.5,
     position: 'absolute',
     left: 0,
   },
@@ -179,7 +264,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: COLORS.PRIMARY,
     textAlign: 'center',
-    fontFamily: FONTS.Bold
+    fontFamily: FONTS.Bold,
   },
   buttonStyle: {
     backgroundColor: COLORS.WHITE,
@@ -242,7 +327,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.WHITE,
     borderRadius: 10,
     elevation: 4,
-    marginLeft: 20
+    marginLeft: 20,
   },
   shareImage: {
     width: 20,

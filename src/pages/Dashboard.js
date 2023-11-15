@@ -22,6 +22,7 @@ import {API_ENDPOINTS} from '../Utils/apiConfig';
 import {useIsFocused} from '@react-navigation/native';
 import {COLORS, FONTS} from '../assets/Colors';
 import CommonModal from '../component/CommonModal';
+import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const Dashboard = ({navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -41,6 +42,8 @@ const Dashboard = ({navigation}) => {
   const [modalColor, setModalColor] = useState('');
   const [modalHeader, setModalHeader] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [jwtToken, setJwtToken] = useState("");
+  const [errorCode, setErrorCode] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,19 +52,21 @@ const Dashboard = ({navigation}) => {
         const storedUserFondaID = await getData('fonda_ID');
         const storedDataStorage = await getData('dataStorageAccepted');
         const storedIconStatus = await getData('iconStatus');
+        const storedJwtToken = await getData('jwt_token');
 
         if (storedIconStatus !== null) {
           setIconStatus(storedIconStatus === 'true');
         }
 
+        setJwtToken(storedJwtToken);
         setUserRefID(storedUserRefID || '');
         setUserFondaID(storedUserFondaID);
         handleUser(storedUserRefID);
-        getDocumentDetails(storedUserFondaID);
+        getDocumentDetails(storedUserFondaID, storedJwtToken);
         if (storedUserFondaID) {
           setUserFondaID(storedUserFondaID);
           if (isFocused) {
-            getDocumentDetails(storedUserFondaID);
+            getDocumentDetails(storedUserFondaID, storedJwtToken);
           }
           console.log('fodaid++++' + storedUserFondaID);
         } else {
@@ -89,8 +94,13 @@ const Dashboard = ({navigation}) => {
   const handleUser = async userRefID => {
     setLoading(true);
 
+    const headers = {
+      'Content-Type': 'application/json',
+      'access-token' : jwtToken,
+    };
+
     try {
-      const response = await getRequest(API_ENDPOINTS.GETUSER + userRefID);
+      const response = await getRequest(API_ENDPOINTS.GETUSER + userRefID, {} , headers);
       console.log(JSON.stringify(response));
       setData('fondaId', response.fonda_id);
       setData('_id', response._id);
@@ -112,12 +122,18 @@ const Dashboard = ({navigation}) => {
     }
   };
 
-  const getDocumentDetails = fondaId => {
+  const getDocumentDetails = (fondaId, jwtToken) => {
     setLoading(true);
 
     console.log(API_ENDPOINTS.GETDOCUMENT + fondaId);
 
-    getRequest(API_ENDPOINTS.GETDOCUMENT + fondaId)
+    const headers = {
+      'Content-Type': 'application/json',
+      'access-token' : jwtToken,
+    };
+
+    getRequest(API_ENDPOINTS.GETDOCUMENT + fondaId, {},
+      headers,)
       .then(response => {
         console.log(JSON.stringify(response));
         setDocuments(response);
@@ -125,8 +141,18 @@ const Dashboard = ({navigation}) => {
       })
 
       .catch(error => {
+        if (error.response && error.response.status === 401) {
+          setLoading(false);
+          setModalVisible(true);
+          setErrorMessage("Session timed out, please login again");
+          setModalColor(COLORS.ERROR);
+          setModalImage(require('../assets/images/error.png'));
+          setModalHeader('Error');
+          setErrorCode('F401');
+        } else {
         setLoading(false);
         console.error('GET error:', error);
+        }
       });
   };
 
@@ -158,6 +184,8 @@ const Dashboard = ({navigation}) => {
     setDataStorageEnabled2(!dataStorageEnabled2);
   };
 
+  
+
   const handleLinkPress = () => {
     const url = 'https://www.example.com'; // Replace with your desired URL
     Linking.openURL(url);
@@ -188,6 +216,12 @@ const Dashboard = ({navigation}) => {
 
   const closeModal = () => {
     setModalVisible(false);
+  };
+
+
+  const sucess = () => {
+    setModalVisible(false);
+    navigation.navigate('Auth', {screen: 'LoginScreen'})
   };
 
   return iconStatus == true ? (
@@ -223,7 +257,13 @@ const Dashboard = ({navigation}) => {
       </View>
 
       {loading ? (
-        <ActivityIndicator size="large" color={COLORS.PRIMARY} />
+        <ActivityIndicator size="large" color={COLORS.PRIMARY}style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          alignContent: 'center',
+          alignSelf: 'center',
+        }} />
       ) : (
         <FlatList
           data={documents}
@@ -233,6 +273,7 @@ const Dashboard = ({navigation}) => {
                 navigation.navigate('DocumentDetailsScreen', {
                   id: item._id,
                   doc_type: item.doc_type,
+                  fonda_id: userFondaID,
                 })
               }>
               <View style={styles.documentItem}>
@@ -321,7 +362,7 @@ const Dashboard = ({navigation}) => {
       )}
       <CommonModal
         visible={modalVisible}
-        onClose={closeModal}
+        onClose={errorCode == 'F401' ? sucess : closeModal}
         message={errorMessage}
         header={modalHeader}
         color={modalColor}
@@ -424,7 +465,6 @@ const Dashboard = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     backgroundColor: '#F6F8F9 ',
     flexGrow: 1,
   },
@@ -595,7 +635,7 @@ const styles = StyleSheet.create({
     color: COLORS.TEXTCOLOR,
   },
   documentId: {
-    marginTop: 10,
+    marginTop: 0,
   marginLeft: 10,
   paddingRight: 100,
   fontSize: 12,
@@ -704,4 +744,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Dashboard;
+export default withInternetConnectivity(Dashboard);

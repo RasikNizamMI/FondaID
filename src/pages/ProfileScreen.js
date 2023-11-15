@@ -12,6 +12,7 @@ import {
 import Feather from 'react-native-vector-icons/Feather';
 import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
 import {COLORS, FONTS} from '../assets/Colors';
+import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const ProfileScreen = ({navigation}) => {
   const [userDocument, setUserDocument] = useState('');
@@ -101,12 +102,12 @@ const ProfileScreen = ({navigation}) => {
     return `${day}/${month}/${year}`;
   };
   const handleSkip = () => {
-    navigation.goBack(null);
+    navigation.navigate('Dashboard', {screen: 'Dashboard'})
   };
 
 
   const handleLogin = ({navigation}) => {
-    navigation.navigate('LoginOtpScreen');
+    navigation.navigate('Dashboard', {screen: 'Dashboard'})
   };
 
   return (
@@ -118,7 +119,7 @@ const ProfileScreen = ({navigation}) => {
           <View style={styles.headerView}>
             <Feather
               onPress={() => {
-                navigation.goBack(null);
+                navigation.navigate('Dashboard', {screen: 'Dashboard'})
               }}
               style={styles.headerIcon}
               name="chevron-left"
@@ -128,7 +129,13 @@ const ProfileScreen = ({navigation}) => {
             <Text style={styles.headerText}>My Profile</Text>
           </View>
           {loading ? (
-            <ActivityIndicator size="large" color={COLORS.PRIMARY} />
+            <ActivityIndicator size="large" color={COLORS.PRIMARY} style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+              alignContent: 'center',
+              alignSelf: 'center',
+            }}/>
           ) : (
             <>
               <View
@@ -206,7 +213,7 @@ const ProfileScreen = ({navigation}) => {
               <View style={styles.headerTextView}>
                 <Text style={styles.headerTexts}>My Face ID</Text>
               </View>
-              <View style={{flexDirection: 'row'}}>
+              <View style={{flexDirection: 'row', flex: 1,}}>
                 <View style={styles.imageView}>
                   <Image
                     source={require('../assets/images/faceIdIcon.png')}
@@ -220,9 +227,9 @@ const ProfileScreen = ({navigation}) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     backgroundColor: COLORS.WHITE,
-                    height: 50,
                     width: '40%',
                     borderRadius: 10,
+                    padding: 10,
                     elevation: 4,
                   }}
                   activeOpacity={0.5}
@@ -240,7 +247,7 @@ const ProfileScreen = ({navigation}) => {
                   marginBottom: 20,
                   flexDirection: 'row',
                 }}>
-                <View style={{flexDirection: 'column'}}>
+                <View style={{flexDirection: 'column',flexWrap: 'wrap', maxWidth: '80%'}}>
                   <View style={styles.headerTextView}>
                     <Text style={styles.headerTexts}>Mobile Number</Text>
                   </View>
@@ -256,7 +263,7 @@ const ProfileScreen = ({navigation}) => {
                 </View>
               </View>
               <View style={{marginBottom: 20, flexDirection: 'row'}}>
-                <View style={{flexDirection: 'column'}}>
+                <View style={{flexDirection: 'column', flexWrap: 'wrap', maxWidth: '80%'}}>
                   <View style={styles.headerTextView1}>
                     <Text style={styles.headerTexts}>Email Address</Text>
                   </View>
@@ -292,14 +299,12 @@ const ProfileScreen = ({navigation}) => {
     </View>
   );
 };
-export default ProfileScreen;
+export default withInternetConnectivity(ProfileScreen);
 
 const styles = StyleSheet.create({
   mainBody: {
     flex: 1,
-    justifyContent: 'center',
     backgroundColor: '#F6F8F9',
-    alignContent: 'center',
   },
   buttonStyle: {
     backgroundColor: COLORS.PRIMARY,
@@ -338,7 +343,8 @@ const styles = StyleSheet.create({
     color: COLORS.PRIMARY,
     paddingVertical: 10,
     fontSize: 16,
-    fontFamily: FONTS.Regular
+    fontFamily: FONTS.Regular,
+    textAlign: 'center'
   },
   headerView: {
     flexDirection: 'row',
@@ -372,16 +378,16 @@ const styles = StyleSheet.create({
     marginRight: 15,
     marginLeft: 30,
     marginTop: 15,
-    height: 180,
-    width: 180,
+    height: 150,
+    width: 150,
     backgroundColor: COLORS.WHITE,
     borderRadius: 10,
     elevation: 4,
   },
   images: {
     flex: 1,
-    height: 130,
-    width: 110,
+    height: 120,
+    width: 100,
     resizeMode: 'contain',
   },
   editImages: {

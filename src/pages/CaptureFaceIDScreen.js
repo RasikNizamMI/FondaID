@@ -19,6 +19,7 @@ import {postRequest, putRequest} from '../Utils/apiUtils';
 import {API_ENDPOINTS} from '../Utils/apiConfig';
 import {COLORS, FONTS} from '../assets/Colors';
 import CommonModal from '../component/CommonModal';
+import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const CaptureFaceIDScreen = ({navigation}) => {
   const [filePath, setFilePath] = useState({});
@@ -54,7 +55,7 @@ const CaptureFaceIDScreen = ({navigation}) => {
     };
 
     console.log(API_ENDPOINTS.CREATEUSER, requestBody);
-    putRequest(API_ENDPOINTS.CREATEUSER, requestBody)
+    postRequest(API_ENDPOINTS.CREATEUSER, requestBody)
       .then(response => {
         console.log('response' + JSON.stringify(response));
         if (response.statusCode === 200) {
@@ -285,7 +286,7 @@ const CaptureFaceIDScreen = ({navigation}) => {
     </View>
   );
 };
-export default CaptureFaceIDScreen;
+export default withInternetConnectivity(CaptureFaceIDScreen);
 
 const styles = StyleSheet.create({
   mainBody: {

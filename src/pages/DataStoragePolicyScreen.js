@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { setData, getData } from '../Utils/AsyncStorageUtil';
 import {COLORS, FONTS} from '../assets/Colors';
+import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const DataStoragePolicyScreen = ({navigation}) => {
   const [dataStorageEnabled, setDataStorageEnabled] = useState(false);
@@ -229,4 +230,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DataStoragePolicyScreen;
+export default withInternetConnectivity(DataStoragePolicyScreen);

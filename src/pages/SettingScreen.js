@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { setData, getData, removeData } from '../Utils/AsyncStorageUtil';
 import {COLORS, FONTS} from '../assets/Colors';
+import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const SettingScreen = ({navigation}) => {
   const [dataStorageEnabled, setDataStorageEnabled] = useState(false);
@@ -91,7 +92,7 @@ const SettingScreen = ({navigation}) => {
         style={styles.buttonStyle}
         activeOpacity={0.5}
         onPress={() => {
-            navigation.goBack(null);
+          navigation.navigate('Dashboard', {screen: 'Dashboard'})
           }}>
         <Text style={styles.buttonTextStyle}>Back</Text>
       </TouchableOpacity>
@@ -211,4 +212,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SettingScreen;
+export default withInternetConnectivity(SettingScreen);

@@ -18,6 +18,7 @@ import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
 import {COLORS, FONTS} from '../assets/Colors';
 import CommonModal from '../component/CommonModal';
+import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const AddNewDocumentScreen = ({navigation}) => {
   const [useDocumentNumber, setUseDocumentNumber] = useState('');
@@ -28,7 +29,7 @@ const AddNewDocumentScreen = ({navigation}) => {
   const [selectedStartDate, setSelectedStartDate] = useState('Date of Issue');
   const [selectedEndDate, setSelectedEndDate] = useState('Date of Expiry');
   const [filePath, setFilePath] = useState({});
-  const [selectedDocumentType, setSelectedDocumentType] = React.useState('');
+  const [selectedDocumentType, setSelectedDocumentType] = useState('');
   const [modalImage, setModalImage] = useState('');
   const [modalColor, setModalColor] = useState('');
   const [modalHeader, setModalHeader] = useState('');
@@ -40,7 +41,7 @@ const AddNewDocumentScreen = ({navigation}) => {
     {key: 'idCard', value: 'ID Card'},
     {key: 'driverLicense', value: "Driver's License"},
     {key: 'healthCard', value: 'Health Card'},
-    {key: 'professionalLicense', value: 'Professional License'},
+    {key: 'professionalLicense', value: 'Professional Card'},
     {key: 'other', value: 'Other'},
   ];
 
@@ -170,6 +171,18 @@ const AddNewDocumentScreen = ({navigation}) => {
     });
   };
 
+  const resetState = () => {
+    setUseDocumentNumber('');
+    setStartDate(new Date());
+    setEndDate(new Date());
+    setShowStartDatePicker(false);
+    setShowEndDatePicker(false);
+    setSelectedStartDate('Date of Issue');
+    setSelectedEndDate('Date of Expiry');
+    setFilePath({});
+    setSelectedDocumentType('');
+  };
+
   const handleToAddNewDoc = () => {
     if (
       !selectedDocumentType ||
@@ -193,7 +206,7 @@ const AddNewDocumentScreen = ({navigation}) => {
     setData('addDoUploadImg', filePath.uri);
     setData('addDocumentNumber', useDocumentNumber)
     setData('addDoUploadImgBase64', filePath.base64)
-
+    resetState();
     navigation.navigate('ConfirmDocument');
     }
   };
@@ -331,7 +344,7 @@ const AddNewDocumentScreen = ({navigation}) => {
     </View>
   );
 };
-export default AddNewDocumentScreen;
+export default withInternetConnectivity(AddNewDocumentScreen);
 
 const styles = StyleSheet.create({
   mainBody: {
@@ -398,6 +411,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.WHITE,
     fontFamily: FONTS.Regular,
     fontSize: 14,
+    borderRadius: 10,
   },
   headerView: {
     flexDirection: 'row',
@@ -437,7 +451,6 @@ const styles = StyleSheet.create({
   datePickerView: {
     flexDirection: 'row',
     alignItems: 'center',
-
     borderRadius: 5,
     borderWidth: 1,
     marginTop: 15,
@@ -447,8 +460,8 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.WHITE,
     elevation: 4,
     height: 50,
-
     justifyContent: 'space-between',
+    borderRadius: 10,
   },
   datePickerViews: {
     flexDirection: 'row',

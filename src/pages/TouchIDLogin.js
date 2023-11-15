@@ -15,6 +15,7 @@ import {
 import Navigation from '../navigation/Navigator';
 import TouchID from 'react-native-touch-id';
 import {COLORS, FONTS} from '../assets/Colors';
+import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const TouchIDLogin = ({navigation}) => {
   const [iconStatus, setIconStatus] = useState(false);
@@ -264,4 +265,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TouchIDLogin;
+export default withInternetConnectivity(TouchIDLogin);

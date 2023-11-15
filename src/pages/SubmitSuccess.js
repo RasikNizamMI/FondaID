@@ -20,6 +20,7 @@ import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
 import {useClipboard} from '@react-native-community/clipboard';
 import {COLORS, FONTS} from '../assets/Colors';
+import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const SubmitSuccess = ({navigation}) => {
   const [useDocumentNumber, setUseDocumentNumber] = useState('');
@@ -240,7 +241,7 @@ const SubmitSuccess = ({navigation}) => {
     </View>
   );
 };
-export default SubmitSuccess;
+export default withInternetConnectivity(SubmitSuccess);
 
 const styles = StyleSheet.create({
   mainBody: {

@@ -16,6 +16,7 @@ import {API_ENDPOINTS} from '../Utils/apiConfig';
 import {convertImageToBase64} from 'react-native-image-base64';
 import {COLORS, FONTS} from '../assets/Colors';
 import CommonModal from '../component/CommonModal';
+import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const ConfirmDocument = ({navigation}) => {
   const [userDocument, setUserDocument] = useState('');
@@ -43,6 +44,7 @@ const ConfirmDocument = ({navigation}) => {
   const [modalColor, setModalColor] = useState('');
   const [modalHeader, setModalHeader] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [jwtToken, setJwtToken] = useState("");
 
   useEffect(() => {
     const loadRememberedCredentials = async () => {
@@ -66,6 +68,7 @@ const ConfirmDocument = ({navigation}) => {
         const storedUserUploadImageBase64 = await getData(
           'addDoUploadImgBase64',
         );
+        const storedJwtToken = await getData('jwt_token');
         const storedUserFondaID = await getData('fondaId');
         setUserDocument(storedUserDocument);
         setUserDateOfIssue(storedUserDateOfIssue);
@@ -85,6 +88,7 @@ const ConfirmDocument = ({navigation}) => {
         setUserCountyCode(storeUserCountryCode);
         setUserUploadImageBase64(storedUserUploadImageBase64);
         setUserFondaID(storedUserFondaID);
+        setJwtToken(storedJwtToken);
 
         if (userDocument === 'passport') {
           console.log('Passport');
@@ -106,6 +110,11 @@ const ConfirmDocument = ({navigation}) => {
 
   const handletoSubmitDoc = () => {
     setLoading(true);
+
+    const headers = {
+      'Content-Type': 'application/json',
+      'access-token' : jwtToken,
+    };
 
     const requestBody = {
       fonda_id: userFondaID,
@@ -129,7 +138,7 @@ const ConfirmDocument = ({navigation}) => {
     };
     console.log('RequestBody-------' + API_ENDPOINTS.UPLOADDOCUMENT);
     console.log('RequestBody-------' + JSON.stringify(requestBody));
-    postRequest(API_ENDPOINTS.UPLOADDOCUMENT, requestBody)
+    postRequest(API_ENDPOINTS.UPLOADDOCUMENT, requestBody, headers)
       .then(response => {
         console.log(response);
         if (response.responseCode === 'F200') {
@@ -256,7 +265,7 @@ const ConfirmDocument = ({navigation}) => {
   );
 };
 
-export default ConfirmDocument;
+export default withInternetConnectivity(ConfirmDocument);
 
 const styles = StyleSheet.create({
   mainBody: {

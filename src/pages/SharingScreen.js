@@ -10,6 +10,7 @@ import {
   Linking,
 } from 'react-native';
 import {COLORS, FONTS} from '../assets/Colors';
+import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const SharingScreen = ({navigation}) => {
   const [dataStorageEnabled, setDataStorageEnabled] = useState(false);
@@ -224,4 +225,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SharingScreen;
+export default withInternetConnectivity(SharingScreen);

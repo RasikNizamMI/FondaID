@@ -17,6 +17,7 @@ import {setData} from '../Utils/AsyncStorageUtil';
 import {postRequest} from '../Utils/apiUtils';
 import {API_ENDPOINTS} from '../Utils/apiConfig';
 import {COLORS, FONTS} from '../assets/Colors';
+import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const LoginScreen = ({navigation}) => {
   const [fondaID, setFondaID] = useState('');
@@ -27,7 +28,8 @@ const LoginScreen = ({navigation}) => {
   const [emailErrorMessage, setEmailErrorMessage] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('Phone');
-  const [callingCodeValue, setCallingCodeValue] = useState('+1');
+  const [callingCodeValue, setCallingCodeValue] = useState('+33');
+  const [defaultCode, setDefaultCode] = useState('FR');
 
   useEffect(() => {
     const handleBackButtonPress = () => {
@@ -101,13 +103,14 @@ const LoginScreen = ({navigation}) => {
         if (response.responseCode === 'F200') {
           await setData('refID', response.refId);
           if (selectedCategory === 'Phone') {
-          await setData('phoneNumber', fondaPhone);
-          }else{
+            await setData('phoneNumber', fondaPhone);
+          } else {
             await setData('phoneNumber', fondaEmail);
           }
           navigation.navigate('LoginOtpScreen');
           setFondaID('');
           setFondaPhone('');
+          setFondaEmail('');
           setErrorMessage('');
           setEmailErrorMessage('');
         } else {
@@ -116,7 +119,7 @@ const LoginScreen = ({navigation}) => {
         }
       } catch (error) {
         console.log('error', error);
-        setErrorMessage('Please check credentials');
+        setEmailErrorMessage('Please check credentials');
       } finally {
         setLoading(false);
       }
@@ -143,6 +146,7 @@ const LoginScreen = ({navigation}) => {
           size="large"
           color={COLORS.PRIMARY}
           style={{
+            flex: 1,
             justifyContent: 'center',
             alignItems: 'center',
             alignContent: 'center',
@@ -166,9 +170,9 @@ const LoginScreen = ({navigation}) => {
               <TextInput
                 value={fondaID}
                 style={styles.input}
-                onChangeText={userFondaID => setFondaID(userFondaID)}
+                onChangeText={(text) => setFondaID(text.toUpperCase())}
                 placeholder="Enter Fonda ID"
-                placeholderTextColor="#37474F"
+                placeholderTextColor={COLORS.SUBTEXT}
                 autoCapitalize="none"
                 keyboardType="default"
                 returnKeyType="next"
@@ -188,7 +192,7 @@ const LoginScreen = ({navigation}) => {
                   flexDirection: 'row',
                   borderColor: COLORS.PRIMARY,
                   borderWidth: 2,
-                  borderRadius: 10,
+                  borderRadius: 5,
                   width: 200,
                   height: 30,
                   marginBottom: 10,
@@ -201,11 +205,13 @@ const LoginScreen = ({navigation}) => {
                       flexDirection: 'column',
                       alignItems: 'center',
                       justifyContent: 'center', // Center the content vertically
-                      borderRightWidth: 1, // Add border on the right side
                       borderColor: COLORS.WHITE, // Border color for the right side
                     },
                     selectedCategory === 'Phone' && {
                       backgroundColor: COLORS.PRIMARY,
+                      borderTopStartRadius:0,
+                      borderBottomStartRadius: 0,
+                      borderColor: COLORS.PRIMARY,
                     },
                   ]}>
                   <Text
@@ -233,6 +239,9 @@ const LoginScreen = ({navigation}) => {
                     },
                     selectedCategory === 'Email' && {
                       backgroundColor: COLORS.PRIMARY,
+                      borderBottomEndRadius: 0,
+                      borderTopEndRadius: 0,
+                      borderColor: COLORS.PRIMARY,
                     },
                   ]}>
                   <Text
@@ -253,10 +262,12 @@ const LoginScreen = ({navigation}) => {
               {selectedCategory === 'Phone' ? (
                 <PhoneInput
                   value={fondaPhone}
-                  defaultCode="US"
+                  defaultCode={defaultCode}
                   layout="first"
                   onChangeText={fondaPhone => setFondaPhone(fondaPhone)}
-                  placeholder="Enter Phone Number"
+                textStyle={{ color: COLORS.SUBTEXT,
+                  fontFamily: FONTS.Regular,
+                  fontSize: 16,}}
                   containerStyle={{
                     flex: 1,
                     width: '100%',
@@ -265,38 +276,42 @@ const LoginScreen = ({navigation}) => {
                     elevation: 4,
                     backgroundColor: COLORS.WHITE,
                     borderRadius: 10,
+                    justifyContent: 'center'
                   }}
                   textContainerStyle={{
                     flex: 1,
                     flexDirection: 'row',
                     justifyContent: 'space-between',
-                    alignItems: 'center',
                     paddingLeft: 10,
                     fontFamily: FONTS.Regular,
-                    fontSize: 14,
+                    fontSize: 16,
                     borderRadius: 10,
+                    paddingVertical: 0,
                   }}
                   textInputStyle={{
                     flex: 1,
-                    fontSize: 14,
+                    fontSize: 16,
                     paddingVertical: 0,
                     fontFamily: FONTS.Regular,
-                    alignItems: 'center',
+                    color: COLORS.SUBTEXT,
                   }}
+                  textInputProps={{ maxLength: 12, placeholder: 'Enter Phone Number', placeholderTextColor: COLORS.SUBTEXT}}
                   flagButtonStyle={{width: 50, marginLeft: 10}}
+                  codeTextStyle={{color: COLORS.SUBTEXT, marginLeft: -5, textAlign: 'center',  paddingVertical: 0,}}
                   onChangeCountry={countryData => {
                     const callingCode = countryData.callingCode;
-                    console.log(callingCode);
+                    console.log(countryData);
                     setCallingCodeValue(callingCode);
+                    setDefaultCode(countryData.cca2);
                   }}
                 />
               ) : (
                 <TextInput
                   value={fondaEmail}
                   style={styles.input}
-                  onChangeText={fondaEmail => setFondaEmail(fondaEmail)}
+                  onChangeText={(text) => setFondaEmail(text.toLowerCase())}
                   placeholder="Enter Email"
-                  placeholderTextColor="#37474F"
+                  placeholderTextColor={COLORS.SUBTEXT}
                   keyboardType="default"
                   onSubmitEditing={Keyboard.dismiss}
                   blurOnSubmit={false}
@@ -385,7 +400,7 @@ const LoginScreen = ({navigation}) => {
   );
 };
 
-export default LoginScreen;
+export default withInternetConnectivity(LoginScreen);
 
 const styles = StyleSheet.create({
   mainBody: {
@@ -415,7 +430,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    color: COLORS.TEXTCOLOR,
+    color: COLORS.SUBTEXT,
     paddingLeft: 15,
     paddingRight: 15,
     elevation: 4,

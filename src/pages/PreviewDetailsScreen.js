@@ -12,6 +12,7 @@ import {
 import Feather from 'react-native-vector-icons/Feather';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {COLORS, FONTS} from '../assets/Colors';
+import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const PreviewDetailsScreen = ({navigation}) => {
   const [startDate, setStartDate] = useState(new Date());
@@ -323,7 +324,7 @@ const PreviewDetailsScreen = ({navigation}) => {
     </View>
   );
 };
-export default PreviewDetailsScreen;
+export default withInternetConnectivity(PreviewDetailsScreen);
 
 const styles = StyleSheet.create({
   mainBody: {

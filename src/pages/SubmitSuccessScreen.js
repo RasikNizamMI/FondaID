@@ -18,6 +18,7 @@ import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
 import {useClipboard} from '@react-native-community/clipboard';
 import {COLORS, FONTS} from '../assets/Colors';
 import CommonModal from '../component/CommonModal';
+import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const SubmitSuccessScreen = ({navigation}) => {
   const [userFondaID, setUserFondaID] = useState('');
@@ -238,7 +239,7 @@ const SubmitSuccessScreen = ({navigation}) => {
     </View>
   );
 };
-export default SubmitSuccessScreen;
+export default withInternetConnectivity(SubmitSuccessScreen);
 
 const styles = StyleSheet.create({
   mainBody: {

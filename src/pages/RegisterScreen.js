@@ -22,6 +22,7 @@ import {SelectList} from 'react-native-dropdown-select-list';
 import {COLORS, FONTS} from '../assets/Colors';
 import CommonModal from '../component/CommonModal';
 import PhoneInput from 'react-native-phone-number-input';
+import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const RegisterScreen = ({navigation}) => {
   const [formValues, setFormValues] = useState({
@@ -52,7 +53,8 @@ const RegisterScreen = ({navigation}) => {
   const [modalColor, setModalColor] = useState('');
   const [modalHeader, setModalHeader] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [callingCodeValue, setCallingCodeValue] = useState('+1');
+  const [callingCodeValue, setCallingCodeValue] = useState('+33');
+  const [defaultCode, setDefaultCode] = useState('FR')
   const documentTypes = [
     {key: 'M', value: 'Male'},
     {key: 'F', value: 'Female'},
@@ -516,7 +518,13 @@ const RegisterScreen = ({navigation}) => {
   return (
     <View style={styles.mainBody}>
       {loading ? (
-        <ActivityIndicator size="large" color={COLORS.PRIMARY} />
+        <ActivityIndicator size="large" color={COLORS.PRIMARY} style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          alignContent: 'center',
+          alignSelf: 'center',
+        }}/>
       ) : (
         <ScrollView
           contentContainerStyle={{flexGrow: 1}}
@@ -543,7 +551,7 @@ const RegisterScreen = ({navigation}) => {
                   setFormValues({...formValues, firstName: text})
                 }
                 placeholder="Enter First Name"
-                placeholderTextColor="#37474F"
+                placeholderTextColor={COLORS.SUBTEXT}
                 autoCapitalize="none"
                 keyboardType="default"
                 returnKeyType="next"
@@ -562,7 +570,7 @@ const RegisterScreen = ({navigation}) => {
                   setFormValues({...formValues, surName: text})
                 }
                 placeholder="Enter Surname"
-                placeholderTextColor="#37474F"
+                placeholderTextColor={COLORS.SUBTEXT}
                 autoCapitalize="none"
                 keyboardType="default"
                 returnKeyType="next"
@@ -581,7 +589,7 @@ const RegisterScreen = ({navigation}) => {
                   setFormValues({...formValues, birthName: text})
                 }
                 placeholder="Enter Birth Name"
-                placeholderTextColor="#37474F"
+                placeholderTextColor={COLORS.SUBTEXT}
                 autoCapitalize="none"
                 keyboardType="default"
                 returnKeyType="next"
@@ -597,8 +605,8 @@ const RegisterScreen = ({navigation}) => {
                 placeholder={selectedDocumentType.key === '' ? "Choose Gender" : documentTypes.find(item => item.key === selectedDocumentType.key).value}
                 boxStyles={styles.dropdowmBox}
                 dropdownStyles={styles.dropdown}
-                inputStyles={{fontSize: 14, color: COLORS.TEXTCOLOR,  fontFamily: FONTS.Regular,}}
-                dropdownTextStyles={{fontSize: 14, fontFamily: FONTS.Regular,color: COLORS.TEXTCOLOR}}
+                inputStyles={{fontSize: 16, color: COLORS.SUBTEXT,  fontFamily: FONTS.Regular,}}
+                dropdownTextStyles={{fontSize: 16, fontFamily: FONTS.Regular,color: COLORS.TEXTCOLOR}}
                 setSelected={(key,value) => setSelectedDocumentType({ key : key, value: value })} // Set the selected document type
                 data={documentTypes}
                 save="key" // Save the key of the selected item
@@ -646,7 +654,9 @@ const RegisterScreen = ({navigation}) => {
                       : 'Select Nationality'}
                   </Text>
                   </View>
-                  <Feather name="chevron-down" size={15} color={'#999999'} />
+                  <View style={{marginRight: 20}}>
+                  <Feather name="chevron-down" size={15} color={'#999999'}/>
+                  </View>
                 </View>
               </TouchableOpacity>
               {showCountryPicker && (
@@ -680,7 +690,7 @@ const RegisterScreen = ({navigation}) => {
                   setFormValues({...formValues, placeOfBirth: text})
                 }
                 placeholder="Enter Place of Birth"
-                placeholderTextColor="#37474F"
+                placeholderTextColor={COLORS.SUBTEXT}
                 autoCapitalize="none"
                 keyboardType="default"
                 returnKeyType="next"
@@ -702,7 +712,10 @@ const RegisterScreen = ({navigation}) => {
                       : 'Select Native Country'}
                   </Text>
                   </View>
-                  <Feather name="chevron-down" size={15} color={'#999999'} />
+                  <View style={{marginRight: 20}}>
+                  <Feather name="chevron-down" size={15} color={'#999999'}/>
+                  </View>
+                  
                 </View>
               </TouchableOpacity>
               {showNativeCountryPicker && (
@@ -732,42 +745,51 @@ const RegisterScreen = ({navigation}) => {
               <Text style={styles.formLabel}>Phone Number</Text>
               <PhoneInput
                 defaultValue={formValues.phoneNumber}
-                defaultCode="US"
+                defaultCode={defaultCode}
                 layout="first"
                 onChangeText={text =>
                   setFormValues({...formValues, phoneNumber: text})
                 }
-                placeholder="Enter Phone Number"
+              textStyle={{ color: COLORS.SUBTEXT,
+                fontFamily: FONTS.Regular,
+                fontSize: 16,}}
                 containerStyle={{
-                  height: 50,
+                  flex: 1,
                   width: '100%',
-                  color: COLORS.TEXTCOLOR,
+                  height: 50,
+                  color: COLORS.SUBTEXT,
                   elevation: 4,
                   backgroundColor: COLORS.WHITE,
                   borderRadius: 10,
+                  justifyContent: 'center',
+                  marginTop: 10
                 }}
                 textContainerStyle={{
                   flex: 1,
                   flexDirection: 'row',
                   justifyContent: 'space-between',
-                  alignItems: 'center',
-                  paddingLeft: 0,
+                  paddingLeft: 10,
                   fontFamily: FONTS.Regular,
-                  fontSize: 14,
+                  fontSize: 16,
                   borderRadius: 10,
+                  paddingVertical: 0,
+                  color: COLORS.SUBTEXT,
                 }}
                 textInputStyle={{
                   flex: 1,
-                  fontSize: 14,
+                  fontSize: 16,
                   paddingVertical: 0,
                   fontFamily: FONTS.Regular,
-                  alignItems: 'center',
+                  color: COLORS.SUBTEXT,
                 }}
+                textInputProps={{ maxLength: 12, placeholder: 'Enter Phone Number', placeholderTextColor: COLORS.SUBTEXT}}
                 flagButtonStyle={{width: 50, marginLeft: 10}}
+                codeTextStyle={{color: COLORS.SUBTEXT, marginLeft: -5, textAlign: 'center',  paddingVertical: 0,}}
                 onChangeCountry={countryData => {
                   const callingCode = countryData.callingCode;
                   console.log(callingCode);
                   setCallingCodeValue(callingCode);
+                  setDefaultCode(countryData.cca2)
                 }}
               />
             </View>
@@ -779,10 +801,10 @@ const RegisterScreen = ({navigation}) => {
                 value={formValues.email}
                 style={styles.inputStyle}
                 onChangeText={text =>
-                  setFormValues({...formValues, email: text})
+                  setFormValues({...formValues, email: text.toLowerCase()})
                 }
                 placeholder="Enter Email Address"
-                placeholderTextColor="#37474F"
+                placeholderTextColor={COLORS.SUBTEXT}
                 autoCapitalize="none"
                 keyboardType="default"
                 returnKeyType="next"
@@ -858,7 +880,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: COLORS.PRIMARY,
     textAlign: 'center',
-    fontFamily: FONTS.Bold
+    fontFamily: FONTS.Bold,
+    marginRight: 10,
   },
   formSection: {
     marginTop: 20,
@@ -872,14 +895,14 @@ const styles = StyleSheet.create({
   },
   inputStyle: {
     flex: 1,
-    color: COLORS.TEXTCOLOR,
+    color: COLORS.SUBTEXT,
     paddingLeft: 15,
     paddingRight: 15,
     elevation: 4,
     backgroundColor: COLORS.WHITE,
     borderRadius: 10,
     fontFamily: FONTS.Regular,
-    fontSize: 14,
+    fontSize: 16,
     marginTop: 10,
   },
   countryPickerButton: {
@@ -898,16 +921,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   placeholderText: {
-    color: COLORS.TEXTCOLOR,
+    color: COLORS.SUBTEXT,
     fontFamily: FONTS.Regular,
-    fontSize: 14,
+    fontSize: 16,
   },
   datePickerView: {
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 5,
     borderWidth: 1,
-    marginTop: 15,
+    marginTop: 10,
     borderColor: COLORS.WHITE,
     backgroundColor: COLORS.WHITE,
     elevation: 4,
@@ -920,11 +943,11 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   datePickerText: {
-    fontSize: 14,
+    fontSize: 16,
     flex: 1,
     marginTop: 5,
     textAlign: 'left',
-    color: COLORS.TEXTCOLOR,
+    color: COLORS.SUBTEXT,
     marginLeft: 16,
     fontFamily: FONTS.Regular,
   },
@@ -1018,4 +1041,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RegisterScreen;
+export default withInternetConnectivity(RegisterScreen);
