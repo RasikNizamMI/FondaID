@@ -425,7 +425,7 @@ const RegisterScreen = ({navigation}) => {
       sur_name: formValues.surName,
       birth_name: formValues.birthName,
       date_of_birth: formattedStartDate,
-      email_id: formValues.email,
+      email_id: (formValues.email.toLowerCase()),
       place_of_birth: formValues.placeOfBirth,
       phone_number: formValues.phoneNumber,
       phone_number_country_code: callingCodeString,
@@ -445,7 +445,7 @@ const RegisterScreen = ({navigation}) => {
         ) {
           console.log("1234")
           setData('refID', response.refId);
-          setData('emailID', formValues.email);
+          setData('emailID', (formValues.email.toLowerCase()));
           setData('phoneNumber', formValues.phoneNumber);
           setData('firstName', formValues.firstName);
           setData('surName', formValues.surName);
@@ -801,7 +801,7 @@ const RegisterScreen = ({navigation}) => {
                 value={formValues.email}
                 style={styles.inputStyle}
                 onChangeText={text =>
-                  setFormValues({...formValues, email: text.toLowerCase()})
+                  setFormValues({...formValues, email: text})
                 }
                 placeholder="Enter Email Address"
                 placeholderTextColor={COLORS.SUBTEXT}
@@ -872,7 +872,6 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     position: 'absolute',
     left: 0,
-    top: 18
   },
   headerText: {
     marginLeft: 10,
@@ -882,6 +881,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: FONTS.Bold,
     marginRight: 10,
+    width: '80%'
   },
   formSection: {
     marginTop: 20,

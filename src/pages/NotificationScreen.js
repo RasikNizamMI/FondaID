@@ -347,17 +347,21 @@ const styles = StyleSheet.create({
   },
   headerText: {
     marginTop: 12,
-    fontSize: 18,
-    color: '#F5A922',
+    fontSize: 24,
+    color: COLORS.PRIMARY,
     textAlign: 'center',
-    fontWeight: 'bold',
+    fontFamily: FONTS.Bold
   },
   noNotificationsContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    alignContent: 'center',
+    alignSelf: 'center',
+    marginTop: '70%'
   },
   noNotificationsText: {
+    flex: 1,
     fontSize: 16,
     color: COLORS.BLACK,
     fontFamily: FONTS.SemiBold,

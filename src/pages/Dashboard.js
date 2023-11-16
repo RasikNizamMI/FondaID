@@ -47,6 +47,7 @@ const Dashboard = ({navigation}) => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const storedUserRefID = await getData('refID');
         const storedUserFondaID = await getData('fonda_ID');
@@ -74,6 +75,8 @@ const Dashboard = ({navigation}) => {
         }
       } catch (error) {
         console.log('Error loading remembered credentials:', error);
+      }finally{
+        setLoading(false);
       }
     };
 
@@ -116,7 +119,7 @@ const Dashboard = ({navigation}) => {
       setData('gender', response.gender);
     } catch (error) {
       console.log('error', error);
-      setErrorMessage('Please check credentials');
+      // setErrorMessage('Please check credentials');
     } finally {
       setLoading(false);
     }

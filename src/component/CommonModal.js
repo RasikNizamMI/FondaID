@@ -20,8 +20,8 @@ const CommonModal = ({ visible, onClose, imageSource, message, header, color }) 
           </View>
           <Text style={{color: COLORS.BLACK, fontSize: 14, fontFamily: FONTS.Regular, textAlign: 'center', marginTop: 20}}>{message}</Text>
           <TouchableOpacity onPress={onClose}>
-            <View style={{height: 40, borderColor: COLORS.PRIMARY, borderWidth: 2, borderRadius: 10, marginTop: 30}}>
-            <Text style={{ textAlign: 'center', marginTop: 10, color: COLORS.PRIMARY, fontSize: 16, fontFamily: FONTS.Regular }}>OK</Text>
+            <View style={{height: 40, borderColor: COLORS.PRIMARY, borderWidth: 2, borderRadius: 10, marginTop: 30, justifyContent: 'center'}}>
+            <Text style={{ textAlign: 'center', color: COLORS.PRIMARY, fontSize: 16, fontFamily: FONTS.Regular }}>OK</Text>
             </View>
           </TouchableOpacity>
         </View>

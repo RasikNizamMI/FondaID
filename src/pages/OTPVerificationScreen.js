@@ -9,7 +9,8 @@ import {
   TouchableOpacity,
   Platform,
   ActivityIndicator,
-  Alert
+  Alert,
+  Dimensions
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
@@ -25,6 +26,11 @@ import {
   useBlurOnFulfill,
   useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
+
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+
+const minScreenSize = Math.min(screenWidth, screenHeight);
+
 const CELL_COUNT = 6;
 const EMAIL_CELL_COUNT = 6;
 
@@ -386,9 +392,9 @@ const OTPVerificationScreen = ({navigation}) => {
                   key={index}
                   style={[
                     {
-                      width: 50,
-                      height: 50,
-                      lineHeight: 50,
+                      width: minScreenSize * 0.1, // Adjust as needed
+                      height: minScreenSize * 0.1, // Adjust as needed
+                      lineHeight: minScreenSize * 0.1,
                       fontSize: 24,
                       borderWidth: 2,
                       borderColor: COLORS.PRIMARY,
@@ -478,9 +484,9 @@ const OTPVerificationScreen = ({navigation}) => {
                   key={index}
                   style={[
                     {
-                      width: 50,
-                      height: 50,
-                      lineHeight: 50,
+                      width: minScreenSize * 0.1, // Adjust as needed
+                        height: minScreenSize * 0.1, // Adjust as needed
+                        lineHeight: minScreenSize * 0.1,
                       fontSize: 24,
                       borderWidth: 2,
                       borderColor: COLORS.PRIMARY,

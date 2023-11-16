@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  Dimensions
 } from 'react-native';
 import {
   CodeField,
@@ -23,6 +24,8 @@ import CommonModal from '../component/CommonModal';
 import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const CELL_COUNT = 6;
+
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 const LoginOtpScreen = ({navigation}) => {
   const [value, setValue] = useState('');
@@ -161,7 +164,7 @@ const LoginOtpScreen = ({navigation}) => {
       }
     } catch (error) {
       console.log('error', error);
-      setErrorMessage('Please check credentials');
+      setErrorMessage('Network Issue');
     } finally {
       setLoading(false);
     }
@@ -175,6 +178,8 @@ const LoginOtpScreen = ({navigation}) => {
     setModalVisible(false);
     navigation.navigate('Home', {screen: 'Dashboard'});
   };
+
+  const minScreenSize = Math.min(screenWidth, screenHeight);
 
   return (
     <View style={styles.mainBody}>
@@ -209,9 +214,9 @@ const LoginOtpScreen = ({navigation}) => {
                     key={index}
                     style={[
                       {
-                        width: 50,
-                        height: 50,
-                        lineHeight: 50,
+                        width: minScreenSize * 0.1, // Adjust as needed
+                        height: minScreenSize * 0.1, // Adjust as needed
+                        lineHeight: minScreenSize * 0.1,
                         fontSize: 24,
                         borderWidth: 2,
                         borderColor: COLORS.PRIMARY,

@@ -78,14 +78,14 @@ const LoginScreen = ({navigation}) => {
       if (selectedCategory === 'Phone') {
         const callingCodeString = callingCodeValue.toString();
         requestBody = {
-          fonda_id: fondaID,
+          fonda_id: (fondaID.toUpperCase()),
           email_id_phone_number: fondaPhone,
           phone_number_country_code: callingCodeString,
         };
       } else {
         requestBody = {
-          fonda_id: fondaID,
-          email_id_phone_number: fondaEmail,
+          fonda_id: (fondaID.toUpperCase()),
+          email_id_phone_number: (fondaEmail.toLowerCase()),
         };
       }
 
@@ -105,7 +105,7 @@ const LoginScreen = ({navigation}) => {
           if (selectedCategory === 'Phone') {
             await setData('phoneNumber', fondaPhone);
           } else {
-            await setData('phoneNumber', fondaEmail);
+            await setData('phoneNumber', (fondaEmail.toLowerCase()));
           }
           navigation.navigate('LoginOtpScreen');
           setFondaID('');
@@ -170,7 +170,7 @@ const LoginScreen = ({navigation}) => {
               <TextInput
                 value={fondaID}
                 style={styles.input}
-                onChangeText={(text) => setFondaID(text.toUpperCase())}
+                onChangeText={(text) => setFondaID(text)}
                 placeholder="Enter Fonda ID"
                 placeholderTextColor={COLORS.SUBTEXT}
                 autoCapitalize="none"
@@ -309,7 +309,7 @@ const LoginScreen = ({navigation}) => {
                 <TextInput
                   value={fondaEmail}
                   style={styles.input}
-                  onChangeText={(text) => setFondaEmail(text.toLowerCase())}
+                  onChangeText={(text) => setFondaEmail(text)}
                   placeholder="Enter Email"
                   placeholderTextColor={COLORS.SUBTEXT}
                   keyboardType="default"

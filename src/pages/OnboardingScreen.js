@@ -109,7 +109,7 @@ const OnboardingScreen = ({navigation}) => {
           <Text style={styles.text1View}>Use our Fonda ID for</Text>
           <View style={styles.row}>
             <Text style={styles.text1View}>your </Text>
-            <Text style={styles.text2View}>KYC documents</Text>
+            <Text style={styles.text2View}>Digital Authenticity</Text>
           </View>
           <Text style={styles.text1View}>on all the platforms!</Text>
         </View>
@@ -245,7 +245,14 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     marginTop: 30,
     marginRight: 30,
-  }
+  },
+  buttonTextStyle: {
+    color: COLORS.WHITE,
+    paddingVertical: 10,
+    fontSize: 16,
+    fontFamily: FONTS.Regular
+  },
+
 });
 
 export default OnboardingScreen;
