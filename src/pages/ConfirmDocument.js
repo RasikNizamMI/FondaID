@@ -44,7 +44,7 @@ const ConfirmDocument = ({navigation}) => {
   const [modalColor, setModalColor] = useState('');
   const [modalHeader, setModalHeader] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [jwtToken, setJwtToken] = useState("");
+  const [jwtToken, setJwtToken] = useState('');
 
   useEffect(() => {
     const loadRememberedCredentials = async () => {
@@ -91,11 +91,8 @@ const ConfirmDocument = ({navigation}) => {
         setJwtToken(storedJwtToken);
 
         if (userDocument === 'passport') {
-          console.log('Passport');
         }
-      } catch (error) {
-        console.log('Error loading remembered credentials:', error);
-      }
+      } catch (error) {}
     };
     loadRememberedCredentials();
   }, []);
@@ -113,7 +110,7 @@ const ConfirmDocument = ({navigation}) => {
 
     const headers = {
       'Content-Type': 'application/json',
-      'access-token' : jwtToken,
+      'access-token': jwtToken,
     };
 
     const requestBody = {
@@ -136,20 +133,15 @@ const ConfirmDocument = ({navigation}) => {
         imageToProcess: userUploadImageBase64,
       },
     };
-    console.log('RequestBody-------' + API_ENDPOINTS.UPLOADDOCUMENT);
-    console.log('RequestBody-------' + JSON.stringify(requestBody));
     postRequest(API_ENDPOINTS.UPLOADDOCUMENT, requestBody, headers)
       .then(response => {
-        console.log(response);
         if (response.responseCode === 'F200') {
-          console.log(response);
           setModalVisible(true);
           setErrorMessage(response.message);
           setModalColor(COLORS.PRIMARY);
           setModalImage(require('../assets/images/sucess.png'));
           setModalHeader('Success');
         } else {
-          console.log(response);
           setModalVisible(true);
           setErrorMessage(response.message);
           setModalColor(COLORS.ERROR);
@@ -158,12 +150,11 @@ const ConfirmDocument = ({navigation}) => {
         }
       })
       .catch(error => {
-        console.log("123456765432")
         setModalVisible(true);
-          setErrorMessage('No face Detected');
-          setModalColor(COLORS.ERROR);
-          setModalImage(require('../assets/images/error.png'));
-          setModalHeader('Error');
+        setErrorMessage('No face Detected');
+        setModalColor(COLORS.ERROR);
+        setModalImage(require('../assets/images/error.png'));
+        setModalHeader('Error');
       })
       .finally(() => {
         setLoading(false);

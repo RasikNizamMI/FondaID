@@ -87,7 +87,6 @@ const CapturePictureInstructionScreen = ({navigation}) => {
     };
 
     launchCamera(options, response => {
-      console.log('Response = ', response);
       const {assets} = response;
 
       if (response.didCancel) {
@@ -103,13 +102,6 @@ const CapturePictureInstructionScreen = ({navigation}) => {
         alert(response.errorMessage);
         return;
       }
-      console.log('base64 -> ', assets[0].base64);
-      console.log('uri -> ', assets[0].uri);
-      console.log('width -> ', assets[0].width);
-      console.log('height -> ', assets[0].height);
-      console.log('fileSize -> ', assets[0].fileSize);
-      console.log('type -> ', assets[0].type);
-      console.log('fileName -> ', assets[0].fileName);
       setFilePath(assets[0]);
     });
   };

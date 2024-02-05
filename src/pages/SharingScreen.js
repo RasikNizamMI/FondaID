@@ -36,7 +36,6 @@ const SharingScreen = ({navigation}) => {
       };
 
       const result = await Share.share(shareOptions);
-      console.log(result);
     } catch (error) {
       console.error(error.message);
     }
@@ -49,7 +48,7 @@ const SharingScreen = ({navigation}) => {
 
   const handleConfirm = () => {
     navigation.navigate('Dashboard');
-  }
+  };
 
   return (
     <View style={styles.container}>
@@ -63,20 +62,20 @@ const SharingScreen = ({navigation}) => {
           </View>
           <View style={styles.textView}>
             <Text style={styles.text}>Else your Fonda ID Validity will be</Text>
-            <Text style={styles.text}>
-            automatically reduced to
-            </Text>
+            <Text style={styles.text}>automatically reduced to</Text>
           </View>
           <View style={styles.linkTextView}>
-              <Text style={styles.linkText}>7 days</Text>  
+            <Text style={styles.linkText}>7 days</Text>
           </View>
           <View style={styles.textView}>
-            <Text style={styles.text}>Next time you create a Fonda ID you will be</Text>
+            <Text style={styles.text}>
+              Next time you create a Fonda ID you will be
+            </Text>
             <Text style={styles.text}>charged as per Fonda Policy.</Text>
             <Text style={styles.text}>The pricing will be.</Text>
           </View>
           <View style={styles.linkTextView}>
-              <Text style={styles.priceText}>€1.00</Text>  
+            <Text style={styles.priceText}>€1.00</Text>
           </View>
           <View
             style={{
@@ -124,7 +123,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   content: {
-    
     justifyContent: 'center',
     backgroundColor: '#FFFFFF',
     margin: 10,
@@ -170,13 +168,13 @@ const styles = StyleSheet.create({
     fontSize: 32,
     color: '#FF0000',
     textAlign: 'center',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   priceText: {
     fontSize: 24,
     color: '#F5A922',
     textAlign: 'center',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   buttonStyle: {
     backgroundColor: '#F5A922',
@@ -189,13 +187,13 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     marginTop: 20,
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   buttonTextStyle: {
     color: '#FFFFFF',
     paddingVertical: 10,
     fontSize: 16,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   skipButtonStyle: {
     backgroundColor: '#FFFFFF',
@@ -210,7 +208,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderWidth: 2,
     marginBottom: 110,
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   skipButtonTextStyle: {
     color: '#F5A922',

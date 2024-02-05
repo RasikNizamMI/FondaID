@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {Image, StyleSheet, View} from 'react-native';
 import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
-import { loadAndroidRawResource } from 'react-native-svg/lib/typescript/LocalSvg';
+import {loadAndroidRawResource} from 'react-native-svg/lib/typescript/LocalSvg';
 import {COLORS, FONTS} from '../assets/Colors';
 
 const SplashScreen = ({navigation}) => {
@@ -9,23 +9,16 @@ const SplashScreen = ({navigation}) => {
     try {
       const storedUserFondaID = await getData('fonda_ID');
       const storedUserOnboard = await getData('onboard');
-      console.log(storedUserFondaID);
-      console.log(storedUserOnboard);
-      if ( storedUserOnboard !== null) {
-        console.log("11111")
+      if (storedUserOnboard !== null) {
         setTimeout(() => {
           navigation.replace('Auth');
         }, 2000); // Delay navigation for 2 seconds (adjust as needed)
-      }else{
-        console.log('3333')
+      } else {
         setTimeout(() => {
           navigation.replace('Onboard');
         }, 2000);
       }
-    } catch (error) {
-      console.error('Error accessing data:', error);
-      // Handle the error appropriately (e.g., show a message to the user)
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -33,7 +26,6 @@ const SplashScreen = ({navigation}) => {
       checkAccessKey();
     } catch (error) {
       console.error('Error in useEffect:', error);
-      // Handle the error appropriately
     }
   }, [navigation]);
 

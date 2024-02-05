@@ -43,11 +43,8 @@ const NotificationScreen = ({navigation}) => {
             getDocumentDetails(storedUserFondaID, storedJwtToken);
           }
         } else {
-          console.log('No remembered credentials found.');
         }
-      } catch (error) {
-        console.log('Error loading remembered credentials:', error);
-      }
+      } catch (error) {}
     };
 
     fetchData();
@@ -62,54 +59,51 @@ const NotificationScreen = ({navigation}) => {
 
     getRequest(API_ENDPOINTS.NOTIFICATION + fondaId, {}, headers)
       .then(response => {
-        console.log('getnotifiaction' + JSON.stringify(response));
+        console.log(response);
         setNotificationInfo(response.data);
         setLoading(false);
       })
       .catch(error => {
-      //   console.error('GET error:', error);
-      //   setLoading(false);
-      // });
-      if (error.response && error.response.status === 401) {
-        setLoading(false);
-        setModalVisible(true);
-        setErrorMessage("Session timed out, please login again");
-        setModalColor(COLORS.ERROR);
-        setModalImage(require('../assets/images/error.png'));
-        setModalHeader('Error');
-        setErrorCode('F401');
-      } else {
-        // Handle other errors
-        console.error('GET error:', error);
-        setLoading(false);
-      }
-    });
+        if (error.response && error.response.status === 401) {
+          setLoading(false);
+          setModalVisible(true);
+          setErrorMessage('Session timed out, please login again');
+          setModalColor(COLORS.ERROR);
+          setModalImage(require('../assets/images/error.png'));
+          setModalHeader('Error');
+          setErrorCode('F401');
+        } else {
+          // Handle other errors
+          console.error('GET error:', error);
+          setLoading(false);
+        }
+      });
   };
 
-//   if (response.responseCode === 'F200') {
-//     // Successfully loaded data
-//     setNotificationInfo(response.data);
-//     setLoading(false);
-//   } else if (response.responseCode === 'F401') {
-//     // Show popup and redirect to login screen
-//     setLoading(false);
-//         setModalVisible(true);
-//         setErrorMessage(response.responseMessage);
-//         setModalColor(COLORS.ERROR);
-//         setModalImage(require('../assets/images/error.png'));
-//         setModalHeader('Error');
-//         setErrorCode('F401');
-//   } else {
-//     // Handle other response codes if needed
-//     console.error('Unhandled responseCode:', response.responseCode);
-//     setLoading(false);
-//   }
-// })
-// .catch(error => {
-//   console.error('GET error:', error);
-//   setLoading(false);
-// });
-// };
+  //   if (response.responseCode === 'F200') {
+  //     // Successfully loaded data
+  //     setNotificationInfo(response.data);
+  //     setLoading(false);
+  //   } else if (response.responseCode === 'F401') {
+  //     // Show popup and redirect to login screen
+  //     setLoading(false);
+  //         setModalVisible(true);
+  //         setErrorMessage(response.responseMessage);
+  //         setModalColor(COLORS.ERROR);
+  //         setModalImage(require('../assets/images/error.png'));
+  //         setModalHeader('Error');
+  //         setErrorCode('F401');
+  //   } else {
+  //     // Handle other response codes if needed
+  //     console.error('Unhandled responseCode:', response.responseCode);
+  //     setLoading(false);
+  //   }
+  // })
+  // .catch(error => {
+  //   console.error('GET error:', error);
+  //   setLoading(false);
+  // });
+  // };
 
   const formattedDate = dateString => {
     const options = {
@@ -143,17 +137,8 @@ const NotificationScreen = ({navigation}) => {
         postData,
         headers,
       );
-      console.log('response', response);
 
       if (response.responseCode === 'F200') {
-        console.log(response)
-        // Handle success, if needed
-        // setLoading(false);
-        // setModalVisible(true);
-        // setErrorMessage(response.responseMessage);
-        // setModalColor(COLORS.PRIMARY);
-        // setModalImage(require('../assets/images/sucess.png'));
-        // setModalHeader('Success');
       } else {
         // Handle error, if needed
         setLoading(false);
@@ -169,19 +154,19 @@ const NotificationScreen = ({navigation}) => {
       if (error.response && error.response.status === 401) {
         setLoading(false);
         setModalVisible(true);
-        setErrorMessage("Session timed out, please login again");
+        setErrorMessage('Session timed out, please login again');
         setModalColor(COLORS.ERROR);
         setModalImage(require('../assets/images/error.png'));
         setModalHeader('Error');
         setErrorCode('F401');
       } else {
-      setLoading(false);
-      setApiResponseMessage('POST error:', error);
-      setModalVisible(true);
-      setErrorMessage(error);
-      setModalColor(COLORS.ERROR);
-      setModalImage(require('../assets/images/error.png'));
-      setModalHeader('Error');
+        setLoading(false);
+        setApiResponseMessage('POST error:', error);
+        setModalVisible(true);
+        setErrorMessage(error);
+        setModalColor(COLORS.ERROR);
+        setModalImage(require('../assets/images/error.png'));
+        setModalHeader('Error');
       }
     }
   };
@@ -192,7 +177,7 @@ const NotificationScreen = ({navigation}) => {
 
   const sucess = () => {
     setModalVisible(false);
-    navigation.navigate('Auth', {screen: 'LoginScreen'})
+    navigation.navigate('Auth', {screen: 'LoginScreen'});
   };
 
   return (
@@ -350,7 +335,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: COLORS.PRIMARY,
     textAlign: 'center',
-    fontFamily: FONTS.Bold
+    fontFamily: FONTS.Bold,
   },
   noNotificationsContainer: {
     flex: 1,
@@ -358,7 +343,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignContent: 'center',
     alignSelf: 'center',
-    marginTop: '70%'
+    marginTop: '70%',
   },
   noNotificationsText: {
     flex: 1,

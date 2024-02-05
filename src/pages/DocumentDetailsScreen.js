@@ -24,13 +24,13 @@ const getDisplayName = doc_type => {
   switch (doc_type) {
     case 'passport':
       return 'Passport';
-    case 'driverLicense':
+    case 'driving_license':
       return 'Driving License';
-    case 'idCard':
+    case 'national_id':
       return 'National ID Card';
     case 'healthCard':
       return 'Health Card';
-    case 'professionalLicense':
+    case 'residence_permit':
       return 'Professional Card';
     case 'other':
       return 'Other';
@@ -44,7 +44,7 @@ const DocumentDetailsScreen = ({route, navigation}) => {
   const displayName = getDisplayName(doc_type);
   const [userId, setuserId] = useState('');
   const [docType, setdocType] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [jwtToken, setJwtToken] = useState('');
   const [htmlContent, setHtmlContent] = useState('');
@@ -86,41 +86,21 @@ const DocumentDetailsScreen = ({route, navigation}) => {
     );
   }
 
-  // const handleWebViewNavigationStateChange = (newNavState) => {
-  //   console.log('New Navigation State:', newNavState);
-
-  //   const url = newNavState.url || '';
-  //   if (url.startsWith(API_ENDPOINTS.GETDOCUMENTPREVIEW)) {
-  //     const injectScript = `
-  //       fetch('${url}', {
-  //         method: 'GET',
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //           'access-token': '${jwtToken}',
-  //         },
-  //       });
-  //     `;
-  //     console.log('Injecting Script:', injectScript);
-  //     webViewRef.current.injectJavaScript(injectScript);
-  //   }
-  // };
-
   const handleShare = async () => {
     try {
-      const imageUrl = API_ENDPOINTS.GETDOCUMENTQR + id; // Replace with your image URL
+      const imageUrl = API_ENDPOINTS.GETDOCUMENTQR + id;
       const options = {
         url: imageUrl,
       };
       await Share.open(options);
       addNotification();
     } catch (error) {
+      addNotification();
       console.error('Error sharing:', error.message);
     }
   };
 
   const addNotification = async () => {
-    console.log('12345678909876543');
-    console.log(doc_type);
     const headers = {
       'Content-Type': 'application/json',
       'access-token': jwtToken,
@@ -128,13 +108,10 @@ const DocumentDetailsScreen = ({route, navigation}) => {
 
     const requestBody = {
       fonda_id: fonda_id,
-      message: 'You shared ' + doc_type + ' QR code',
+      message: 'You shared ' + displayName + ' QR code',
     };
-    console.log(API_ENDPOINTS.ADDNOTIFICATION, requestBody, headers);
     putRequest(API_ENDPOINTS.ADDNOTIFICATION, requestBody, headers)
-      .then(response => {
-        console.log(JSON.stringify(response));
-      })
+      .then(response => {})
       .catch(error => {
         console.error('GET error:', error);
       });
@@ -163,6 +140,19 @@ const DocumentDetailsScreen = ({route, navigation}) => {
           backgroundColor: COLORS.WHITE,
           marginTop: 20,
         }}>
+        {loading ? (
+        <ActivityIndicator
+          size="large"
+          color={COLORS.PRIMARY}
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            alignContent: 'center',
+            alignSelf: 'center',
+          }}
+        />
+      ) : (
         <View style={{justifyContent: 'center', alignItems: 'center'}}>
           <View
             style={{
@@ -206,6 +196,7 @@ const DocumentDetailsScreen = ({route, navigation}) => {
             Scan the above QR code to verify the above document.
           </Text>
         </View>
+      )}
         {/* <WebView
           ref={webViewRef}
           originWhitelist={['*']}
@@ -219,7 +210,9 @@ const DocumentDetailsScreen = ({route, navigation}) => {
         /> */}
         <WebView
           source={{html: htmlContent}}
-          renderLoading={this.LoadingIndicatorView}
+          // renderLoading={() => (
+          //   <ActivityIndicator size="large" color={COLORS.PRIMARY} />
+          // )}
           startInLoadingState={true}
           onError={syntheticEvent => {
             const {nativeEvent} = syntheticEvent;

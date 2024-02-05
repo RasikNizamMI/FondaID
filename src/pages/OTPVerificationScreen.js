@@ -10,7 +10,7 @@ import {
   Platform,
   ActivityIndicator,
   Alert,
-  Dimensions
+  Dimensions,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
@@ -27,7 +27,7 @@ import {
   useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+const {width: screenWidth, height: screenHeight} = Dimensions.get('window');
 
 const minScreenSize = Math.min(screenWidth, screenHeight);
 
@@ -85,23 +85,21 @@ const OTPVerificationScreen = ({navigation}) => {
         setUserPhoneOTP(storedUserPhoneOTP);
         setUserEmailOTP(storedUserEmailOTP);
         setuserRefID(storeduserRefID);
-      } catch (error) {
-        console.log('Error loading remembered credentials:', error);
-      }
+      } catch (error) {}
     };
     loadRememberedCredentials();
   }, []);
 
   const handleCaptureFaceID = () => {
-    if(mobileVerificationSuccess && emailVerificationSuccess){
+    if (mobileVerificationSuccess && emailVerificationSuccess) {
       navigation.navigate('CaptureFaceIDScreen');
-    }else{
+    } else {
       setModalVisible(true);
-        setErrorMessage("Please Verify Mobile Number and Email OTP");
-        setModalColor(COLORS.PRIMARY);
-        setModalImage(require('../assets/images/failur.png'))
-        setModalHeader('Error')
-        // navigation.navigate('CaptureFaceIDScreen');
+      setErrorMessage('Please Verify Mobile Number and Email OTP');
+      setModalColor(COLORS.PRIMARY);
+      setModalImage(require('../assets/images/failur.png'));
+      setModalHeader('Error');
+      // navigation.navigate('CaptureFaceIDScreen');
     }
   };
 
@@ -114,28 +112,23 @@ const OTPVerificationScreen = ({navigation}) => {
     const requestBody = {
       ref_id: userRefID,
     };
-
-    console.log(API_ENDPOINTS.MOBILERESENDOTP);
     postRequest(API_ENDPOINTS.MOBILERESENDOTP, requestBody)
       .then(response => {
         setLoading(false);
-        console.log('response' + JSON.stringify(response));
-        if (
-          response.responseCode === 'F200'
-        ) {
+        if (response.responseCode === 'F200') {
           setLoading(false);
-           setModalVisible(true);
-        setErrorMessage(response.responseMessage);
-        setModalColor(COLORS.PRIMARY);
-        setModalImage(require('../assets/images/sucess.png'))
-        setModalHeader('Success')
+          setModalVisible(true);
+          setErrorMessage(response.responseMessage);
+          setModalColor(COLORS.PRIMARY);
+          setModalImage(require('../assets/images/sucess.png'));
+          setModalHeader('Success');
         } else {
           setLoading(false);
           setModalVisible(true);
-        setErrorMessage(response.responseMessage);
-        setModalColor(COLORS.ERROR);
-        setModalImage(require('../assets/images/error.png'))
-        setModalHeader('Error')
+          setErrorMessage(response.responseMessage);
+          setModalColor(COLORS.ERROR);
+          setModalImage(require('../assets/images/error.png'));
+          setModalHeader('Error');
         }
       })
       .catch(error => {
@@ -151,28 +144,23 @@ const OTPVerificationScreen = ({navigation}) => {
     const requestBody = {
       ref_id: userRefID,
     };
-
-    console.log(API_ENDPOINTS.EMAILRESENDOTP);
     postRequest(API_ENDPOINTS.EMAILRESENDOTP, requestBody)
       .then(response => {
         setLoading(false);
-        console.log('response' + JSON.stringify(response));
-        if (
-          response.responseCode === 'F200'
-        ) {
+        if (response.responseCode === 'F200') {
           setLoading(false);
           setModalVisible(true);
           setErrorMessage(response.responseMessage);
           setModalColor(COLORS.PRIMARY);
-          setModalImage(require('../assets/images/sucess.png'))
-          setModalHeader('Success')
-          } else {
-            setLoading(false);
-            setModalVisible(true);
+          setModalImage(require('../assets/images/sucess.png'));
+          setModalHeader('Success');
+        } else {
+          setLoading(false);
+          setModalVisible(true);
           setErrorMessage(response.responseMessage);
           setModalColor(COLORS.ERROR);
-          setModalImage(require('../assets/images/error.png'))
-          setModalHeader('Error')
+          setModalImage(require('../assets/images/error.png'));
+          setModalHeader('Error');
         }
       })
       .catch(error => {
@@ -189,44 +177,39 @@ const OTPVerificationScreen = ({navigation}) => {
       phone_otp: value,
       ref_id: userRefID,
     };
-
-    console.log(API_ENDPOINTS.REGISTERMOBILEVALIDATE);
     postRequest(API_ENDPOINTS.REGISTERMOBILEVALIDATE, requestBody)
       .then(response => {
         removeData('phoneOTP');
-        console.log('response' + JSON.stringify(response));
-        if (
-          response.responseCode === 'F200'
-        ) {
+        if (response.responseCode === 'F200') {
           setLoading(false);
           setMobileVerificationSuccess(true);
           setMobileVerificationError(false);
-            setModalVisible(true);
-        setErrorMessage(response.responseMessage);
-        setModalColor(COLORS.PRIMARY);
-        setModalImage(require('../assets/images/sucess.png'))
-        setModalHeader('Success')
+          setModalVisible(true);
+          setErrorMessage(response.responseMessage);
+          setModalColor(COLORS.PRIMARY);
+          setModalImage(require('../assets/images/sucess.png'));
+          setModalHeader('Success');
         } else {
           setApiResponseMessage(response.responseMessage);
           setMobileVerificationSuccess(false);
-      setMobileVerificationError(true);
-      setModalVisible(true);
-      setErrorMessage(response.responseMessage);
-      setModalColor(COLORS.ERROR);
-      setModalImage(require('../assets/images/error.png'))
-      setModalHeader('Error')
+          setMobileVerificationError(true);
+          setModalVisible(true);
+          setErrorMessage(response.responseMessage);
+          setModalColor(COLORS.ERROR);
+          setModalImage(require('../assets/images/error.png'));
+          setModalHeader('Error');
         }
       })
       .catch(error => {
         setLoading(false);
         setApiResponseMessage('POST error:', error);
         setMobileVerificationSuccess(false);
-      setMobileVerificationError(true);
-      setModalVisible(true);
-      setErrorMessage(error);
-      setModalColor(COLORS.ERROR);
-      setModalImage(require('../assets/images/error.png'))
-      setModalHeader('Error')
+        setMobileVerificationError(true);
+        setModalVisible(true);
+        setErrorMessage(error);
+        setModalColor(COLORS.ERROR);
+        setModalImage(require('../assets/images/error.png'));
+        setModalHeader('Error');
       })
       .finally(() => {
         setLoading(false);
@@ -239,33 +222,28 @@ const OTPVerificationScreen = ({navigation}) => {
       email_otp: emailValue,
       ref_id: userRefID,
     };
-
-    console.log(API_ENDPOINTS.REGISTEREMAILVALIDATE);
     postRequest(API_ENDPOINTS.REGISTEREMAILVALIDATE, requestBody)
       .then(response => {
         removeData('phoneOTP');
-        console.log('response' + JSON.stringify(response));
-        if (
-          response.responseCode === 'F200'
-        ) {
+        if (response.responseCode === 'F200') {
           setLoading(false);
           setEmailVerificationSuccess(true);
-      setEmailVerificationError(false); 
-      setModalVisible(true);
-        setErrorMessage(response.responseMessage);
-        setModalColor(COLORS.PRIMARY);
-        setModalImage(require('../assets/images/sucess.png'))
-        setModalHeader('Success')
+          setEmailVerificationError(false);
+          setModalVisible(true);
+          setErrorMessage(response.responseMessage);
+          setModalColor(COLORS.PRIMARY);
+          setModalImage(require('../assets/images/sucess.png'));
+          setModalHeader('Success');
         } else {
           setLoading(false);
           setEmailVerificationSuccess(false);
-      setEmailVerificationError(true);
-      setMobileVerificationError(true);
-      setModalVisible(true);
-      setErrorMessage(response.responseMessage);
-      setModalColor(COLORS.ERROR);
-      setModalImage(require('../assets/images/error.png'))
-      setModalHeader('Error')
+          setEmailVerificationError(true);
+          setMobileVerificationError(true);
+          setModalVisible(true);
+          setErrorMessage(response.responseMessage);
+          setModalColor(COLORS.ERROR);
+          setModalImage(require('../assets/images/error.png'));
+          setModalHeader('Error');
         }
       })
       .catch(error => {
@@ -274,8 +252,8 @@ const OTPVerificationScreen = ({navigation}) => {
         setModalVisible(true);
         setErrorMessage(error);
         setModalColor(COLORS.ERROR);
-        setModalImage(require('../assets/images/error.png'))
-        setModalHeader('Error')
+        setModalImage(require('../assets/images/error.png'));
+        setModalHeader('Error');
       })
       .finally(() => {
         setLoading(false);
@@ -293,7 +271,8 @@ const OTPVerificationScreen = ({navigation}) => {
         <TouchableOpacity onPress={handleMobileVerification}>
           <Text
             style={{
-              color: mobileVerificationError == true ? 'red' : COLORS.DODGUERBLUE,
+              color:
+                mobileVerificationError == true ? 'red' : COLORS.DODGUERBLUE,
               fontSize: 16,
               alignSelf: 'center',
               marginTop: 10,
@@ -320,7 +299,8 @@ const OTPVerificationScreen = ({navigation}) => {
         <TouchableOpacity onPress={handleEmailVerification}>
           <Text
             style={{
-              color: emailVerificationError == true ? 'red' : COLORS.DODGUERBLUE,
+              color:
+                emailVerificationError == true ? 'red' : COLORS.DODGUERBLUE,
               fontSize: 16,
               alignSelf: 'center',
               marginTop: 10,
@@ -340,243 +320,248 @@ const OTPVerificationScreen = ({navigation}) => {
 
   const sucess = () => {
     setModalVisible(false);
-    navigation.navigate('Home', {screen: 'Dashboard'})
+    navigation.navigate('Home', {screen: 'Dashboard'});
   };
   return (
     <View style={styles.mainBody}>
       {loading ? (
         <ActivityIndicator size="large" color={COLORS.PRIMARY} />
       ) : (
-      <ScrollView
-        contentContainerStyle={{flexGrow: 1}}
-        keyboardShouldPersistTaps="handled">
-        <View>
-          <View style={styles.headerView}>
-            <Feather
-              onPress={() => {
-                navigation.goBack(null);
-              }}
-              style={styles.headerIcon}
-              name="chevron-left"
-              size={25}
-              color={COLORS.PRIMARY}
-            />
-            <Text style={styles.headerText}>OTP Verification</Text>
-          </View>
-          <View style={styles.SectionTextStyle}>
-            <Text style={styles.HeaderTextStyle}>
-              Verify your Mobile number & Email
-            </Text>
-          </View>
-          <View style={styles.SectionTextStyle}>
-            <Text style={styles.SubHeadingTextStyle}>
-              Please enter the 6 digit code sent to
-            </Text>
-          </View>
-          <View style={styles.SectionTextStyle}>
-            <Text style={styles.SubMobileHeaderTextStyle}>{userPhoneNO}</Text>
-          </View>
+        <ScrollView
+          contentContainerStyle={{flexGrow: 1}}
+          keyboardShouldPersistTaps="handled">
           <View>
-            <CodeField
-              ref={ref}
-              {...props}
-              // Use `caretHidden={false}` when users can't paste a text value, because context menu doesn't appear
-              value={value}
-              onChangeText={setValue}
-              cellCount={6}
-              rootStyle={styles.codeFiledRoot}
-              keyboardType="number-pad"
-              textContentType="oneTimeCode"
-              renderCell={({index, symbol, isFocused}) => (
-                <Text
-                  key={index}
-                  style={[
-                    {
-                      width: minScreenSize * 0.1, // Adjust as needed
-                      height: minScreenSize * 0.1, // Adjust as needed
-                      lineHeight: minScreenSize * 0.1,
-                      fontSize: 24,
-                      borderWidth: 2,
-                      borderColor: COLORS.PRIMARY,
-                      textAlign: 'center',
-                      borderRadius: 10,
-                      color: COLORS.WHITE,
-                      backgroundColor: symbol ? COLORS.PRIMARY : COLORS.WHITE,
-                    },
-                    isFocused && styles.focusCell,
-                  ]}
-                  onLayout={getCellOnLayoutHandler(index)}>
-                  {symbol || (isFocused ? <Cursor /> : null)}
-                </Text>
-              )}
-            />
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <Text
-              style={{
-                color: COLORS.TEXTCOLOR,
-                fontSize: 13,
-                alignSelf: 'center',
-                marginTop: 20,
-                fontFamily: FONTS.Regular
-              }}>
-              Didn’t receive a code?
-            </Text>
-            <Text> </Text>
-
-            <TouchableOpacity onPress={handleMobileResend}>
-              <Text
-                style={{
-                  color: COLORS.PRIMARY,
-                  fontSize: 13,
-                  alignSelf: 'center',
-                  marginTop: 20,
-                  fontFamily: FONTS.Bold
-                }}>
-                Resend Code
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={{alignSelf: 'center'}}>
-            {renderMobileVerificationButton()}
-          </View>
-          {mobileVerificationSuccess && (
-            <View style={styles.SectionTextStyle}>
-              <Text
-                style={{
-                  marginTop: 10,
-                  color: COLORS.TEXTCOLOR,
-                  textAlign: 'center',
-                  fontSize: 13,
-                  fontFamily: FONTS.Italic
-                }}>
-                Your Mobile Number has been successfully verified!
-              </Text>
-            </View>
-          )}
-
-          <View style={styles.SectionTextStyle}>
-            <Text style={styles.SubHeadingTextStyle}>
-              Please enter the 6 digit code sent to
-            </Text>
-          </View>
-          <View style={styles.SectionTextStyle}>
-            <Text style={styles.SubMobileHeaderTextStyle}>{userEmail}</Text>
-          </View>
-          <View>
-            <CodeField
-              ref={emailref}
-              {...emailprops}
-              // Use `caretHidden={false}` when users can't paste a text value, because context menu doesn't appear
-              value={emailValue}
-              onChangeText={setEmailValue}
-              cellCount={6}
-              rootStyle={styles.codeFiledRoot}
-              keyboardType="number-pad"
-              textContentType="oneTimeCode"
-              renderCell={({index, symbol, isFocused}) => (
-                <Text
-                  key={index}
-                  style={[
-                    {
-                      width: minScreenSize * 0.1, // Adjust as needed
-                        height: minScreenSize * 0.1, // Adjust as needed
-                        lineHeight: minScreenSize * 0.1,
-                      fontSize: 24,
-                      borderWidth: 2,
-                      borderColor: COLORS.PRIMARY,
-                      textAlign: 'center',
-                      borderRadius: 10,
-                      color: COLORS.WHITE,
-                      backgroundColor: symbol ? COLORS.PRIMARY : COLORS.WHITE,
-                    },
-                    isFocused && styles.focusCell,
-                  ]}
-                  onLayout={getCellOnLayoutHandler(index)}>
-                  {symbol || (isFocused ? <Cursor /> : null)}
-                </Text>
-              )}
-            />
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <Text
-              style={{
-                color: COLORS.TEXTCOLOR,
-                fontSize: 13,
-                alignSelf: 'center',
-                marginTop: 20,
-                fontFamily: FONTS.Regular
-              }}>
-              Didn’t receive a code?
-            </Text>
-            <Text> </Text>
-
-            <TouchableOpacity onPress={handleEmailResend}>
-              <Text
-                style={{
-                  color: COLORS.PRIMARY,
-                  fontSize: 13,
-                  alignSelf: 'center',
-                  marginTop: 20,
-                  fontFamily: FONTS.Bold
-                }}>
-                Resend Code
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={{alignSelf: 'center'}}>
-            {renderEmailVerificationButton()}
-          </View>
-          {emailVerificationSuccess && (
-            <View style={styles.SectionTextStyle}>
-              <Text
-                style={{
-                  marginTop: 10,
-                  color: COLORS.TEXTCOLOR,
-                  textAlign: 'center',
-                  fontSize: 13,
-                  fontFamily: FONTS.Italic
-                }}>
-                Your Email Account has been successfully verified!
-              </Text>
-            </View>
-          )}
-
-          <TouchableOpacity
-            style={styles.buttonStyle}
-            activeOpacity={0.5}
-            onPress={handleCaptureFaceID}>
-            <Text style={styles.buttonTextStyle}>Capture Face ID</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.registerButtonStyle}
-            activeOpacity={0.5}
-            // onPress={handleSubmitPress}
-            onPress={handleSkip}>
-            <View style={styles.scannerView}>
+            <View style={styles.headerView}>
               <Feather
-                style={styles.scannerImage}
+                onPress={() => {
+                  navigation.goBack(null);
+                }}
+                style={styles.headerIcon}
                 name="chevron-left"
                 size={25}
                 color={COLORS.PRIMARY}
               />
-              <Text style={styles.registerButtonTextStyle}>Back</Text>
+              <Text style={styles.headerText}>OTP Verification</Text>
             </View>
-          </TouchableOpacity>
-        </View>
-        <CommonModal visible={modalVisible} onClose={closeModal} message={errorMessage} header={modalHeader} color={modalColor} imageSource={modalImage}>
-      </CommonModal>
-      </ScrollView>
+            <View style={styles.SectionTextStyle}>
+              <Text style={styles.HeaderTextStyle}>
+                Verify your Mobile number & Email
+              </Text>
+            </View>
+            <View style={styles.SectionTextStyle}>
+              <Text style={styles.SubHeadingTextStyle}>
+                Please enter the 6 digit code sent to
+              </Text>
+            </View>
+            <View style={styles.SectionTextStyle}>
+              <Text style={styles.SubMobileHeaderTextStyle}>{userPhoneNO}</Text>
+            </View>
+            <View>
+              <CodeField
+                ref={ref}
+                {...props}
+                // Use `caretHidden={false}` when users can't paste a text value, because context menu doesn't appear
+                value={value}
+                onChangeText={setValue}
+                cellCount={6}
+                rootStyle={styles.codeFiledRoot}
+                keyboardType="number-pad"
+                textContentType="oneTimeCode"
+                renderCell={({index, symbol, isFocused}) => (
+                  <Text
+                    key={index}
+                    style={[
+                      {
+                        width: minScreenSize * 0.1, // Adjust as needed
+                        height: minScreenSize * 0.1, // Adjust as needed
+                        lineHeight: minScreenSize * 0.1,
+                        fontSize: 24,
+                        borderWidth: 2,
+                        borderColor: COLORS.PRIMARY,
+                        textAlign: 'center',
+                        borderRadius: 10,
+                        color: COLORS.WHITE,
+                        backgroundColor: symbol ? COLORS.PRIMARY : COLORS.WHITE,
+                      },
+                      isFocused && styles.focusCell,
+                    ]}
+                    onLayout={getCellOnLayoutHandler(index)}>
+                    {symbol || (isFocused ? <Cursor /> : null)}
+                  </Text>
+                )}
+              />
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <Text
+                style={{
+                  color: COLORS.TEXTCOLOR,
+                  fontSize: 13,
+                  alignSelf: 'center',
+                  marginTop: 20,
+                  fontFamily: FONTS.Regular,
+                }}>
+                Didn’t receive a code?
+              </Text>
+              <Text> </Text>
+
+              <TouchableOpacity onPress={handleMobileResend}>
+                <Text
+                  style={{
+                    color: COLORS.PRIMARY,
+                    fontSize: 13,
+                    alignSelf: 'center',
+                    marginTop: 20,
+                    fontFamily: FONTS.Bold,
+                  }}>
+                  Resend Code
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{alignSelf: 'center'}}>
+              {renderMobileVerificationButton()}
+            </View>
+            {mobileVerificationSuccess && (
+              <View style={styles.SectionTextStyle}>
+                <Text
+                  style={{
+                    marginTop: 10,
+                    color: COLORS.TEXTCOLOR,
+                    textAlign: 'center',
+                    fontSize: 13,
+                    fontFamily: FONTS.Italic,
+                  }}>
+                  Your Mobile Number has been successfully verified!
+                </Text>
+              </View>
+            )}
+
+            <View style={styles.SectionTextStyle}>
+              <Text style={styles.SubHeadingTextStyle}>
+                Please enter the 6 digit code sent to
+              </Text>
+            </View>
+            <View style={styles.SectionTextStyle}>
+              <Text style={styles.SubMobileHeaderTextStyle}>{userEmail}</Text>
+            </View>
+            <View>
+              <CodeField
+                ref={emailref}
+                {...emailprops}
+                // Use `caretHidden={false}` when users can't paste a text value, because context menu doesn't appear
+                value={emailValue}
+                onChangeText={setEmailValue}
+                cellCount={6}
+                rootStyle={styles.codeFiledRoot}
+                keyboardType="number-pad"
+                textContentType="oneTimeCode"
+                renderCell={({index, symbol, isFocused}) => (
+                  <Text
+                    key={index}
+                    style={[
+                      {
+                        width: minScreenSize * 0.1, // Adjust as needed
+                        height: minScreenSize * 0.1, // Adjust as needed
+                        lineHeight: minScreenSize * 0.1,
+                        fontSize: 24,
+                        borderWidth: 2,
+                        borderColor: COLORS.PRIMARY,
+                        textAlign: 'center',
+                        borderRadius: 10,
+                        color: COLORS.WHITE,
+                        backgroundColor: symbol ? COLORS.PRIMARY : COLORS.WHITE,
+                      },
+                      isFocused && styles.focusCell,
+                    ]}
+                    onLayout={getCellOnLayoutHandler(index)}>
+                    {symbol || (isFocused ? <Cursor /> : null)}
+                  </Text>
+                )}
+              />
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <Text
+                style={{
+                  color: COLORS.TEXTCOLOR,
+                  fontSize: 13,
+                  alignSelf: 'center',
+                  marginTop: 20,
+                  fontFamily: FONTS.Regular,
+                }}>
+                Didn’t receive a code?
+              </Text>
+              <Text> </Text>
+
+              <TouchableOpacity onPress={handleEmailResend}>
+                <Text
+                  style={{
+                    color: COLORS.PRIMARY,
+                    fontSize: 13,
+                    alignSelf: 'center',
+                    marginTop: 20,
+                    fontFamily: FONTS.Bold,
+                  }}>
+                  Resend Code
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{alignSelf: 'center'}}>
+              {renderEmailVerificationButton()}
+            </View>
+            {emailVerificationSuccess && (
+              <View style={styles.SectionTextStyle}>
+                <Text
+                  style={{
+                    marginTop: 10,
+                    color: COLORS.TEXTCOLOR,
+                    textAlign: 'center',
+                    fontSize: 13,
+                    fontFamily: FONTS.Italic,
+                  }}>
+                  Your Email Account has been successfully verified!
+                </Text>
+              </View>
+            )}
+
+            <TouchableOpacity
+              style={styles.buttonStyle}
+              activeOpacity={0.5}
+              onPress={handleCaptureFaceID}>
+              <Text style={styles.buttonTextStyle}>Capture Face ID</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.registerButtonStyle}
+              activeOpacity={0.5}
+              // onPress={handleSubmitPress}
+              onPress={handleSkip}>
+              <View style={styles.scannerView}>
+                <Feather
+                  style={styles.scannerImage}
+                  name="chevron-left"
+                  size={25}
+                  color={COLORS.PRIMARY}
+                />
+                <Text style={styles.registerButtonTextStyle}>Back</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+          <CommonModal
+            visible={modalVisible}
+            onClose={closeModal}
+            message={errorMessage}
+            header={modalHeader}
+            color={modalColor}
+            imageSource={modalImage}></CommonModal>
+        </ScrollView>
       )}
     </View>
   );
@@ -608,7 +593,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: COLORS.PRIMARY,
     textAlign: 'center',
-    fontFamily: FONTS.Bold
+    fontFamily: FONTS.Bold,
   },
 
   SectionTextStyle: {
@@ -618,7 +603,7 @@ const styles = StyleSheet.create({
   HeaderTextStyle: {
     color: COLORS.PRIMARY,
     fontSize: 24,
-   fontFamily: FONTS.Bold,
+    fontFamily: FONTS.Bold,
     textAlign: 'center',
   },
   SubMobileHeaderTextStyle: {
@@ -626,7 +611,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
     fontSize: 16,
     textAlign: 'center',
-    fontFamily: FONTS.Bold
+    fontFamily: FONTS.Bold,
   },
   SubHeadingTextStyle: {
     marginTop: 20,
@@ -683,13 +668,13 @@ const styles = StyleSheet.create({
     color: COLORS.WHITE,
     paddingVertical: 10,
     fontSize: 16,
-    fontFamily: FONTS.Regular
+    fontFamily: FONTS.Regular,
   },
   registerButtonTextStyle: {
     color: COLORS.PRIMARY,
     paddingVertical: 10,
     fontSize: 16,
-    fontFamily: FONTS.Regular
+    fontFamily: FONTS.Regular,
   },
   scannerView: {
     alignSelf: 'center',
@@ -703,6 +688,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     alignSelf: 'center',
     marginTop: 10,
-    fontFamily: FONTS.SemiBold
+    fontFamily: FONTS.SemiBold,
   },
 });

@@ -78,34 +78,32 @@ const LoginScreen = ({navigation}) => {
       if (selectedCategory === 'Phone') {
         const callingCodeString = callingCodeValue.toString();
         requestBody = {
-          fonda_id: (fondaID.toUpperCase()),
+          fonda_id: fondaID.toUpperCase(),
           email_id_phone_number: fondaPhone,
           phone_number_country_code: callingCodeString,
         };
       } else {
         requestBody = {
-          fonda_id: (fondaID.toUpperCase()),
-          email_id_phone_number: (fondaEmail.toLowerCase()),
+          fonda_id: fondaID.toUpperCase(),
+          email_id_phone_number: fondaEmail.toLowerCase(),
         };
       }
 
       const headers = {
         'Content-Type': 'application/json',
       };
-      console.log(API_ENDPOINTS.LOGINUSER, requestBody, headers);
       try {
         const response = await postRequest(
           API_ENDPOINTS.LOGINUSER,
           requestBody,
           headers,
         );
-        console.log(response);
         if (response.responseCode === 'F200') {
           await setData('refID', response.refId);
           if (selectedCategory === 'Phone') {
             await setData('phoneNumber', fondaPhone);
           } else {
-            await setData('phoneNumber', (fondaEmail.toLowerCase()));
+            await setData('phoneNumber', fondaEmail.toLowerCase());
           }
           navigation.navigate('LoginOtpScreen');
           setFondaID('');
@@ -114,11 +112,9 @@ const LoginScreen = ({navigation}) => {
           setErrorMessage('');
           setEmailErrorMessage('');
         } else {
-          console.log('12345');
           setModalVisible(true);
         }
       } catch (error) {
-        console.log('error', error);
         setEmailErrorMessage('Please check credentials');
       } finally {
         setLoading(false);
@@ -136,7 +132,6 @@ const LoginScreen = ({navigation}) => {
 
   const selectCategory = categary => {
     setSelectedCategory(categary);
-    console.log(selectedCategory);
   };
 
   return (
@@ -170,7 +165,7 @@ const LoginScreen = ({navigation}) => {
               <TextInput
                 value={fondaID}
                 style={styles.input}
-                onChangeText={(text) => setFondaID(text)}
+                onChangeText={text => setFondaID(text)}
                 placeholder="Enter Fonda ID"
                 placeholderTextColor={COLORS.SUBTEXT}
                 autoCapitalize="none"
@@ -209,7 +204,7 @@ const LoginScreen = ({navigation}) => {
                     },
                     selectedCategory === 'Phone' && {
                       backgroundColor: COLORS.PRIMARY,
-                      borderTopStartRadius:0,
+                      borderTopStartRadius: 0,
                       borderBottomStartRadius: 0,
                       borderColor: COLORS.PRIMARY,
                     },
@@ -265,9 +260,11 @@ const LoginScreen = ({navigation}) => {
                   defaultCode={defaultCode}
                   layout="first"
                   onChangeText={fondaPhone => setFondaPhone(fondaPhone)}
-                textStyle={{ color: COLORS.SUBTEXT,
-                  fontFamily: FONTS.Regular,
-                  fontSize: 16,}}
+                  textStyle={{
+                    color: COLORS.SUBTEXT,
+                    fontFamily: FONTS.Regular,
+                    fontSize: 16,
+                  }}
                   containerStyle={{
                     flex: 1,
                     width: '100%',
@@ -276,7 +273,7 @@ const LoginScreen = ({navigation}) => {
                     elevation: 4,
                     backgroundColor: COLORS.WHITE,
                     borderRadius: 10,
-                    justifyContent: 'center'
+                    justifyContent: 'center',
                   }}
                   textContainerStyle={{
                     flex: 1,
@@ -295,12 +292,20 @@ const LoginScreen = ({navigation}) => {
                     fontFamily: FONTS.Regular,
                     color: COLORS.SUBTEXT,
                   }}
-                  textInputProps={{ maxLength: 12, placeholder: 'Enter Phone Number', placeholderTextColor: COLORS.SUBTEXT}}
+                  textInputProps={{
+                    maxLength: 12,
+                    placeholder: 'Enter Phone Number',
+                    placeholderTextColor: COLORS.SUBTEXT,
+                  }}
                   flagButtonStyle={{width: 50, marginLeft: 10}}
-                  codeTextStyle={{color: COLORS.SUBTEXT, marginLeft: -5, textAlign: 'center',  paddingVertical: 0,}}
+                  codeTextStyle={{
+                    color: COLORS.SUBTEXT,
+                    marginLeft: -5,
+                    textAlign: 'center',
+                    paddingVertical: 0,
+                  }}
                   onChangeCountry={countryData => {
                     const callingCode = countryData.callingCode;
-                    console.log(countryData);
                     setCallingCodeValue(callingCode);
                     setDefaultCode(countryData.cca2);
                   }}
@@ -309,7 +314,7 @@ const LoginScreen = ({navigation}) => {
                 <TextInput
                   value={fondaEmail}
                   style={styles.input}
-                  onChangeText={(text) => setFondaEmail(text)}
+                  onChangeText={text => setFondaEmail(text)}
                   placeholder="Enter Email"
                   placeholderTextColor={COLORS.SUBTEXT}
                   keyboardType="default"

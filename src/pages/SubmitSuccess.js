@@ -42,23 +42,18 @@ const SubmitSuccess = ({navigation}) => {
         const storedUserFondaID = await getData('fondaId');
 
         setUserFondaID(storedUserFondaID);
-      } catch (error) {
-        console.log('Error loading remembered credentials:', error);
-      }
+      } catch (error) {}
     };
     loadRememberedCredentials();
   }, []);
-
 
   const handleLogin = () => {
     navigation.navigate('Dashboard');
   };
 
   const handleUploadDoc = () => {
-    navigation.navigate("AddNewDocumentScreen")
-  }
-
- 
+    navigation.navigate('AddNewDocumentScreen');
+  };
 
   const handleShare = async () => {
     try {
@@ -159,7 +154,7 @@ const SubmitSuccess = ({navigation}) => {
               <Text style={styles.subText}>{userFondaID}</Text>
             </View>
 
-            <View style={{flexDirection: 'column', marginRight: 20,}}>
+            <View style={{flexDirection: 'column', marginRight: 20}}>
               <TouchableOpacity onPress={handleCopyToClipboard}>
                 <View
                   style={{

@@ -12,7 +12,7 @@ const CommonModal = ({ visible, onClose, imageSource, message, header, color }) 
       visible={visible}
       onRequestClose={onClose}
     >
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.4)', }}>
         <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10, width: '80%', flexDirection: 'column',  elevation: 4, }}>
           <Text style={{color: color, fontSize: 24, fontFamily: FONTS.Bold, textAlign: 'center'}}>{header}</Text>
           <View style={{justifyContent: 'center', alignItems: 'center',marginTop: 20}}>

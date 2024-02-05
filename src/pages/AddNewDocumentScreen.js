@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   Platform,
   PermissionsAndroid,
-  Modal
+  Modal,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import {SelectList} from 'react-native-dropdown-select-list';
@@ -99,7 +99,6 @@ const AddNewDocumentScreen = ({navigation}) => {
         },
       );
       if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-        console.log('Camera permission denied');
         return;
       }
     }
@@ -112,21 +111,11 @@ const AddNewDocumentScreen = ({navigation}) => {
     };
 
     launchCamera(options, response => {
-      console.log('Response = ', response);
       const {assets} = response;
       if (response.didCancel) {
-        console.log('User cancelled camera');
       } else if (response.error) {
-        console.log('Camera Error: ', response.error);
       } else {
-        console.log('base64 -> ', assets[0].base64);
-      console.log('uri -> ', assets[0].uri);
-      console.log('width -> ', assets[0].width);
-      console.log('height -> ', assets[0].height);
-      console.log('fileSize -> ', assets[0].fileSize);
-      console.log('type -> ', assets[0].type);
-      console.log('fileName -> ', assets[0].fileName);
-      setFilePath(assets[0]);
+        setFilePath(assets[0]);
       }
     });
   };
@@ -140,11 +129,10 @@ const AddNewDocumentScreen = ({navigation}) => {
       videoQuality: 'low',
       durationLimit: 30, //Video max duration in seconds
       saveToPhotos: true,
-      includeBase64: true
+      includeBase64: true,
     };
 
     launchCamera(options, response => {
-      console.log('Response = ', response);
       const {assets} = response;
 
       if (response.didCancel) {
@@ -160,13 +148,6 @@ const AddNewDocumentScreen = ({navigation}) => {
         alert(response.errorMessage);
         return;
       }
-      console.log('base64 -> ', assets[0].base64);
-      console.log('uri -> ', assets[0].uri);
-      console.log('width -> ', assets[0].width);
-      console.log('height -> ', assets[0].height);
-      console.log('fileSize -> ', assets[0].fileSize);
-      console.log('type -> ', assets[0].type);
-      console.log('fileName -> ', assets[0].fileName);
       setFilePath(assets[0]);
     });
   };
@@ -197,17 +178,17 @@ const AddNewDocumentScreen = ({navigation}) => {
       setModalImage(require('../assets/images/failur.png'));
       setModalHeader('Error');
       return;
-    }else{
-    const formattedStartDate = formatDate(startDate);
-    const formattedEndDate = formatDate(endDate);
-    setData('addDoScelectDocument', selectedDocumentType);
-    setData('addDoDateIssue', formattedStartDate);
-    setData('addDoDateExpiry', formattedEndDate);
-    setData('addDoUploadImg', filePath.uri);
-    setData('addDocumentNumber', useDocumentNumber)
-    setData('addDoUploadImgBase64', filePath.base64)
-    resetState();
-    navigation.navigate('ConfirmDocument');
+    } else {
+      const formattedStartDate = formatDate(startDate);
+      const formattedEndDate = formatDate(endDate);
+      setData('addDoScelectDocument', selectedDocumentType);
+      setData('addDoDateIssue', formattedStartDate);
+      setData('addDoDateExpiry', formattedEndDate);
+      setData('addDoUploadImg', filePath.uri);
+      setData('addDocumentNumber', useDocumentNumber);
+      setData('addDoUploadImgBase64', filePath.base64);
+      resetState();
+      navigation.navigate('ConfirmDocument');
     }
   };
 
@@ -235,8 +216,16 @@ const AddNewDocumentScreen = ({navigation}) => {
               placeholder="Choose Document Type"
               boxStyles={styles.dropdowmBox}
               dropdownStyles={styles.dropdown}
-              inputStyles={{fontSize: 14, color: COLORS.TEXTCOLOR, fontFamily: FONTS.Regular}}
-              dropdownTextStyles={{fontSize: 14, color: COLORS.TEXTCOLOR, fontFamily: FONTS.Regular}}
+              inputStyles={{
+                fontSize: 14,
+                color: COLORS.TEXTCOLOR,
+                fontFamily: FONTS.Regular,
+              }}
+              dropdownTextStyles={{
+                fontSize: 14,
+                color: COLORS.TEXTCOLOR,
+                fontFamily: FONTS.Regular,
+              }}
               setSelected={val => setSelectedDocumentType(val)} // Set the selected document type
               data={documentTypes}
               save="key" // Save the key of the selected item
@@ -305,7 +294,7 @@ const AddNewDocumentScreen = ({navigation}) => {
 
           <View style={styles.uploadView}>
             <Text style={styles.uploadText}>
-             Capture a picture of the document along with your FaceID.
+              Capture a picture of the document along with your FaceID.
             </Text>
           </View>
 
@@ -331,15 +320,14 @@ const AddNewDocumentScreen = ({navigation}) => {
             onPress={handleToAddNewDoc}>
             <Text style={styles.buttonTextStyle}>Preview Document</Text>
           </TouchableOpacity>
-         
         </View>
         <CommonModal
-        visible={modalVisible}
-        onClose={closeModal}
-        message={errorMessage}
-        header={modalHeader}
-        color={modalColor}
-        imageSource={modalImage}></CommonModal>
+          visible={modalVisible}
+          onClose={closeModal}
+          message={errorMessage}
+          header={modalHeader}
+          color={modalColor}
+          imageSource={modalImage}></CommonModal>
       </ScrollView>
     </View>
   );
@@ -430,7 +418,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: COLORS.PRIMARY,
     textAlign: 'center',
-    fontFamily: FONTS.Bold
+    fontFamily: FONTS.Bold,
   },
   dropdowmBox: {
     marginTop: 10,
@@ -471,7 +459,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     flex: 1,
     marginTop: 5,
-fontFamily: FONTS.Regular,
+    fontFamily: FONTS.Regular,
     textAlign: 'left',
     color: COLORS.TEXTCOLOR,
     marginLeft: 16,

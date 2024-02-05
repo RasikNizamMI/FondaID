@@ -8,7 +8,7 @@ import {
   Image,
   TouchableOpacity,
   Platform,
-  PermissionsAndroid
+  PermissionsAndroid,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import {SelectList} from 'react-native-dropdown-select-list';
@@ -88,7 +88,6 @@ const CapturePictureScreen = ({navigation}) => {
         },
       );
       if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-        console.log('Camera permission denied');
         return;
       }
     }
@@ -101,21 +100,11 @@ const CapturePictureScreen = ({navigation}) => {
     };
 
     launchCamera(options, response => {
-      console.log('Response = ', response);
       const {assets} = response;
       if (response.didCancel) {
-        console.log('User cancelled camera');
       } else if (response.error) {
-        console.log('Camera Error: ', response.error);
       } else {
-        console.log('base64 -> ', assets[0].base64);
-      console.log('uri -> ', assets[0].uri);
-      console.log('width -> ', assets[0].width);
-      console.log('height -> ', assets[0].height);
-      console.log('fileSize -> ', assets[0].fileSize);
-      console.log('type -> ', assets[0].type);
-      console.log('fileName -> ', assets[0].fileName);
-      setFilePath(assets[0]);
+        setFilePath(assets[0]);
       }
     });
   };
@@ -131,7 +120,6 @@ const CapturePictureScreen = ({navigation}) => {
     };
 
     launchCamera(options, response => {
-      console.log('Response = ', response);
       const {assets} = response;
 
       if (response.didCancel) {
@@ -147,13 +135,6 @@ const CapturePictureScreen = ({navigation}) => {
         alert(response.errorMessage);
         return;
       }
-      console.log('base64 -> ', assets[0].base64);
-      console.log('uri -> ', assets[0].uri);
-      console.log('width -> ', assets[0].width);
-      console.log('height -> ', assets[0].height);
-      console.log('fileSize -> ', assets[0].fileSize);
-      console.log('type -> ', assets[0].type);
-      console.log('fileName -> ', assets[0].fileName);
       setFilePath(assets[0]);
     });
   };
@@ -177,7 +158,7 @@ const CapturePictureScreen = ({navigation}) => {
             <Text style={styles.headerText}>Capture Picture</Text>
           </View>
 
-           <TouchableOpacity onPress={() => handleCameraLaunch()}>
+          <TouchableOpacity onPress={() => handleCameraLaunch()}>
             <View style={styles.uploadImageView}>
               {filePath.uri ? (
                 <Image
@@ -356,7 +337,6 @@ const styles = StyleSheet.create({
     marginRight: 30,
     marginLeft: 30,
     marginTop: 15,
-
   },
   uploadImage: {
     height: 550,

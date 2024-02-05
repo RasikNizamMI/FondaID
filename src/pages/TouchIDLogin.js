@@ -40,7 +40,6 @@ const TouchIDLogin = ({navigation}) => {
       issueDate: '04-02-2014',
       validUntil: '04-02-2024',
     },
-    // Add more data objects here...
   ];
 
   const handleCopyToClipboard = () => {
@@ -59,34 +58,32 @@ const TouchIDLogin = ({navigation}) => {
   const handleTouchID = () => {
     TouchID.authenticate('Authenticate to continue')
       .then(success => {
-        
-            navigation.navigate('LoginOtpScreen');
-        // TouchID authentication successful
-        console.log('TouchID authentication successful');
+        navigation.navigate('LoginOtpScreen');
       })
-      .catch(error => {
-        // TouchID authentication failed or canceled
-        console.log('TouchID authentication failed:', error);
-      });
+      .catch(error => {});
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Touch ID login</Text>
       <TouchableOpacity onPress={handleTouchID}>
-      <View
-        style={{justifyContent: 'center', marginTop: 20, alignItems: 'center'}}>
-        <Image
-          source={require('../assets/images/TouchID.png')}
+        <View
           style={{
             justifyContent: 'center',
-            width: 200,
-            height: 200,
-            resizeMode: 'contain',
-            marginTop: 30,
-          }}
-        />
-      </View>
+            marginTop: 20,
+            alignItems: 'center',
+          }}>
+          <Image
+            source={require('../assets/images/TouchID.png')}
+            style={{
+              justifyContent: 'center',
+              width: 200,
+              height: 200,
+              resizeMode: 'contain',
+              marginTop: 30,
+            }}
+          />
+        </View>
       </TouchableOpacity>
       <View style={{flexDirection: 'row', alignSelf: 'center', marginTop: 20}}>
         <Text
@@ -95,7 +92,7 @@ const TouchIDLogin = ({navigation}) => {
             fontSize: 14,
             alignSelf: 'center',
             marginTop: 20,
-            fontFamily: FONTS.SemiBold
+            fontFamily: FONTS.SemiBold,
           }}>
           Switch to
         </Text>
@@ -108,7 +105,7 @@ const TouchIDLogin = ({navigation}) => {
               marginTop: 20,
               textDecorationLine: 'underline',
               textDecorationColor: '#F5A922',
-              fontFamily: FONTS.SemiBold
+              fontFamily: FONTS.SemiBold,
             }}>
             Manual Sign In
           </Text>
@@ -141,7 +138,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 30,
     color: '#F5A922',
-    fontFamily: FONTS.Bold
+    fontFamily: FONTS.Bold,
   },
   textView: {
     marginTop: 10,
@@ -202,7 +199,7 @@ const styles = StyleSheet.create({
     color: '#F5A922',
     paddingVertical: 10,
     fontSize: 16,
-    fontFamily: FONTS.Regular
+    fontFamily: FONTS.Regular,
   },
   skipButtonStyle: {
     backgroundColor: '#FFFFFF',

@@ -35,9 +35,7 @@ const SubmitSuccessScreen = ({navigation}) => {
         const storedUserFondaID = await getData('fondaId');
 
         setUserFondaID(storedUserFondaID);
-      } catch (error) {
-        console.log('Error loading remembered credentials:', error);
-      }
+      } catch (error) {}
     };
     loadRememberedCredentials();
   }, []);
@@ -64,10 +62,10 @@ const SubmitSuccessScreen = ({navigation}) => {
   const handleCopyToClipboard = () => {
     setString(userFondaID);
     setModalVisible(true);
-          setErrorMessage("Fonda ID Coppied Successfully");
-          setModalColor(COLORS.PRIMARY);
-          setModalImage(require('../assets/images/sucess.png'));
-          setModalHeader('Success');
+    setErrorMessage('Fonda ID Coppied Successfully');
+    setModalColor(COLORS.PRIMARY);
+    setModalImage(require('../assets/images/sucess.png'));
+    setModalHeader('Success');
   };
 
   const closeModal = () => {
@@ -130,10 +128,21 @@ const SubmitSuccessScreen = ({navigation}) => {
           </View>
 
           <View style={{marginTop: 15, marginLeft: 30, alignItems: 'center'}}>
-            <Text style={{color: '#37474F', fontSize: 18, fontFamily: FONTS.Medium}}>
+            <Text
+              style={{
+                color: '#37474F',
+                fontSize: 18,
+                fontFamily: FONTS.Medium,
+              }}>
               Your KYC Details & Documents are
             </Text>
-            <Text style={{color: '#37474F', fontSize: 18, fontFamily: FONTS.Medium, marginTop: 10}}>
+            <Text
+              style={{
+                color: '#37474F',
+                fontSize: 18,
+                fontFamily: FONTS.Medium,
+                marginTop: 10,
+              }}>
               verified successfully!
             </Text>
           </View>
@@ -215,7 +224,13 @@ const SubmitSuccessScreen = ({navigation}) => {
           </View>
 
           <View style={{marginTop: 15, marginLeft: 30, alignItems: 'center'}}>
-            <Text style={{color: '#37474F', fontSize: 14, textAlign: 'center', fontFamily: FONTS.Medium}}>
+            <Text
+              style={{
+                color: '#37474F',
+                fontSize: 14,
+                textAlign: 'center',
+                fontFamily: FONTS.Medium,
+              }}>
               Note: You can use this Fonda ID on various platforms/applications
               as your Digital Identity!
             </Text>
@@ -229,12 +244,12 @@ const SubmitSuccessScreen = ({navigation}) => {
           </TouchableOpacity>
         </View>
         <CommonModal
-            visible={modalVisible}
-            onClose={closeModal}
-            message={errorMessage}
-            header={modalHeader}
-            color={modalColor}
-            imageSource={modalImage}></CommonModal>
+          visible={modalVisible}
+          onClose={closeModal}
+          message={errorMessage}
+          header={modalHeader}
+          color={modalColor}
+          imageSource={modalImage}></CommonModal>
       </ScrollView>
     </View>
   );
@@ -294,7 +309,7 @@ const styles = StyleSheet.create({
     borderColor: '#FFFFFF',
     height: 50,
     alignItems: 'center',
-    borderRadius:10,
+    borderRadius: 10,
     marginLeft: 35,
     marginRight: 35,
     marginTop: 10,
@@ -306,7 +321,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     paddingVertical: 10,
     fontSize: 16,
-    fontFamily: FONTS.Regular
+    fontFamily: FONTS.Regular,
   },
   registerButtonTextStyle: {
     color: '#F5A922',
@@ -356,9 +371,9 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   subText: {
-    fontSize: 32,
+    fontSize: 28,
     textAlign: 'center',
     color: '#F5A922',
-    fontFamily: FONTS.Bold
+    fontFamily: FONTS.Bold,
   },
 });

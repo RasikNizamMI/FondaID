@@ -1,11 +1,19 @@
 // DocumentDetails.js
 
-import React, { useState, useEffect } from 'react';
-import { View, ScrollView, Text, Image, StyleSheet, TouchableOpacity, Modal } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  ScrollView,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+} from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import {postRequest, getRequest} from '../Utils/apiUtils';
 import {API_ENDPOINTS} from '../Utils/apiConfig';
-import { WebView } from 'react-native-webview';
+import {WebView} from 'react-native-webview';
 import {COLORS, FONTS} from '../assets/Colors';
 import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
@@ -35,41 +43,40 @@ const BioDetailsScreen = ({route, navigation}) => {
   const [responseData, setResponseData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-console.log( API_ENDPOINTS.GETDOCUMENTPREVIEW + id);
 
-function LoadingIndicatorView() {
-  return <ActivityIndicator color='#009b88' size='large' />
-}
+  function LoadingIndicatorView() {
+    return <ActivityIndicator color="#009b88" size="large" />;
+  }
 
-return (
-  <View style={{flex: 1,marginTop: 10}}>
-    <View style={styles.headerView}>
-            <Feather
-              onPress={() => {
-                navigation.goBack(null);
-              }}
-              style={styles.headerIcon}
-              name="chevron-left"
-              size={25}
-              color={'#F5A922'}
-            />
-            <Text style={styles.headerText}>{displayName}</Text>
-          </View>
-  <WebView
-       originWhitelist={['*']}
-       source={{ uri: API_ENDPOINTS.GETDOCUMENTPREVIEW + id}}  
-       renderLoading={this.LoadingIndicatorView}
-       startInLoadingState={true}
-     />
-     <TouchableOpacity
+  return (
+    <View style={{flex: 1, marginTop: 10}}>
+      <View style={styles.headerView}>
+        <Feather
+          onPress={() => {
+            navigation.goBack(null);
+          }}
+          style={styles.headerIcon}
+          name="chevron-left"
+          size={25}
+          color={'#F5A922'}
+        />
+        <Text style={styles.headerText}>{displayName}</Text>
+      </View>
+      <WebView
+        originWhitelist={['*']}
+        source={{uri: API_ENDPOINTS.GETDOCUMENTPREVIEW + id}}
+        renderLoading={this.LoadingIndicatorView}
+        startInLoadingState={true}
+      />
+      <TouchableOpacity
         style={styles.buttonStyle}
         activeOpacity={0.5}
         onPress={() => {
-            navigation.goBack(null);
-          }}>
+          navigation.goBack(null);
+        }}>
         <Text style={styles.buttonTextStyle}>Back</Text>
       </TouchableOpacity>
-     </View>
+    </View>
   );
 };
 

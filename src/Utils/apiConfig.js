@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://fonda.dturn.net/v2/';
+const API_BASE_URL = 'https://fonda.dturn.net/';
 const API_BASE_BIO_URL = 'http://vps-35c5bf77.vps.ovh.net:8000/';
 
 export const API_ENDPOINTS = {
@@ -23,5 +23,8 @@ export const API_ENDPOINTS = {
   GETDOCUMENTPREVIEW: `${API_BASE_URL}v1/document/verify/qrcode?ref_id=`,
   NOTIFICATION: `${API_BASE_URL}v1/user/notification?fonda_id=`,
   UPDATENOTIFICATION: `${API_BASE_URL}v1/user/notification/update/status`,
-  ADDNOTIFICATION: `${API_BASE_URL}v1/user/notification`
+  ADDNOTIFICATION: `${API_BASE_URL}v1/user/notification`,
+  ADDNEWDOCGET: `${API_BASE_URL}docaposte/url`,
+  GETUSERDOCUMENT: `${API_BASE_URL}user/documents`,
+  GETPENDINGDOC:  `${API_BASE_URL}pending/documents`,
 };

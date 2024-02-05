@@ -8,7 +8,7 @@ import {
   Image,
   TouchableOpacity,
   Platform,
-  FlatList
+  FlatList,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import {SelectList} from 'react-native-dropdown-select-list';
@@ -87,7 +87,6 @@ const UploadDocumentScreen = ({navigation}) => {
     };
 
     launchCamera(options, response => {
-      console.log('Response = ', response);
       const {assets} = response;
 
       if (response.didCancel) {
@@ -103,13 +102,6 @@ const UploadDocumentScreen = ({navigation}) => {
         alert(response.errorMessage);
         return;
       }
-      console.log('base64 -> ', assets[0].base64);
-      console.log('uri -> ', assets[0].uri);
-      console.log('width -> ', assets[0].width);
-      console.log('height -> ', assets[0].height);
-      console.log('fileSize -> ', assets[0].fileSize);
-      console.log('type -> ', assets[0].type);
-      console.log('fileName -> ', assets[0].fileName);
       setFilePath(assets[0]);
     });
   };
@@ -121,7 +113,6 @@ const UploadDocumentScreen = ({navigation}) => {
       dataKB: '443KB',
       timeDuration: '10',
       percentage: '44',
-      
     },
     {
       id: '2',
@@ -136,7 +127,6 @@ const UploadDocumentScreen = ({navigation}) => {
   const handleUploadImage = () => {
     navigation.navigate('CapturePictureInstructionScreen');
   };
-
 
   return (
     <View style={styles.mainBody}>
@@ -283,113 +273,111 @@ const UploadDocumentScreen = ({navigation}) => {
           </TouchableOpacity> */}
           <TouchableOpacity onPress={handleUploadImage}>
             <View style={styles.uploadImageView}>
-                <Image
-                  source={require('../assets/images/camera.png')}
-                  style={styles.uploadImage}
-                />
+              <Image
+                source={require('../assets/images/camera.png')}
+                style={styles.uploadImage}
+              />
             </View>
           </TouchableOpacity>
 
           <FlatList
-  data={datadetails}
-  renderItem={({item}) => (
-          <View style={{marginTop: 20}}>
-            <View
-              style={{
-                height: 80,
-                marginLeft: 30,
-                marginRight: 30,
-                backgroundColor: '#FFFFFF',
-                borderRadius: 10,
-                marginTop: 10,
-                elevation: 4,
-              }}>
-              <View>
-                <View style={{flexDirection: 'row'}}>
-                  <Image
-                    source={require('../assets/images/document.png')}
-                    style={{
-                      height: 40,
-                      width: 40,
-                      marginLeft: 20,
-                      marginTop: 10,
-                      resizeMode: 'contain',
-                    }}
-                  />
-                  <View style={{flexDirection: 'column'}}>
+            data={datadetails}
+            renderItem={({item}) => (
+              <View style={{marginTop: 20}}>
+                <View
+                  style={{
+                    height: 80,
+                    marginLeft: 30,
+                    marginRight: 30,
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: 10,
+                    marginTop: 10,
+                    elevation: 4,
+                  }}>
+                  <View>
                     <View style={{flexDirection: 'row'}}>
-                      <Text
+                      <Image
+                        source={require('../assets/images/document.png')}
                         style={{
+                          height: 40,
+                          width: 40,
+                          marginLeft: 20,
                           marginTop: 10,
-                          marginLeft: 10,
-                          fontSize: 14,
-                          color: '#37474F',
-                          
-                        }}>
-                       {item.title}
-                      </Text>
-
-                      <Feather
-                        onPress={() => {
-                          navigation.goBack(null);
+                          resizeMode: 'contain',
                         }}
-                        style={{
-                          marginTop: 10,
-                          position: 'absolute',
-                          right: 0,
-                          
-                        }}
-                        name="x"
-                        size={25}
-                        color={'#F5A922'}
                       />
-                    </View>
-                    <View style={{flexDirection: 'row'}}>
-                      <Text
-                        style={{
-                          marginTop: 5,
-                          marginLeft: 10,
-                          fontSize: 14,
-                          color: '#37474F',
-                        }}>
-                        {item.dataKB}
-                      </Text>
-                      <Text
-                        style={{
-                          marginTop: 5,
-                          marginLeft: 10,
-                          fontSize: 14,
-                          color: '#37474F',
-                        }}>
-                        -
-                      </Text>
-                      <Text
-                        style={{
-                          marginTop: 5,
-                          marginLeft: 10,
-                          fontSize: 14,
-                          color: '#37474F',
-                        }}>
-                        {item.timeDuration} seconds left
-                      </Text>
-                      <Text
-                        style={{
-                          marginTop: 5,
-                          marginLeft: 150,
-                          fontSize: 14,
-                          color: '#37474F',
-                        }}>
-                        {item.percentage}%
-                      </Text>
+                      <View style={{flexDirection: 'column'}}>
+                        <View style={{flexDirection: 'row'}}>
+                          <Text
+                            style={{
+                              marginTop: 10,
+                              marginLeft: 10,
+                              fontSize: 14,
+                              color: '#37474F',
+                            }}>
+                            {item.title}
+                          </Text>
+
+                          <Feather
+                            onPress={() => {
+                              navigation.goBack(null);
+                            }}
+                            style={{
+                              marginTop: 10,
+                              position: 'absolute',
+                              right: 0,
+                            }}
+                            name="x"
+                            size={25}
+                            color={'#F5A922'}
+                          />
+                        </View>
+                        <View style={{flexDirection: 'row'}}>
+                          <Text
+                            style={{
+                              marginTop: 5,
+                              marginLeft: 10,
+                              fontSize: 14,
+                              color: '#37474F',
+                            }}>
+                            {item.dataKB}
+                          </Text>
+                          <Text
+                            style={{
+                              marginTop: 5,
+                              marginLeft: 10,
+                              fontSize: 14,
+                              color: '#37474F',
+                            }}>
+                            -
+                          </Text>
+                          <Text
+                            style={{
+                              marginTop: 5,
+                              marginLeft: 10,
+                              fontSize: 14,
+                              color: '#37474F',
+                            }}>
+                            {item.timeDuration} seconds left
+                          </Text>
+                          <Text
+                            style={{
+                              marginTop: 5,
+                              marginLeft: 150,
+                              fontSize: 14,
+                              color: '#37474F',
+                            }}>
+                            {item.percentage}%
+                          </Text>
+                        </View>
+                      </View>
                     </View>
                   </View>
                 </View>
               </View>
-            </View>
-          </View>
- )}
- keyExtractor={(item) => item.id.toString()}
-/>
+            )}
+            keyExtractor={item => item.id.toString()}
+          />
 
           <TouchableOpacity
             style={styles.buttonStyle}

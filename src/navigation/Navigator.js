@@ -18,6 +18,7 @@ import NotificationScreen from '../pages/NotificationScreen';
 import SettingScreen from '../pages/SettingScreen';
 import SharingScreen from '../pages/SharingScreen';
 import AddNewDocumentScreen from '../pages/AddNewDocumentScreen';
+import AddNewDocumentNewScreen from '../pages/AddNewDocumentNewScreen';
 import ConfirmDocument from '../pages/ConfirmDocument';
 import SubmitSuccess from '../pages/SubmitSuccess';
 import RegisterScreen from '../pages/RegisterScreen';
@@ -129,9 +130,13 @@ const HomeStackScreen = () => (
       component={DocumentDetailsScreen}
     />
     <HomeStack.Screen name="SharingScreen" component={SharingScreen} />
-    <HomeStack.Screen
+    {/* <HomeStack.Screen
       name="AddNewDocumentScreen"
       component={AddNewDocumentScreen}
+    /> */}
+    <HomeStack.Screen
+      name="AddNewDocumentNewScreen"
+      component={AddNewDocumentNewScreen}
     />
     <HomeStack.Screen name="ConfirmDocument" component={ConfirmDocument} />
     <HomeStack.Screen name="SubmitSuccess" component={SubmitSuccess} />

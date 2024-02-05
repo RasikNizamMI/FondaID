@@ -7,7 +7,7 @@ import {
   Image,
   TouchableOpacity,
   Platform,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
@@ -80,14 +80,11 @@ const ProfileScreen = ({navigation}) => {
           'data:image/jpeg;base64,' + storedUserUploadImageBase64,
         );
         setUserFondaID(storedUserFondaID);
-        console.log(storeUserCountryCode);
 
         if (userDocument === 'passport') {
-          console.log('Passport');
         }
         setLoading(false);
       } catch (error) {
-        console.log('Error loading remembered credentials:', error);
         setLoading(false);
       }
     };
@@ -102,12 +99,11 @@ const ProfileScreen = ({navigation}) => {
     return `${day}/${month}/${year}`;
   };
   const handleSkip = () => {
-    navigation.navigate('Dashboard', {screen: 'Dashboard'})
+    navigation.navigate('Dashboard', {screen: 'Dashboard'});
   };
 
-
   const handleLogin = ({navigation}) => {
-    navigation.navigate('Dashboard', {screen: 'Dashboard'})
+    navigation.navigate('Dashboard', {screen: 'Dashboard'});
   };
 
   return (
@@ -119,7 +115,7 @@ const ProfileScreen = ({navigation}) => {
           <View style={styles.headerView}>
             <Feather
               onPress={() => {
-                navigation.navigate('Dashboard', {screen: 'Dashboard'})
+                navigation.navigate('Dashboard', {screen: 'Dashboard'});
               }}
               style={styles.headerIcon}
               name="chevron-left"
@@ -129,13 +125,17 @@ const ProfileScreen = ({navigation}) => {
             <Text style={styles.headerText}>My Profile</Text>
           </View>
           {loading ? (
-            <ActivityIndicator size="large" color={COLORS.PRIMARY} style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-              alignContent: 'center',
-              alignSelf: 'center',
-            }}/>
+            <ActivityIndicator
+              size="large"
+              color={COLORS.PRIMARY}
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignContent: 'center',
+                alignSelf: 'center',
+              }}
+            />
           ) : (
             <>
               <View
@@ -213,14 +213,14 @@ const ProfileScreen = ({navigation}) => {
               <View style={styles.headerTextView}>
                 <Text style={styles.headerTexts}>My Face ID</Text>
               </View>
-              <View style={{flexDirection: 'row', flex: 1,}}>
+              <View style={{flexDirection: 'row', flex: 1}}>
                 <View style={styles.imageView}>
                   <Image
                     source={require('../assets/images/faceIdIcon.png')}
                     style={styles.images}
                   />
                 </View>
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   style={{
                     marginRight: 20,
                     alignSelf: 'center',
@@ -233,12 +233,29 @@ const ProfileScreen = ({navigation}) => {
                     elevation: 4,
                   }}
                   activeOpacity={0.5}
-                  onPress={" "}>
-                 
+                  onPress={' '}>
                   <Text style={styles.registerButtonTextStyle}>
                     Change My Face ID
                   </Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
+                <View
+                  style={{
+                    marginRight: 20,
+                    alignSelf: 'center',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: COLORS.WHITE,
+                    width: '40%',
+                    borderRadius: 10,
+                    padding: 10,
+                    elevation: 4,
+                  }}
+                  activeOpacity={0.5}
+                  onPress={' '}>
+                  <Text style={styles.registerButtonTextStyle}>
+                    Change My Face ID
+                  </Text>
+                </View>
               </View>
               <View
                 style={{
@@ -247,7 +264,12 @@ const ProfileScreen = ({navigation}) => {
                   marginBottom: 20,
                   flexDirection: 'row',
                 }}>
-                <View style={{flexDirection: 'column',flexWrap: 'wrap', maxWidth: '80%'}}>
+                <View
+                  style={{
+                    flexDirection: 'column',
+                    flexWrap: 'wrap',
+                    maxWidth: '80%',
+                  }}>
                   <View style={styles.headerTextView}>
                     <Text style={styles.headerTexts}>Mobile Number</Text>
                   </View>
@@ -263,7 +285,12 @@ const ProfileScreen = ({navigation}) => {
                 </View>
               </View>
               <View style={{marginBottom: 20, flexDirection: 'row'}}>
-                <View style={{flexDirection: 'column', flexWrap: 'wrap', maxWidth: '80%'}}>
+                <View
+                  style={{
+                    flexDirection: 'column',
+                    flexWrap: 'wrap',
+                    maxWidth: '80%',
+                  }}>
                   <View style={styles.headerTextView1}>
                     <Text style={styles.headerTexts}>Email Address</Text>
                   </View>
@@ -337,14 +364,14 @@ const styles = StyleSheet.create({
     color: COLORS.WHITE,
     paddingVertical: 10,
     fontSize: 16,
-    fontFamily: FONTS.Regular
+    fontFamily: FONTS.Regular,
   },
   registerButtonTextStyle: {
     color: COLORS.PRIMARY,
     paddingVertical: 10,
     fontSize: 16,
     fontFamily: FONTS.Regular,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   headerView: {
     flexDirection: 'row',
@@ -367,11 +394,19 @@ const styles = StyleSheet.create({
   },
   headerTextView: {marginLeft: 30, marginTop: 10},
   headerTexts: {color: COLORS.SUBTEXT, fontSize: 14, fontFamily: FONTS.Regular},
-  subheaderText: {color: COLORS.TEXTCOLOR, fontSize: 14, fontFamily: FONTS.Bold},
+  subheaderText: {
+    color: COLORS.TEXTCOLOR,
+    fontSize: 14,
+    fontFamily: FONTS.Bold,
+  },
   subheaderView: {marginTop: 5, marginLeft: 30, marginBottom: 10},
   headerTextView1: {marginLeft: 30},
   headerTexts1: {color: COLORS.SUBTEXT, fontSize: 14},
-  subheaderText1: {color: COLORS.TEXTCOLOR, fontSize: 14, fontFamily: FONTS.Bold},
+  subheaderText1: {
+    color: COLORS.TEXTCOLOR,
+    fontSize: 14,
+    fontFamily: FONTS.Bold,
+  },
   subheaderView1: {marginTop: 5, marginLeft: 30},
   imageView: {
     alignItems: 'center',

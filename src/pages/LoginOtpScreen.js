@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
-  Dimensions
+  Dimensions,
 } from 'react-native';
 import {
   CodeField,
@@ -25,7 +25,7 @@ import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const CELL_COUNT = 6;
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+const {width: screenWidth, height: screenHeight} = Dimensions.get('window');
 
 const LoginOtpScreen = ({navigation}) => {
   const [value, setValue] = useState('');
@@ -53,9 +53,7 @@ const LoginOtpScreen = ({navigation}) => {
 
         setUserPhoneNo(storedUserPhoneNo || '');
         setUserRefID(storedUserRefID || '');
-      } catch (error) {
-        console.log('Error loading remembered credentials:', error);
-      }
+      } catch (error) {}
     };
     loadRememberedCredentials();
   }, []);
@@ -72,9 +70,7 @@ const LoginOtpScreen = ({navigation}) => {
         API_ENDPOINTS.LOGINVERIFYOTP,
         requestBody,
       );
-      console.log(response);
       if (response.responseCode === 'F200') {
-        console.log(response);
         setData('jwt_token', response.token);
         handleUser(response.token);
         // setModalVisible(true);
@@ -91,8 +87,6 @@ const LoginOtpScreen = ({navigation}) => {
       }
     } catch (error) {
       setModalVisible(true);
-
-      console.log('error', error);
       setErrorMessage('OTP invalid');
     } finally {
       setLoading(false);
@@ -111,7 +105,6 @@ const LoginOtpScreen = ({navigation}) => {
         {},
         headers,
       );
-      console.log(JSON.stringify(response));
       setUserFondaID(response.fonda_id);
       setData('fonda_ID', response.fonda_id);
       setData('_id', response._id);
@@ -129,7 +122,6 @@ const LoginOtpScreen = ({navigation}) => {
       setData('nativeCode', response.native_country_code);
       navigation.navigate('Home', {screen: 'Dashboard'});
     } catch (error) {
-      console.log('error', error);
       setModalVisible(true);
     } finally {
       setLoading(false);
@@ -163,7 +155,6 @@ const LoginOtpScreen = ({navigation}) => {
         setModalHeader('Error');
       }
     } catch (error) {
-      console.log('error', error);
       setErrorMessage('Network Issue');
     } finally {
       setLoading(false);

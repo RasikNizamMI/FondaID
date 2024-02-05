@@ -23,6 +23,8 @@ import {useIsFocused} from '@react-navigation/native';
 import {COLORS, FONTS} from '../assets/Colors';
 import CommonModal from '../component/CommonModal';
 import withInternetConnectivity from '../Utils/withInternetConnectivity';
+import Collapsible from 'react-native-collapsible';
+import Icon from 'react-native-vector-icons/Feather';
 
 const Dashboard = ({navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -35,15 +37,19 @@ const Dashboard = ({navigation}) => {
   const [userFondaID, setUserFondaID] = useState('');
   const [documents, setDocuments] = useState([]);
   const [data, setString] = useClipboard();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [userRefID, setUserRefID] = useState('');
   const isFocused = useIsFocused();
   const [modalImage, setModalImage] = useState('');
   const [modalColor, setModalColor] = useState('');
   const [modalHeader, setModalHeader] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [jwtToken, setJwtToken] = useState("");
+  const [jwtToken, setJwtToken] = useState('');
   const [errorCode, setErrorCode] = useState('');
+
+  const [verifiedDocuments, setVerifiedDocuments] = useState([]);
+  const [rejectedDocuments, setRejectedDocuments] = useState([]);
+  const [inProgressDocuments, setInProgressDocuments] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -69,13 +75,10 @@ const Dashboard = ({navigation}) => {
           if (isFocused) {
             getDocumentDetails(storedUserFondaID, storedJwtToken);
           }
-          console.log('fodaid++++' + storedUserFondaID);
         } else {
-          console.log('No remembered credentials found.');
         }
       } catch (error) {
-        console.log('Error loading remembered credentials:', error);
-      }finally{
+      } finally {
         setLoading(false);
       }
     };
@@ -99,12 +102,15 @@ const Dashboard = ({navigation}) => {
 
     const headers = {
       'Content-Type': 'application/json',
-      'access-token' : jwtToken,
+      'access-token': jwtToken,
     };
 
     try {
-      const response = await getRequest(API_ENDPOINTS.GETUSER + userRefID, {} , headers);
-      console.log(JSON.stringify(response));
+      const response = await getRequest(
+        API_ENDPOINTS.GETUSER + userRefID,
+        {},
+        headers,
+      );
       setData('fondaId', response.fonda_id);
       setData('_id', response._id);
       setData('emailID', response.email_id);
@@ -118,7 +124,6 @@ const Dashboard = ({navigation}) => {
       setData('nativeCountry', response.native_country);
       setData('gender', response.gender);
     } catch (error) {
-      console.log('error', error);
       // setErrorMessage('Please check credentials');
     } finally {
       setLoading(false);
@@ -128,18 +133,36 @@ const Dashboard = ({navigation}) => {
   const getDocumentDetails = (fondaId, jwtToken) => {
     setLoading(true);
 
-    console.log(API_ENDPOINTS.GETDOCUMENT + fondaId);
-
     const headers = {
       'Content-Type': 'application/json',
-      'access-token' : jwtToken,
+      'access-token': jwtToken,
     };
 
-    getRequest(API_ENDPOINTS.GETDOCUMENT + fondaId, {},
-      headers,)
+    getRequest(
+      API_ENDPOINTS.GETUSERDOCUMENT + '?fonda_id=' + fondaId,
+      {},
+      headers,
+    )
       .then(response => {
-        console.log(JSON.stringify(response));
-        setDocuments(response);
+        if (response && response.data && response.data.length > 0) {
+          const verifiedDocs = response.data.filter(doc => doc.status === 'OK');
+          const inProgressDocs = response.data.filter(
+            doc => doc.status === 'INPROGRESS',
+          );
+          const rejectedDocs = response.data.filter(
+            doc => doc.status === 'CANCELED' || doc.status === 'KO',
+          );
+
+          setVerifiedDocuments(verifiedDocs);
+          setRejectedDocuments(rejectedDocs);
+          setInProgressDocuments(inProgressDocs);
+        } else {
+          setVerifiedDocuments([]);
+          setRejectedDocuments([]);
+          setInProgressDocuments([]);
+          console.error('No documents found for the given Fonda ID');
+        }
+
         setLoading(false);
       })
 
@@ -147,14 +170,14 @@ const Dashboard = ({navigation}) => {
         if (error.response && error.response.status === 401) {
           setLoading(false);
           setModalVisible(true);
-          setErrorMessage("Session timed out, please login again");
+          setErrorMessage('Session timed out, please login again');
           setModalColor(COLORS.ERROR);
           setModalImage(require('../assets/images/error.png'));
           setModalHeader('Error');
           setErrorCode('F401');
         } else {
-        setLoading(false);
-        console.error('GET error:', error);
+          setLoading(false);
+          console.error('GET error:', error);
         }
       });
   };
@@ -174,7 +197,7 @@ const Dashboard = ({navigation}) => {
   };
 
   const handleToAddNewDoc = () => {
-    navigation.navigate('AddNewDocumentScreen');
+    navigation.navigate('AddNewDocumentNewScreen');
   };
 
   const toggleDataStorage = () => {
@@ -186,8 +209,6 @@ const Dashboard = ({navigation}) => {
   const toggleDataStorage2 = () => {
     setDataStorageEnabled2(!dataStorageEnabled2);
   };
-
-  
 
   const handleLinkPress = () => {
     const url = 'https://www.example.com'; // Replace with your desired URL
@@ -211,20 +232,282 @@ const Dashboard = ({navigation}) => {
   };
 
   const handleSkip = async () => {
-    console.log('iconStatus');
     setIconStatus(true);
     setMandatory(true);
-    console.log(iconStatus);
   };
 
   const closeModal = () => {
     setModalVisible(false);
   };
 
-
   const sucess = () => {
     setModalVisible(false);
-    navigation.navigate('Auth', {screen: 'LoginScreen'})
+    navigation.navigate('Auth', {screen: 'LoginScreen'});
+  };
+
+  const renderVerifiedDocumentItem = item => (
+    <TouchableOpacity
+      onPress={() =>
+        navigation.navigate('DocumentDetailsScreen', {
+          id: item._id,
+          doc_type: item.doc_type,
+          fonda_id: userFondaID,
+        })
+      }>
+      <View style={styles.documentItem}>
+        <View style={{flexDirection: 'row'}}>
+          <View
+            style={{
+              borderColor: COLORS.BORDER,
+              borderWidth: 2,
+              borderRadius: 10,
+              margin: 10,
+              padding: 5,
+            }}>
+            {getDocumentImage(item.doc_type)}
+          </View>
+
+          <View style={{flexDirection: 'column'}}>
+            <Text style={styles.documentType}>
+              {getDocumentType(item.doc_type)}
+            </Text>
+            <Text style={styles.documentId}>
+              {getDocumentDescription(item.doc_type)}
+            </Text>
+          </View>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+
+  const [isCollapsed, setIsCollapsed] = useState(true);
+
+  const toggleCollapsible = index => {
+    setIsCollapsed(prev => (prev === index ? null : index));
+  };
+
+  const renderRejectedDocumentItem = (item, index) => {
+    const isStatusResponseEmpty =
+      !item.status_response || item.status_response.trim() === '';
+
+    return (
+      <View style={styles.documentItem} key={index}>
+        <TouchableOpacity
+          onPress={() =>
+            isStatusResponseEmpty ? null : toggleCollapsible(index)
+          }>
+          <View style={{flexDirection: 'row'}}>
+            <View
+              style={{
+                borderColor: COLORS.BORDER,
+                borderWidth: 2,
+                borderRadius: 10,
+                margin: 10,
+                padding: 5,
+              }}>
+              {getDocumentImage(item.doc_type)}
+            </View>
+
+            <View style={{flexDirection: 'column'}}>
+              <Text style={styles.documentType}>
+                {getDocumentType(item.doc_type)}
+              </Text>
+              <Text style={styles.documentId}>
+                {getDocumentDescription(item.doc_type)}
+              </Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+
+        {!isStatusResponseEmpty && (
+          <Collapsible collapsed={isCollapsed !== index}>
+            <View
+              style={{
+                flexDirection: 'row',
+                backgroundColor: COLORS.ERROR,
+                padding: 10,
+                width: 100,
+                marginLeft: 10,
+                marginBottom: 10,
+                borderRadius: 10,
+              }}>
+              <Icon name="x-circle" size={20} color="white" />
+              <Text
+                style={{
+                  fontSize: 12,
+                  fontFamily: FONTS.Regular,
+                  color: COLORS.WHITE,
+                  textAlign: 'center',
+                  marginLeft: 5,
+                  marginTop: 1,
+                }}>
+                Reason
+              </Text>
+            </View>
+            <View
+              style={{
+                marginLeft: 10,
+                marginRight: 10,
+                marginBottom: 10,
+                borderRadius: 10,
+                borderColor: COLORS.BLACK,
+                borderWidth: 1,
+                padding: 10,
+              }}>
+              <Text
+                style={{
+                  fontSize: 12,
+                  fontFamily: FONTS.Regular,
+                  color: COLORS.BLACK,
+                }}>
+                {item.status_response}
+              </Text>
+            </View>
+          </Collapsible>
+        )}
+      </View>
+    );
+  };
+
+  const renderInProgressDocumentItem = item => (
+    <View style={styles.documentItem}>
+      <View style={{flexDirection: 'row'}}>
+        <View
+          style={{
+            borderColor: COLORS.BORDER,
+            borderWidth: 2,
+            borderRadius: 10,
+            margin: 10,
+            padding: 5,
+          }}>
+          {getDocumentImage(item.doc_type)}
+        </View>
+
+        <View style={{flexDirection: 'column'}}>
+          <Text style={styles.documentType}>
+            {getDocumentType(item.doc_type)}
+          </Text>
+          <Text style={styles.documentId}>
+            {getDocumentDescription(item.doc_type)}
+          </Text>
+        </View>
+      </View>
+    </View>
+  );
+
+  const renderDocumentItem = item => {
+    if (item.status === 'OK') {
+      return renderVerifiedDocumentItem(item);
+    } else if (item.status === 'CANCELED' || item.status === 'KO') {
+      return renderRejectedDocumentItem(item);
+    } else if (item.status === 'INPROGRESS') {
+      return renderInProgressDocumentItem(item);
+    } else {
+      // Handle other status as needed
+      return null;
+    }
+  };
+
+  const renderDocumentSection = (documents, title) => {
+    return (
+      <View>
+        <View style={styles.documentsHeader}>
+          <Text style={styles.documentsHeaderText}>{title}</Text>
+        </View>
+        <FlatList
+          data={documents}
+          renderItem={({item}) => renderDocumentItem(item)}
+          keyExtractor={item => item._id}
+        />
+      </View>
+    );
+  };
+
+  const getDocumentImage = docType => {
+    switch (docType) {
+      case 'passport':
+        return (
+          <Image
+            source={require('../assets/images/passport.png')}
+            style={styles.documentImage}
+          />
+        );
+      case 'driving_license':
+        return (
+          <Image
+            source={require('../assets/images/driving.png')}
+            style={styles.documentImage}
+          />
+        );
+      case 'national_id':
+        return (
+          <Image
+            source={require('../assets/images/national.png')}
+            style={styles.documentImage}
+          />
+        );
+      case 'healthCard':
+        return (
+          <Image
+            source={require('../assets/images/health.png')}
+            style={styles.documentImage}
+          />
+        );
+      case 'residence_permit':
+        return (
+          <Image
+            source={require('../assets/images/professional.png')}
+            style={styles.documentImage}
+          />
+        );
+      case 'other':
+        return (
+          <Image
+            source={require('../assets/images/other.png')}
+            style={styles.documentImage}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
+  const getDocumentType = docType => {
+    switch (docType) {
+      case 'passport':
+        return 'Passport';
+      case 'driving_license':
+        return 'Driving License';
+      case 'national_id':
+        return 'National ID Card';
+      case 'healthCard':
+        return 'Health Card';
+      case 'residence_permit':
+        return 'Residence Permit';
+      case 'other':
+        return 'Other';
+      default:
+        return '';
+    }
+  };
+
+  const getDocumentDescription = docType => {
+    switch (docType) {
+      case 'passport':
+        return 'Travel document that the French government gives to its citizens for international travel.';
+      case 'driving_license':
+        return 'Card that permits individuals to drive legally in France';
+      case 'national_id':
+        return "Carte Nationale d'Identité is an official document issued by the French government to its citizens as proof of identity.";
+      case 'healthCard':
+        return 'The Carte Vitale is the health insurance card.';
+      case 'residence_permit':
+        return 'A French residence permit is a card that lets people from other countries live in France legally.';
+      case 'other':
+        return 'Other cards such any special cards.';
+      default:
+        return '';
+    }
   };
 
   return iconStatus == true ? (
@@ -255,113 +538,137 @@ const Dashboard = ({navigation}) => {
           </TouchableOpacity>
         </View>
       </View>
-      <View style={styles.documentsHeader}>
+      {/* <View style={styles.documentsHeader}>
         <Text style={styles.documentsHeaderText}>My Verified Documents</Text>
-      </View>
+      </View> */}
 
       {loading ? (
-        <ActivityIndicator size="large" color={COLORS.PRIMARY}style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          alignContent: 'center',
-          alignSelf: 'center',
-        }} />
-      ) : (
-        <FlatList
-          data={documents}
-          renderItem={({item}) => (
-            <TouchableOpacity
-              onPress={() =>
-                navigation.navigate('DocumentDetailsScreen', {
-                  id: item._id,
-                  doc_type: item.doc_type,
-                  fonda_id: userFondaID,
-                })
-              }>
-              <View style={styles.documentItem}>
-                <View style={{flexDirection: 'row'}}>
-                  <View
-                    style={{
-                      borderColor: COLORS.BORDER,
-                      borderWidth: 2,
-                      borderRadius: 10,
-                      margin: 10,
-                      padding: 5,
-                    }}>
-                    {item.doc_type == 'passport' && (
-                      <Image
-                        source={require('../assets/images/passport.png')}
-                        style={styles.documentImage}
-                      />
-                    )}
-                    {item.doc_type == 'driverLicense' && (
-                      <Image
-                        source={require('../assets/images/driving.png')}
-                        style={styles.documentImage}
-                      />
-                    )}
-                    {item.doc_type == 'idCard' && (
-                      <Image
-                        source={require('../assets/images/national.png')}
-                        style={styles.documentImage}
-                      />
-                    )}
-                    {item.doc_type == 'healthCard' && (
-                      <Image
-                        source={require('../assets/images/health.png')}
-                        style={styles.documentImage}
-                      />
-                    )}
-                    {item.doc_type == 'professionalLicense' && (
-                      <Image
-                        source={require('../assets/images/professional.png')}
-                        style={styles.documentImage}
-                      />
-                    )}
-                    {item.doc_type == 'other' && (
-                      <Image
-                        source={require('../assets/images/other.png')}
-                        style={styles.documentImage}
-                      />
-                    )}
-                  </View>
-
-                  <View style={{flexDirection: 'column',}}>
-                    <Text style={styles.documentType}>
-                      {item.doc_type == 'passport' && 'Passport'}
-                      {item.doc_type == 'driverLicense' && 'Driving License'}
-                      {item.doc_type == 'idCard' && 'National ID Card'}
-                      {item.doc_type == 'healthCard' && 'Health Card'}
-                      {item.doc_type == 'professionalLicense' &&
-                        'Professional Card'}
-                      {item.doc_type == 'other' && 'Other'}
-                    </Text>
-                    {item.doc_type == 'passport' && (
-                     <Text style={styles.documentId}>{"A French passport is an identity document issued to French citizens"}</Text>
-                    )}
-                    {item.doc_type == 'driverLicense' && (
-                     <Text style={styles.documentId}>{"Driving licences issued in Saint Barthélemy"}</Text>
-                    )}
-                    {item.doc_type == 'idCard' && (
-                      <Text style={styles.documentId}>{"Official ID consisting of an electronic bearing a photograph, name and address."}</Text>
-                    )}
-                    {item.doc_type == 'healthCard' && (
-                      <Text style={styles.documentId}>{"The Carte Vitale is the health insurance card."}</Text>
-                    )}
-                    {item.doc_type == 'professionalLicense' && (
-                     <Text style={styles.documentId}>{"A valid card is issued for any profession."}</Text>
-                    )}
-                    {item.doc_type == 'other' && (
-                     <Text style={styles.documentId}>{"Other cards such any special cards."}</Text>
-                    )}
-                  </View>
-                </View>
-              </View>
-            </TouchableOpacity>
-          )}
-          keyExtractor={item => item._id}
+        <ActivityIndicator
+          size="large"
+          color={COLORS.PRIMARY}
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            alignContent: 'center',
+            alignSelf: 'center',
+          }}
         />
+      ) : (
+        // <FlatList
+        //   data={documents}
+        //   renderItem={({item}) => (
+        //     <TouchableOpacity
+        //       onPress={() =>
+        //         navigation.navigate('DocumentDetailsScreen', {
+        //           id: item._id,
+        //           doc_type: item.doc_type,
+        //           fonda_id: userFondaID,
+        //         })
+        //       }>
+        //       <View style={styles.documentItem}>
+        //         <View style={{flexDirection: 'row'}}>
+        //           <View
+        //             style={{
+        //               borderColor: COLORS.BORDER,
+        //               borderWidth: 2,
+        //               borderRadius: 10,
+        //               margin: 10,
+        //               padding: 5,
+        //             }}>
+        //             {item.doc_type == 'passport' && (
+        //               <Image
+        //                 source={require('../assets/images/passport.png')}
+        //                 style={styles.documentImage}
+        //               />
+        //             )}
+        //             {item.doc_type == 'driverLicense' && (
+        //               <Image
+        //                 source={require('../assets/images/driving.png')}
+        //                 style={styles.documentImage}
+        //               />
+        //             )}
+        //             {item.doc_type == 'idCard' && (
+        //               <Image
+        //                 source={require('../assets/images/national.png')}
+        //                 style={styles.documentImage}
+        //               />
+        //             )}
+        //             {item.doc_type == 'healthCard' && (
+        //               <Image
+        //                 source={require('../assets/images/health.png')}
+        //                 style={styles.documentImage}
+        //               />
+        //             )}
+        //             {item.doc_type == 'professionalLicense' && (
+        //               <Image
+        //                 source={require('../assets/images/professional.png')}
+        //                 style={styles.documentImage}
+        //               />
+        //             )}
+        //             {item.doc_type == 'other' && (
+        //               <Image
+        //                 source={require('../assets/images/other.png')}
+        //                 style={styles.documentImage}
+        //               />
+        //             )}
+        //           </View>
+
+        //           <View style={{flexDirection: 'column',}}>
+        //             <Text style={styles.documentType}>
+        //               {item.doc_type == 'passport' && 'Passport'}
+        //               {item.doc_type == 'driverLicense' && 'Driving License'}
+        //               {item.doc_type == 'idCard' && 'National ID Card'}
+        //               {item.doc_type == 'healthCard' && 'Health Card'}
+        //               {item.doc_type == 'professionalLicense' &&
+        //                 'Professional Card'}
+        //               {item.doc_type == 'other' && 'Other'}
+        //             </Text>
+        //             {item.doc_type == 'passport' && (
+        //              <Text style={styles.documentId}>{"A French passport is an identity document issued to French citizens"}</Text>
+        //             )}
+        //             {item.doc_type == 'driverLicense' && (
+        //              <Text style={styles.documentId}>{"Driving licences issued in Saint Barthélemy"}</Text>
+        //             )}
+        //             {item.doc_type == 'idCard' && (
+        //               <Text style={styles.documentId}>{"Official ID consisting of an electronic bearing a photograph, name and address."}</Text>
+        //             )}
+        //             {item.doc_type == 'healthCard' && (
+        //               <Text style={styles.documentId}>{"The Carte Vitale is the health insurance card."}</Text>
+        //             )}
+        //             {item.doc_type == 'professionalLicense' && (
+        //              <Text style={styles.documentId}>{"A valid card is issued for any profession."}</Text>
+        //             )}
+        //             {item.doc_type == 'other' && (
+        //              <Text style={styles.documentId}>{"Other cards such any special cards."}</Text>
+        //             )}
+        //           </View>
+
+        //         </View>
+        //       </View>
+        //     </TouchableOpacity>
+        //   )}
+        //   keyExtractor={item => item._id}
+        // />
+        <ScrollView style={{height: '70%'}}>
+          {verifiedDocuments.length > 0 &&
+            renderDocumentSection(verifiedDocuments, 'Verified Documents')}
+            {inProgressDocuments.length > 0 &&
+            renderDocumentSection(inProgressDocuments, 'In-Progress Documents')}
+          {rejectedDocuments.length > 0 &&
+            renderDocumentSection(rejectedDocuments, 'Rejected Documents')}
+          
+
+          {verifiedDocuments.length === 0 &&
+            rejectedDocuments.length === 0 &&
+            inProgressDocuments.length === 0 && (
+              <View style={styles.noDocumentsContainer}>
+                <Text style={styles.noDocumentsText}>
+                  No verified documents is present.
+                </Text>
+              </View>
+            )}
+        </ScrollView>
       )}
       <CommonModal
         visible={modalVisible}
@@ -411,7 +718,7 @@ const Dashboard = ({navigation}) => {
             />
             <Text
               ellipsizeMode="tail"
-              numberOfLines={4}
+              numberOfLines={5}
               style={styles.switchLabel}>
               I agree to store my personal KYC details like, Name, Email, Mobile
               Number, Date of birth, Nationality, Gender.
@@ -439,13 +746,13 @@ const Dashboard = ({navigation}) => {
           </View>
           {mandatory == true && (
             <View style={styles.datatextView}>
-            <Text style={styles.datamandatorytext}>
-              * Mandatory to select personal KYC information
-            </Text>
-            <Text style={styles.datamandatorytext}>to store</Text>
-          </View>
+              <Text style={styles.datamandatorytext}>
+                * Mandatory to select personal KYC information
+              </Text>
+              <Text style={styles.datamandatorytext}>to store</Text>
+            </View>
           )}
-          
+
           <TouchableOpacity
             style={styles.databuttonStyle}
             activeOpacity={0.5}
@@ -624,6 +931,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.WHITE,
     borderRadius: 10,
     elevation: 2,
+    marginBottom: 5,
   },
   documentImage: {
     width: 60,
@@ -639,11 +947,11 @@ const styles = StyleSheet.create({
   },
   documentId: {
     marginTop: 0,
-  marginLeft: 10,
-  paddingRight: 100,
-  fontSize: 12,
-  fontFamily: FONTS.Regular,
-  color: COLORS.TEXTCOLOR,
+    marginLeft: 10,
+    paddingRight: 100,
+    fontSize: 12,
+    fontFamily: FONTS.Regular,
+    color: COLORS.TEXTCOLOR,
   },
   datacontainer: {
     flex: 1,
@@ -744,6 +1052,16 @@ const styles = StyleSheet.create({
     color: COLORS.PRIMARY,
     paddingVertical: 10,
     fontSize: 16,
+  },
+  noDocumentsContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noDocumentsText: {
+    textAlign: 'center',
+    fontSize: 16,
+    fontFamily: FONTS.Bold,
+    color: COLORS.BLACK,
   },
 });
 

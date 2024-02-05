@@ -9,10 +9,10 @@ import {
   TextInput,
   Platform,
   ActivityIndicator,
-  DatePickerIOS,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import CountryPicker, {FlagButton} from 'react-native-country-picker-modal';
 import {postRequest} from '../Utils/apiUtils';
 import {API_ENDPOINTS} from '../Utils/apiConfig';
@@ -47,14 +47,17 @@ const RegisterScreen = ({navigation}) => {
   const [countryCodeNationality, setCountryCodeNationality] = useState('');
   const [countryCodeNative, setCountryCodeNative] = useState('');
   const [selectedStartDate, setSelectedStartDate] = useState('Date of Birth');
-  const [selectedDocumentType, setSelectedDocumentType] = useState({ key: '', value: '' });
+  const [selectedDocumentType, setSelectedDocumentType] = useState({
+    key: '',
+    value: '',
+  });
   const [modalVisible, setModalVisible] = useState(false);
   const [modalImage, setModalImage] = useState('');
   const [modalColor, setModalColor] = useState('');
   const [modalHeader, setModalHeader] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [callingCodeValue, setCallingCodeValue] = useState('+33');
-  const [defaultCode, setDefaultCode] = useState('FR')
+  const [defaultCode, setDefaultCode] = useState('FR');
   const documentTypes = [
     {key: 'M', value: 'Male'},
     {key: 'F', value: 'Female'},
@@ -327,9 +330,12 @@ const RegisterScreen = ({navigation}) => {
     return codeMappings[twoDigitCode] || twoDigitCode;
   };
 
-  const threeDigitCodeNationality = convertToThreeDigitCode(countryCodeNationality);
+  const threeDigitCodeNationality = convertToThreeDigitCode(
+    countryCodeNationality,
+  );
 
-  const threeDigitCodeNativeCountry = convertToThreeDigitCode(countryCodeNative);
+  const threeDigitCodeNativeCountry =
+    convertToThreeDigitCode(countryCodeNative);
 
   const handleCountryPicker = () => {
     setShowNativeCountryPicker(false);
@@ -375,30 +381,9 @@ const RegisterScreen = ({navigation}) => {
       isFieldEmpty(selectedDocumentType) ||
       isFieldEmpty(startDate)
     ) {
-      console.log(selectedDocumentType);
       setApiResponseMessage('Please fill in all required fields');
       return;
     }
-
-    // if (!validateAlphabets(formValues.firstName)) {
-    //   setApiResponseMessage('First Name should be alphabets');
-    //   return;
-    // }
-
-    // if (!validateAlphabets(formValues.surName)) {
-    //   setApiResponseMessage('Sur Name should be alphabets');
-    //   return;
-    // }
-
-    // if (!validateAlphabets(formValues.birthName)) {
-    //   setApiResponseMessage('Birth Name should be alphabets');
-    //   return;
-    // }
-
-    // if (!validateAlphabets(formValues.placeOfBirth)) {
-    //   setApiResponseMessage('Place Of Birth should be alphabets');
-    //   return;
-    // }
 
     if (!validatePhoneNumber(formValues.phoneNumber)) {
       setApiResponseMessage('Please enter a 10-digit phone number');
@@ -411,9 +396,7 @@ const RegisterScreen = ({navigation}) => {
     }
 
     setLoading(true);
-    console.log( formValues.nationality);
     const callingCodeString = callingCodeValue.toString();
-    console.log(callingCodeString);
     const formattedStartDate = formatDate(startDate);
 
     const headers = {
@@ -425,7 +408,7 @@ const RegisterScreen = ({navigation}) => {
       sur_name: formValues.surName,
       birth_name: formValues.birthName,
       date_of_birth: formattedStartDate,
-      email_id: (formValues.email.toLowerCase()),
+      email_id: formValues.email.toLowerCase(),
       place_of_birth: formValues.placeOfBirth,
       phone_number: formValues.phoneNumber,
       phone_number_country_code: callingCodeString,
@@ -435,17 +418,11 @@ const RegisterScreen = ({navigation}) => {
       native_country_code: threeDigitCodeNativeCountry,
       gender: selectedDocumentType.key,
     };
-    console.log(JSON.stringify(requestBody));
-    postRequest(API_ENDPOINTS.REGISTERVERIFYOTP, requestBody,
-      headers,)
+    postRequest(API_ENDPOINTS.REGISTERVERIFYOTP, requestBody, headers)
       .then(response => {
-        console.log(JSON.stringify(response));
-        if (
-          response.responseCode === 'F200'
-        ) {
-          console.log("1234")
+        if (response.responseCode === 'F200') {
           setData('refID', response.refId);
-          setData('emailID', (formValues.email.toLowerCase()));
+          setData('emailID', formValues.email.toLowerCase());
           setData('phoneNumber', formValues.phoneNumber);
           setData('firstName', formValues.firstName);
           setData('surName', formValues.surName);
@@ -465,7 +442,7 @@ const RegisterScreen = ({navigation}) => {
         } else {
           setModalVisible(true);
           setModalColor(COLORS.ERROR);
-          setModalImage(require('../assets/images/error.png'))
+          setModalImage(require('../assets/images/error.png'));
           setModalHeader('Error');
           setErrorMessage(response.responseMessage);
           setApiResponseMessage(response.responseMessage);
@@ -473,11 +450,10 @@ const RegisterScreen = ({navigation}) => {
       })
       .catch(error => {
         setModalVisible(true);
-          setModalColor(COLORS.ERROR);
-          setModalImage(require('../assets/images/error.png'))
-          setModalHeader('Error')
-        setApiResponseMessage(error)
-        console.log('POST error:', error);
+        setModalColor(COLORS.ERROR);
+        setModalImage(require('../assets/images/error.png'));
+        setModalHeader('Error');
+        setApiResponseMessage(error);
       })
       .finally(() => {
         setLoading(false);
@@ -514,17 +490,33 @@ const RegisterScreen = ({navigation}) => {
     navigation.navigate('OTPVerificationScreen');
   };
 
+  const handleStartDateConfirm = date => {
+    if (date) {
+      setStartDate(date);
+      const formattedDate = date.toDateString(); // Format the selected date
+      setSelectedStartDate(formattedDate);
+    }
+    hideStartDatePickerModal();
+  };
+
+  const hideStartDatePickerModal = () => {
+    setStartDatePickerVisible(false);
+  };
 
   return (
     <View style={styles.mainBody}>
       {loading ? (
-        <ActivityIndicator size="large" color={COLORS.PRIMARY} style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          alignContent: 'center',
-          alignSelf: 'center',
-        }}/>
+        <ActivityIndicator
+          size="large"
+          color={COLORS.PRIMARY}
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            alignContent: 'center',
+            alignSelf: 'center',
+          }}
+        />
       ) : (
         <ScrollView
           contentContainerStyle={{flexGrow: 1}}
@@ -602,12 +594,28 @@ const RegisterScreen = ({navigation}) => {
             <View style={styles.formSection}>
               <Text style={styles.formLabel}>Gender</Text>
               <SelectList
-                placeholder={selectedDocumentType.key === '' ? "Choose Gender" : documentTypes.find(item => item.key === selectedDocumentType.key).value}
+                placeholder={
+                  selectedDocumentType.key === ''
+                    ? 'Choose Gender'
+                    : documentTypes.find(
+                        item => item.key === selectedDocumentType.key,
+                      ).value
+                }
                 boxStyles={styles.dropdowmBox}
                 dropdownStyles={styles.dropdown}
-                inputStyles={{fontSize: 16, color: COLORS.SUBTEXT,  fontFamily: FONTS.Regular,}}
-                dropdownTextStyles={{fontSize: 16, fontFamily: FONTS.Regular,color: COLORS.TEXTCOLOR}}
-                setSelected={(key,value) => setSelectedDocumentType({ key : key, value: value })} // Set the selected document type
+                inputStyles={{
+                  fontSize: 16,
+                  color: COLORS.SUBTEXT,
+                  fontFamily: FONTS.Regular,
+                }}
+                dropdownTextStyles={{
+                  fontSize: 16,
+                  fontFamily: FONTS.Regular,
+                  color: COLORS.TEXTCOLOR,
+                }}
+                setSelected={(key, value) =>
+                  setSelectedDocumentType({key: key, value: value})
+                } // Set the selected document type
                 data={documentTypes}
                 save="key" // Save the key of the selected item
                 label={selectedDocumentType.value}
@@ -618,44 +626,51 @@ const RegisterScreen = ({navigation}) => {
             <View style={styles.formSection}>
               <Text style={styles.formLabel}>Date of Birth</Text>
               <TouchableOpacity onPress={showStartDatePickerModal}>
-                {showStartDatePicker && (
-                  <DateTimePicker
-                    value={startDate}
-                    mode="date"
-                    display="default"
-                    maximumDate={eighteenYearsAgo}
-                    onChange={handleStartDateChange}
-                  />
-                )}
                 <View style={styles.datePickerView}>
-                  <View style={styles.datePickerViews}>
-                    <Text style={styles.datePickerText}>
-                      {selectedStartDate}
-                    </Text>
-                    <Image
-                      source={require('../assets/images/Date.png')}
-                      // tintColor={Colors.primaryColor}
-                      style={styles.datePickerIcon}></Image>
-                  </View>
+                  <Text style={styles.datePickerText}>{selectedStartDate}</Text>
+                  <Image
+                    source={require('../assets/images/Date.png')}
+                    style={styles.datePickerIcon}
+                  />
                 </View>
               </TouchableOpacity>
+              {showStartDatePicker && Platform.OS == 'android' && (
+                <DateTimePicker
+                value={startDate}
+                mode="date"
+                display="default"
+                maximumDate={eighteenYearsAgo}
+                onChange={handleStartDateChange}
+              />
+              )}
             </View>
-
+            {Platform.OS == 'ios' && (
+              <DateTimePickerModal
+              isVisible={isStartDatePickerVisible}
+              maximumDate={eighteenYearsAgo}
+              mode="date"
+              onConfirm={handleStartDateConfirm}
+              onCancel={hideStartDatePickerModal}
+            />
+            )}
             {/* Nationality */}
             <View style={styles.formSection}>
               <Text style={styles.formLabel}>Nationality</Text>
               <TouchableOpacity onPress={handleCountryPicker}>
                 <View style={styles.countryPickerButton}>
                   <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <FlagButton withEmoji={formValues.nationality? true : false} countryCode={countryCodeNationality} />
-                  <Text style={styles.placeholderText}>
-                    {formValues.nationality
-                      ? formValues.nationality.name
-                      : 'Select Nationality'}
-                  </Text>
+                    <FlagButton
+                      withEmoji={formValues.nationality ? true : false}
+                      countryCode={countryCodeNationality}
+                    />
+                    <Text style={styles.placeholderText}>
+                      {formValues.nationality
+                        ? formValues.nationality.name
+                        : 'Select Nationality'}
+                    </Text>
                   </View>
                   <View style={{marginRight: 20}}>
-                  <Feather name="chevron-down" size={15} color={'#999999'}/>
+                    <Feather name="chevron-down" size={15} color={'#999999'} />
                   </View>
                 </View>
               </TouchableOpacity>
@@ -704,18 +719,20 @@ const RegisterScreen = ({navigation}) => {
               <Text style={styles.formLabel}>Native Country</Text>
               <TouchableOpacity onPress={handleNativeCountryPicker}>
                 <View style={styles.countryPickerButton}>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <FlagButton withEmoji={formValues.nativeCountry? true : false} countryCode={countryCodeNative} />
-                  <Text style={styles.placeholderText}>
-                    {formValues.nativeCountry
-                      ? formValues.nativeCountry.name
-                      : 'Select Native Country'}
-                  </Text>
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <FlagButton
+                      withEmoji={formValues.nativeCountry ? true : false}
+                      countryCode={countryCodeNative}
+                    />
+                    <Text style={styles.placeholderText}>
+                      {formValues.nativeCountry
+                        ? formValues.nativeCountry.name
+                        : 'Select Native Country'}
+                    </Text>
                   </View>
                   <View style={{marginRight: 20}}>
-                  <Feather name="chevron-down" size={15} color={'#999999'}/>
+                    <Feather name="chevron-down" size={15} color={'#999999'} />
                   </View>
-                  
                 </View>
               </TouchableOpacity>
               {showNativeCountryPicker && (
@@ -750,9 +767,11 @@ const RegisterScreen = ({navigation}) => {
                 onChangeText={text =>
                   setFormValues({...formValues, phoneNumber: text})
                 }
-              textStyle={{ color: COLORS.SUBTEXT,
-                fontFamily: FONTS.Regular,
-                fontSize: 16,}}
+                textStyle={{
+                  color: COLORS.SUBTEXT,
+                  fontFamily: FONTS.Regular,
+                  fontSize: 16,
+                }}
                 containerStyle={{
                   flex: 1,
                   width: '100%',
@@ -762,7 +781,7 @@ const RegisterScreen = ({navigation}) => {
                   backgroundColor: COLORS.WHITE,
                   borderRadius: 10,
                   justifyContent: 'center',
-                  marginTop: 10
+                  marginTop: 10,
                 }}
                 textContainerStyle={{
                   flex: 1,
@@ -782,14 +801,22 @@ const RegisterScreen = ({navigation}) => {
                   fontFamily: FONTS.Regular,
                   color: COLORS.SUBTEXT,
                 }}
-                textInputProps={{ maxLength: 12, placeholder: 'Enter Phone Number', placeholderTextColor: COLORS.SUBTEXT}}
+                textInputProps={{
+                  maxLength: 12,
+                  placeholder: 'Enter Phone Number',
+                  placeholderTextColor: COLORS.SUBTEXT,
+                }}
                 flagButtonStyle={{width: 50, marginLeft: 10}}
-                codeTextStyle={{color: COLORS.SUBTEXT, marginLeft: -5, textAlign: 'center',  paddingVertical: 0,}}
+                codeTextStyle={{
+                  color: COLORS.SUBTEXT,
+                  marginLeft: -5,
+                  textAlign: 'center',
+                  paddingVertical: 0,
+                }}
                 onChangeCountry={countryData => {
                   const callingCode = countryData.callingCode;
-                  console.log(callingCode);
                   setCallingCodeValue(callingCode);
-                  setDefaultCode(countryData.cca2)
+                  setDefaultCode(countryData.cca2);
                 }}
               />
             </View>
@@ -881,7 +908,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: FONTS.Bold,
     marginRight: 10,
-    width: '80%'
+    width: '80%',
   },
   formSection: {
     marginTop: 20,
@@ -973,7 +1000,7 @@ const styles = StyleSheet.create({
     color: COLORS.WHITE,
     paddingVertical: 10,
     fontSize: 16,
-    fontFamily: FONTS.Regular
+    fontFamily: FONTS.Regular,
   },
   registerButtonStyle: {
     backgroundColor: COLORS.WHITE,
@@ -994,7 +1021,7 @@ const styles = StyleSheet.create({
     color: COLORS.PRIMARY,
     paddingVertical: 10,
     fontSize: 16,
-    fontFamily: FONTS.Regular
+    fontFamily: FONTS.Regular,
   },
   scannerView: {
     alignSelf: 'center',
@@ -1020,7 +1047,7 @@ const styles = StyleSheet.create({
   apiResponseText: {
     color: '#FF0000',
     fontSize: 16,
-    fontFamily: FONTS.Regular
+    fontFamily: FONTS.Regular,
   },
 
   genderPickerContainer: {

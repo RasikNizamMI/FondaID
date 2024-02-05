@@ -10,7 +10,7 @@ import {
   Platform,
   ActivityIndicator,
   Alert,
-  PermissionsAndroid
+  PermissionsAndroid,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
@@ -48,36 +48,28 @@ const CaptureFaceIDScreen = ({navigation}) => {
 
   const handleToAddNewDoc = () => {
     setLoading(true);
-    console.log('1234567890');
     // Form validation and API call
     const requestBody = {
       ref_id: userRefID,
     };
-
-    console.log(API_ENDPOINTS.CREATEUSER, requestBody);
     postRequest(API_ENDPOINTS.CREATEUSER, requestBody)
       .then(response => {
-        console.log('response' + JSON.stringify(response));
         if (response.statusCode === 200) {
-          console.log('12345');
-          setData('fondaId',response.fondaId);
+          setData('fondaId', response.fondaId);
           setModalVisible(true);
-        setErrorMessage(response.message);
-        setModalColor(COLORS.PRIMARY);
-        setModalImage(require('../assets/images/sucess.png'))
-        setModalHeader('Success')
-         
+          setErrorMessage(response.message);
+          setModalColor(COLORS.PRIMARY);
+          setModalImage(require('../assets/images/sucess.png'));
+          setModalHeader('Success');
         } else {
-          console.log('12345678');
-           setErrorMessage(response.message);
-           setModalVisible(true);
-        setModalColor(COLORS.ERROR);
-        setModalImage(require('../assets/images/error.png'))
-        setModalHeader('Error')
+          setErrorMessage(response.message);
+          setModalVisible(true);
+          setModalColor(COLORS.ERROR);
+          setModalImage(require('../assets/images/error.png'));
+          setModalHeader('Error');
         }
       })
       .catch(error => {
-        console.log(error);
         setApiResponseMessage('POST error:', error);
       })
       .finally(() => {
@@ -110,9 +102,7 @@ const CaptureFaceIDScreen = ({navigation}) => {
         setUserNativeCountry(storedUserNativeCountry);
         setUserGender(storeUserGender);
         setuserRefID(storeduserRefID);
-      } catch (error) {
-        console.log('Error loading remembered credentials:', error);
-      }
+      } catch (error) {}
     };
     loadRememberedCredentials();
   }, []);
@@ -130,7 +120,6 @@ const CaptureFaceIDScreen = ({navigation}) => {
         },
       );
       if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-        console.log('Camera permission denied');
         return;
       }
     }
@@ -143,25 +132,14 @@ const CaptureFaceIDScreen = ({navigation}) => {
     };
 
     launchCamera(options, response => {
-      console.log('Response = ', response);
       const {assets} = response;
       if (response.didCancel) {
-        console.log('User cancelled camera');
       } else if (response.error) {
-        console.log('Camera Error: ', response.error);
       } else {
-        console.log('base64 -> ', assets[0].base64);
-      console.log('uri -> ', assets[0].uri);
-      console.log('width -> ', assets[0].width);
-      console.log('height -> ', assets[0].height);
-      console.log('fileSize -> ', assets[0].fileSize);
-      console.log('type -> ', assets[0].type);
-      console.log('fileName -> ', assets[0].fileName);
-      setFilePath(assets[0]);
+        setFilePath(assets[0]);
       }
     });
   };
-
 
   const captureImage = type => {
     let options = {
@@ -175,7 +153,6 @@ const CaptureFaceIDScreen = ({navigation}) => {
     };
 
     launchCamera(options, response => {
-      console.log('Response = ', response);
       const {assets} = response;
 
       if (response.didCancel) {
@@ -191,13 +168,6 @@ const CaptureFaceIDScreen = ({navigation}) => {
         alert(response.errorMessage);
         return;
       }
-      console.log('base64 -> ', assets[0].base64);
-      console.log('uri -> ', assets[0].uri);
-      console.log('width -> ', assets[0].width);
-      console.log('height -> ', assets[0].height);
-      console.log('fileSize -> ', assets[0].fileSize);
-      console.log('type -> ', assets[0].type);
-      console.log('fileName -> ', assets[0].fileName);
       setFilePath(assets[0]);
     });
   };
@@ -209,7 +179,7 @@ const CaptureFaceIDScreen = ({navigation}) => {
   const sucess = () => {
     setModalVisible(false);
     navigation.navigate('SubmitSuccessScreen');
-  }
+  };
 
   return (
     <View style={styles.mainBody}>
@@ -279,8 +249,13 @@ const CaptureFaceIDScreen = ({navigation}) => {
               </View>
             </TouchableOpacity>
           </View>
-          <CommonModal visible={modalVisible} onClose={modalHeader == 'Success' ? sucess : closeModal} message={errorMessage} header={modalHeader} color={modalColor} imageSource={modalImage}>
-      </CommonModal>
+          <CommonModal
+            visible={modalVisible}
+            onClose={modalHeader == 'Success' ? sucess : closeModal}
+            message={errorMessage}
+            header={modalHeader}
+            color={modalColor}
+            imageSource={modalImage}></CommonModal>
         </ScrollView>
       )}
     </View>
