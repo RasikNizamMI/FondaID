@@ -1,7 +1,6 @@
-import React, {useState, createRef, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
-  TextInput,
   View,
   Text,
   ScrollView,
@@ -9,15 +8,14 @@ import {
   TouchableOpacity,
   Platform,
   ActivityIndicator,
-  Alert,
   PermissionsAndroid,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
-import {postRequest, putRequest} from '../Utils/apiUtils';
+import {launchCamera} from 'react-native-image-picker';
+import {setData, getData} from '../Utils/AsyncStorageUtil';
+import {postRequest} from '../Utils/apiUtils';
 import {API_ENDPOINTS} from '../Utils/apiConfig';
-import {COLORS, FONTS} from '../assets/Colors';
+import {COLORS} from '../assets/Colors';
 import CommonModal from '../component/CommonModal';
 import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
@@ -141,37 +139,6 @@ const CaptureFaceIDScreen = ({navigation}) => {
     });
   };
 
-  const captureImage = type => {
-    let options = {
-      mediaType: type,
-      maxWidth: 550,
-      maxHeight: 550,
-      quality: 1,
-      videoQuality: 'low',
-      durationLimit: 30, //Video max duration in seconds
-      saveToPhotos: true,
-    };
-
-    launchCamera(options, response => {
-      const {assets} = response;
-
-      if (response.didCancel) {
-        alert('User cancelled camera picker');
-        return;
-      } else if (response.errorCode === 'camera_unavailable') {
-        alert('Camera not available on device');
-        return;
-      } else if (response.errorCode === 'permission') {
-        alert('Permission not satisfied');
-        return;
-      } else if (response.errorCode === 'others') {
-        alert(response.errorMessage);
-        return;
-      }
-      setFilePath(assets[0]);
-    });
-  };
-
   const closeModal = () => {
     setModalVisible(false);
   };
@@ -198,6 +165,8 @@ const CaptureFaceIDScreen = ({navigation}) => {
                 }}
                 style={styles.headerIcon}
                 name="chevron-left"
+                accessibilityRole="button"
+                accessibilityLabel="Back"
                 size={25}
                 color={COLORS.PRIMARY}
               />
@@ -303,7 +272,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginLeft: 35,
     marginRight: 35,
-    marginTop: 10,
     elevation: 4,
     marginBottom: 30,
     marginTop: 30,

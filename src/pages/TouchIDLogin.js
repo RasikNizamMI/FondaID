@@ -1,29 +1,12 @@
 import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  Switch,
-  TouchableOpacity,
-  Linking,
-  Image,
-  Share,
-  Clipboard,
-  FlatList,
-} from 'react-native';
-import Navigation from '../navigation/Navigator';
+import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import TouchID from 'react-native-touch-id';
-import {COLORS, FONTS} from '../assets/Colors';
+import {FONTS} from '../assets/Colors';
 import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const TouchIDLogin = ({navigation}) => {
   const [iconStatus, setIconStatus] = useState(false);
   const [openItemId, setOpenItemId] = useState(null);
-
-  const handleShare = async () => {
-    navigation.navigate('SharingScreen');
-  };
 
   const data = [
     {
@@ -41,15 +24,6 @@ const TouchIDLogin = ({navigation}) => {
       validUntil: '04-02-2024',
     },
   ];
-
-  const handleCopyToClipboard = () => {
-    navigation.navigate('SharingScreen');
-  };
-
-  const handleIconClick = itemId => {
-    // setIconStatus(itemId === data.id && !iconStatus);
-    setOpenItemId(itemId === openItemId ? null : itemId);
-  };
 
   const handleToLogin = () => {
     navigation.navigate('LoginScreen');
@@ -203,7 +177,6 @@ const styles = StyleSheet.create({
   },
   skipButtonStyle: {
     backgroundColor: '#FFFFFF',
-    borderWidth: 0,
     color: '#FFFFFF',
     borderColor: '#F5A922',
     height: 50,

@@ -1,24 +1,22 @@
 // DocumentDetails.js
 
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
-  ScrollView,
   Text,
   Image,
   StyleSheet,
   TouchableOpacity,
-  Modal,
   ActivityIndicator,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import {postRequest, getRequest, putRequest} from '../Utils/apiUtils';
+import {getRequest, putRequest} from '../Utils/apiUtils';
 import {API_ENDPOINTS} from '../Utils/apiConfig';
 import {COLORS, FONTS} from '../assets/Colors';
 import {WebView} from 'react-native-webview';
 import Share from 'react-native-share';
 import withInternetConnectivity from '../Utils/withInternetConnectivity';
-import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
+import {getData} from '../Utils/AsyncStorageUtil';
 
 const getDisplayName = doc_type => {
   switch (doc_type) {
@@ -78,14 +76,6 @@ const DocumentDetailsScreen = ({route, navigation}) => {
     getDocumentDetails(id);
   }, [id]);
 
-  function LoadingIndicatorView() {
-    return (
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <ActivityIndicator size="large" color="#F5A922" />
-      </View>
-    );
-  }
-
   const handleShare = async () => {
     try {
       const imageUrl = API_ENDPOINTS.GETDOCUMENTQR + id;
@@ -126,6 +116,8 @@ const DocumentDetailsScreen = ({route, navigation}) => {
           }}
           style={styles.headerIcon}
           name="chevron-left"
+          accessibilityRole="button"
+          accessibilityLabel="Back"
           size={25}
           color={'#F5A922'}
         />
@@ -157,7 +149,6 @@ const DocumentDetailsScreen = ({route, navigation}) => {
           <View
             style={{
               flexDirection: 'row',
-              justifyContent: 'space-around',
               justifyContent: 'center',
               alignItems: 'center',
             }}>

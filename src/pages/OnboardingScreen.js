@@ -3,7 +3,7 @@
 import React, {useRef} from 'react';
 import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import Swiper from 'react-native-swiper';
-import {setData, getData} from '../Utils/AsyncStorageUtil';
+import {setData} from '../Utils/AsyncStorageUtil';
 import {COLORS, FONTS} from '../assets/Colors';
 
 const OnboardingScreen = ({navigation}) => {

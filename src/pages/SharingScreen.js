@@ -4,28 +4,16 @@ import {
   Text,
   ScrollView,
   StyleSheet,
-  Switch,
   Share,
   TouchableOpacity,
-  Linking,
 } from 'react-native';
-import {COLORS, FONTS} from '../assets/Colors';
+import {COLORS} from '../assets/Colors';
 import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const SharingScreen = ({navigation}) => {
   const [dataStorageEnabled, setDataStorageEnabled] = useState(false);
   const [dataStorageEnabled1, setDataStorageEnabled1] = useState(false);
   const [dataStorageEnabled2, setDataStorageEnabled2] = useState(false);
-
-  const toggleDataStorage = () => {
-    setDataStorageEnabled(!dataStorageEnabled);
-  };
-  const toggleDataStorage1 = () => {
-    setDataStorageEnabled1(!dataStorageEnabled1);
-  };
-  const toggleDataStorage2 = () => {
-    setDataStorageEnabled2(!dataStorageEnabled2);
-  };
 
   const handleShare = async () => {
     try {
@@ -39,11 +27,6 @@ const SharingScreen = ({navigation}) => {
     } catch (error) {
       console.error(error.message);
     }
-  };
-
-  const handleLinkPress = () => {
-    const url = 'https://www.example.com'; // Replace with your desired URL
-    Linking.openURL(url);
   };
 
   const handleConfirm = () => {
@@ -197,7 +180,6 @@ const styles = StyleSheet.create({
   },
   skipButtonStyle: {
     backgroundColor: '#FFFFFF',
-    borderWidth: 0,
     color: '#FFFFFF',
     borderColor: '#F5A922',
     height: 50,

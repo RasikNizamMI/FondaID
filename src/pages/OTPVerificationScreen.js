@@ -1,19 +1,15 @@
-import React, {useState, createRef, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
-  TextInput,
   View,
   Text,
   ScrollView,
-  Image,
   TouchableOpacity,
-  Platform,
   ActivityIndicator,
-  Alert,
   Dimensions,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
+import {getData, removeData} from '../Utils/AsyncStorageUtil';
 import {postRequest} from '../Utils/apiUtils';
 import {API_ENDPOINTS} from '../Utils/apiConfig';
 import {COLORS, FONTS} from '../assets/Colors';
@@ -206,7 +202,7 @@ const OTPVerificationScreen = ({navigation}) => {
         setMobileVerificationSuccess(false);
         setMobileVerificationError(true);
         setModalVisible(true);
-        setErrorMessage(error);
+        setErrorMessage(error.message);
         setModalColor(COLORS.ERROR);
         setModalImage(require('../assets/images/error.png'));
         setModalHeader('Error');
@@ -250,7 +246,7 @@ const OTPVerificationScreen = ({navigation}) => {
         setLoading(false);
         setApiResponseMessage('POST error:', error);
         setModalVisible(true);
-        setErrorMessage(error);
+        setErrorMessage(error.message);
         setModalColor(COLORS.ERROR);
         setModalImage(require('../assets/images/error.png'));
         setModalHeader('Error');
@@ -318,10 +314,6 @@ const OTPVerificationScreen = ({navigation}) => {
     setModalVisible(false);
   };
 
-  const sucess = () => {
-    setModalVisible(false);
-    navigation.navigate('Home', {screen: 'Dashboard'});
-  };
   return (
     <View style={styles.mainBody}>
       {loading ? (
@@ -338,6 +330,8 @@ const OTPVerificationScreen = ({navigation}) => {
                 }}
                 style={styles.headerIcon}
                 name="chevron-left"
+                accessibilityRole="button"
+                accessibilityLabel="Back"
                 size={25}
                 color={COLORS.PRIMARY}
               />
@@ -659,7 +653,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginLeft: 35,
     marginRight: 35,
-    marginTop: 10,
     elevation: 4,
     marginBottom: 30,
     marginTop: 30,

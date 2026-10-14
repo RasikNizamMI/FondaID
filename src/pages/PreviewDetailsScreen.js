@@ -1,4 +1,4 @@
-import React, {useState, createRef, useEffect} from 'react';
+import React from 'react';
 import {
   StyleSheet,
   View,
@@ -6,18 +6,12 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
-  Platform,
   FlatList,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import {COLORS, FONTS} from '../assets/Colors';
 import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const PreviewDetailsScreen = ({navigation}) => {
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
-
   const data = [
     {key: '1', value: 'Mobiles', disabled: true},
     {key: '2', value: 'Appliances'},
@@ -63,6 +57,8 @@ const PreviewDetailsScreen = ({navigation}) => {
               }}
               style={styles.headerIcon}
               name="chevron-left"
+              accessibilityRole="button"
+              accessibilityLabel="Back"
               size={25}
               color={'#F5A922'}
             />
@@ -355,7 +351,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginLeft: 35,
     marginRight: 35,
-    marginTop: 10,
     elevation: 4,
     marginBottom: 30,
     marginTop: 30,

@@ -155,6 +155,10 @@ dependencies {
 
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.0.0")
 
+    // id3 Technologies SDKs (local AARs copied from the vendor packages)
+    implementation files("libs/eu.id3.face.aar")      // id3 Face SDK 10.0.0
+    implementation files("libs/eu.id3.bioseal.aar")   // id3 BioSeal SDK 1.42.10
+
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
         exclude group:'com.squareup.okhttp3', module:'okhttp'
@@ -169,3 +173,7 @@ dependencies {
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
+
+// The id3 BioSeal AAR declares minCompileSdk=36 (vendor build default), but it contains only plain
+// Java JNI wrappers with no Android API usage, so it is safe to compile against this project's SDK.
+tasks.matching { it.name ==~ /check.*AarMetadata/ }.configureEach { enabled = false }

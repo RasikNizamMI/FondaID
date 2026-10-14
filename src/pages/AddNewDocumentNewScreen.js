@@ -1,26 +1,17 @@
 import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
-  TextInput,
   View,
   Text,
   ScrollView,
-  Image,
   TouchableOpacity,
-  Platform,
-  PermissionsAndroid,
-  Modal,
   ActivityIndicator,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import {SelectList} from 'react-native-dropdown-select-list';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
+import {getData} from '../Utils/AsyncStorageUtil';
 import {COLORS, FONTS} from '../assets/Colors';
-import CommonModal from '../component/CommonModal';
 import withInternetConnectivity from '../Utils/withInternetConnectivity';
-import {postRequest, getRequest} from '../Utils/apiUtils';
+import {getRequest} from '../Utils/apiUtils';
 import {API_ENDPOINTS} from '../Utils/apiConfig';
 import {WebView} from 'react-native-webview';
 
@@ -311,7 +302,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginLeft: 35,
     marginRight: 35,
-    marginTop: 10,
     elevation: 4,
     marginBottom: 30,
     marginTop: 30,
@@ -376,7 +366,6 @@ const styles = StyleSheet.create({
   datePickerView: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 5,
     borderWidth: 1,
     marginTop: 15,
     marginLeft: 30,

@@ -8,3 +8,6 @@
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
 # Add any project specific keep options here:
+
+# id3 Face / BioSeal SDKs: Java classes are called from native code (JNI), keep them intact
+-keep class eu.id3.** { *; }

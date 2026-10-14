@@ -6,7 +6,6 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
@@ -165,11 +164,6 @@ const LoginOtpScreen = ({navigation}) => {
     setModalVisible(false);
   };
 
-  const sucess = () => {
-    setModalVisible(false);
-    navigation.navigate('Home', {screen: 'Dashboard'});
-  };
-
   const minScreenSize = Math.min(screenWidth, screenHeight);
 
   return (
@@ -325,10 +319,8 @@ const styles = StyleSheet.create({
     borderColor: COLORS.PRIMARY,
     height: 50,
     alignItems: 'center',
-    borderRadius: 0,
     marginLeft: 35,
     marginRight: 35,
-    marginTop: 10,
     elevation: 4,
     marginBottom: 30,
     marginTop: 30,

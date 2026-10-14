@@ -1,21 +1,21 @@
 // DocumentDetails.js
 
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {
   View,
-  ScrollView,
   Text,
-  Image,
   StyleSheet,
   TouchableOpacity,
-  Modal,
+  ActivityIndicator,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import {postRequest, getRequest} from '../Utils/apiUtils';
 import {API_ENDPOINTS} from '../Utils/apiConfig';
 import {WebView} from 'react-native-webview';
-import {COLORS, FONTS} from '../assets/Colors';
 import withInternetConnectivity from '../Utils/withInternetConnectivity';
+
+const LoadingIndicatorView = () => (
+  <ActivityIndicator color="#009b88" size="large" />
+);
 
 const getDisplayName = doc_type => {
   switch (doc_type) {
@@ -44,10 +44,6 @@ const BioDetailsScreen = ({route, navigation}) => {
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
-  function LoadingIndicatorView() {
-    return <ActivityIndicator color="#009b88" size="large" />;
-  }
-
   return (
     <View style={{flex: 1, marginTop: 10}}>
       <View style={styles.headerView}>
@@ -57,6 +53,8 @@ const BioDetailsScreen = ({route, navigation}) => {
           }}
           style={styles.headerIcon}
           name="chevron-left"
+          accessibilityRole="button"
+          accessibilityLabel="Back"
           size={25}
           color={'#F5A922'}
         />
@@ -65,7 +63,7 @@ const BioDetailsScreen = ({route, navigation}) => {
       <WebView
         originWhitelist={['*']}
         source={{uri: API_ENDPOINTS.GETDOCUMENTPREVIEW + id}}
-        renderLoading={this.LoadingIndicatorView}
+        renderLoading={LoadingIndicatorView}
         startInLoadingState={true}
       />
       <TouchableOpacity

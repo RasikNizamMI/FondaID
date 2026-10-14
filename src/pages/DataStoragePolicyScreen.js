@@ -8,8 +8,8 @@ import {
   TouchableOpacity,
   Linking,
 } from 'react-native';
-import { setData, getData } from '../Utils/AsyncStorageUtil';
-import {COLORS, FONTS} from '../assets/Colors';
+import {setData, getData} from '../Utils/AsyncStorageUtil';
+import {COLORS} from '../assets/Colors';
 import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const DataStoragePolicyScreen = ({navigation}) => {
@@ -211,7 +211,6 @@ const styles = StyleSheet.create({
   },
   skipButtonStyle: {
     backgroundColor: '#FFFFFF',
-    borderWidth: 0,
     color: '#FFFFFF',
     borderColor: '#F5A922',
     height: 50,

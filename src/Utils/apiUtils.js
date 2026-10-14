@@ -1,29 +1,14 @@
 import axios from 'axios';
 
-export const postRequest = (url, data, headers = {}) => {
-  return axios.post(url, data, { headers })
-    .then(response => response.data)
-    .catch(error => {
-      throw error;
-    });
-};
+// All helpers resolve with the response body and reject with the original axios error,
+// so callers can keep checking `error.response.status`.
+const unwrap = response => response.data;
 
-export const getRequest = (url, params = {}, headers = {}) => {
-  return axios.get(url, { params, headers })
-    .then(response => response.data)
-    .catch(error => {
-      throw error;
-    });
-};
+export const postRequest = (url, data, headers = {}) =>
+  axios.post(url, data, {headers}).then(unwrap);
 
-export const putRequest = (url, data, headers = {}) => {
-  return axios.put(url, data, { headers })
-    .then(response => response.data)
-    .catch(error => {
-      throw error;
-    });
-};
+export const getRequest = (url, params = {}, headers = {}) =>
+  axios.get(url, {params, headers}).then(unwrap);
 
-
-
-
+export const putRequest = (url, data, headers = {}) =>
+  axios.put(url, data, {headers}).then(unwrap);

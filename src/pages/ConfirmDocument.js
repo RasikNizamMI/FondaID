@@ -6,14 +6,12 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import {getData} from '../Utils/AsyncStorageUtil';
 import {postRequest} from '../Utils/apiUtils';
 import {API_ENDPOINTS} from '../Utils/apiConfig';
-import {convertImageToBase64} from 'react-native-image-base64';
 import {COLORS, FONTS} from '../assets/Colors';
 import CommonModal from '../component/CommonModal';
 import withInternetConnectivity from '../Utils/withInternetConnectivity';
@@ -189,6 +187,8 @@ const ConfirmDocument = ({navigation}) => {
                 }}
                 style={styles.headerIcon}
                 name="chevron-left"
+                accessibilityRole="button"
+                accessibilityLabel="Back"
                 size={25}
                 color={COLORS.PRIMARY}
               />
@@ -287,7 +287,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginLeft: 35,
     marginRight: 35,
-    marginTop: 10,
     elevation: 4,
     marginBottom: 30,
     marginTop: 30,

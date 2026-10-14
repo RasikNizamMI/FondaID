@@ -1,32 +1,26 @@
 import React, {useEffect} from 'react';
 import {Image, StyleSheet, View} from 'react-native';
-import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
-import {loadAndroidRawResource} from 'react-native-svg/lib/typescript/LocalSvg';
-import {COLORS, FONTS} from '../assets/Colors';
+import {getData} from '../Utils/AsyncStorageUtil';
 
 const SplashScreen = ({navigation}) => {
-  const checkAccessKey = async () => {
-    try {
-      const storedUserFondaID = await getData('fonda_ID');
-      const storedUserOnboard = await getData('onboard');
-      if (storedUserOnboard !== null) {
-        setTimeout(() => {
-          navigation.replace('Auth');
-        }, 2000); // Delay navigation for 2 seconds (adjust as needed)
-      } else {
-        setTimeout(() => {
-          navigation.replace('Onboard');
-        }, 2000);
-      }
-    } catch (error) {}
-  };
-
   useEffect(() => {
-    try {
-      checkAccessKey();
-    } catch (error) {
-      console.error('Error in useEffect:', error);
-    }
+    let cancelled = false;
+    let timer;
+
+    // Show the splash for 2 seconds, then go to Auth (onboarding already seen) or Onboard.
+    getData('onboard').then(storedUserOnboard => {
+      if (cancelled) {
+        return;
+      }
+      timer = setTimeout(() => {
+        navigation.replace(storedUserOnboard !== null ? 'Auth' : 'Onboard');
+      }, 2000);
+    });
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [navigation]);
 
   return (

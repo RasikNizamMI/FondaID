@@ -11,13 +11,11 @@ import SplashScreen from '../pages/SplashScreen';
 import OnboardingScreen from '../pages/OnboardingScreen';
 import LoginScreen from '../pages/LoginScreen';
 import LoginOtpScreen from '../pages/LoginOtpScreen';
-import DataStoragePolicyScreen from '../pages/DataStoragePolicyScreen';
 import Dashboard from '../pages/Dashboard';
 import ProfileScreen from '../pages/ProfileScreen';
 import NotificationScreen from '../pages/NotificationScreen';
 import SettingScreen from '../pages/SettingScreen';
 import SharingScreen from '../pages/SharingScreen';
-import AddNewDocumentScreen from '../pages/AddNewDocumentScreen';
 import AddNewDocumentNewScreen from '../pages/AddNewDocumentNewScreen';
 import ConfirmDocument from '../pages/ConfirmDocument';
 import SubmitSuccess from '../pages/SubmitSuccess';
@@ -32,7 +30,6 @@ import TouchIDLogin from '../pages/TouchIDLogin';
 import OTPVerificationScreen from '../pages/OTPVerificationScreen';
 import DocumentDetailsScreen from '../pages/DocumentDetailsScreen';
 import BioDetailsScreen from '../pages/BioDetailsScreen';
-import {COLORS, FONTS} from '../assets/Colors';
 
 import {LogBox} from 'react-native';
 LogBox.ignoreLogs(['Warning: ...']); // Ignore log notification by message
