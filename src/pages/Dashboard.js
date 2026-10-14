@@ -11,13 +11,10 @@ import {
   Share,
   FlatList,
   ActivityIndicator,
-  Modal,
-  Alert,
-  BackHandler,
 } from 'react-native';
-import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
+import {setData, getData} from '../Utils/AsyncStorageUtil';
 import {useClipboard} from '@react-native-community/clipboard';
-import {postRequest, getRequest} from '../Utils/apiUtils';
+import {getRequest} from '../Utils/apiUtils';
 import {API_ENDPOINTS} from '../Utils/apiConfig';
 import {useIsFocused} from '@react-navigation/native';
 import {COLORS, FONTS} from '../assets/Colors';
@@ -69,7 +66,6 @@ const Dashboard = ({navigation}) => {
         setUserRefID(storedUserRefID || '');
         setUserFondaID(storedUserFondaID);
         handleUser(storedUserRefID);
-        getDocumentDetails(storedUserFondaID, storedJwtToken);
         if (storedUserFondaID) {
           setUserFondaID(storedUserFondaID);
           if (isFocused) {
@@ -189,11 +185,6 @@ const Dashboard = ({navigation}) => {
     setModalColor(COLORS.PRIMARY);
     setModalImage(require('../assets/images/sucess.png'));
     setModalHeader('Success');
-  };
-
-  const handleIconClick = itemId => {
-    // setIconStatus(itemId === data.id && !iconStatus);
-    setOpenItemId(itemId === openItemId ? null : itemId);
   };
 
   const handleToAddNewDoc = () => {
@@ -855,7 +846,6 @@ const styles = StyleSheet.create({
   },
   skipButtonStyle: {
     backgroundColor: COLORS.WHITE,
-    borderWidth: 0,
     color: COLORS.WHITE,
     borderColor: COLORS.PRIMARY,
     height: 50,
@@ -1036,7 +1026,6 @@ const styles = StyleSheet.create({
   },
   dataskipButtonStyle: {
     backgroundColor: COLORS.WHITE,
-    borderWidth: 0,
     color: COLORS.WHITE,
     borderColor: COLORS.PRIMARY,
     height: 50,

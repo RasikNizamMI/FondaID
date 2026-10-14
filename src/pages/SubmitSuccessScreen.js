@@ -1,20 +1,15 @@
-import React, {useState, createRef, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
-  TextInput,
   View,
   Text,
   ScrollView,
   Image,
-  Keyboard,
   TouchableOpacity,
-  KeyboardAvoidingView,
-  Button,
-  Platform,
   Share,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
+import {getData} from '../Utils/AsyncStorageUtil';
 import {useClipboard} from '@react-native-community/clipboard';
 import {COLORS, FONTS} from '../assets/Colors';
 import CommonModal from '../component/CommonModal';
@@ -42,10 +37,6 @@ const SubmitSuccessScreen = ({navigation}) => {
 
   const handleLogin = () => {
     navigation.navigate('LoginScreen');
-  };
-
-  const handleUploadDoc = () => {
-    navigation.goBack(null);
   };
 
   const handleShare = async () => {
@@ -96,6 +87,8 @@ const SubmitSuccessScreen = ({navigation}) => {
                 left: 0,
               }}
               name="chevron-left"
+              accessibilityRole="button"
+              accessibilityLabel="Back"
               size={25}
               color={'#F5A922'}
             />
@@ -312,7 +305,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginLeft: 35,
     marginRight: 35,
-    marginTop: 10,
     elevation: 4,
     marginBottom: 30,
     marginTop: 30,

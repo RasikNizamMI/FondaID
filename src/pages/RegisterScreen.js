@@ -17,7 +17,6 @@ import CountryPicker, {FlagButton} from 'react-native-country-picker-modal';
 import {postRequest} from '../Utils/apiUtils';
 import {API_ENDPOINTS} from '../Utils/apiConfig';
 import {setData} from '../Utils/AsyncStorageUtil';
-import {Picker} from '@react-native-picker/picker';
 import {SelectList} from 'react-native-dropdown-select-list';
 import {COLORS, FONTS} from '../assets/Colors';
 import CommonModal from '../component/CommonModal';
@@ -41,7 +40,6 @@ const RegisterScreen = ({navigation}) => {
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [showNativeCountryPicker, setShowNativeCountryPicker] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date());
   const [apiResponseMessage, setApiResponseMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [countryCodeNationality, setCountryCodeNationality] = useState('');
@@ -355,8 +353,6 @@ const RegisterScreen = ({navigation}) => {
     return !fieldValue;
   };
 
-  const validateAlphabets = value => /^[A-Za-z]+$/.test(value);
-
   const validateEmail = email => {
     const emailRegex = /^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/;
     return emailRegex.test(email);
@@ -500,7 +496,7 @@ const RegisterScreen = ({navigation}) => {
   };
 
   const hideStartDatePickerModal = () => {
-    setStartDatePickerVisible(false);
+    setShowStartDatePicker(false);
   };
 
   return (
@@ -527,6 +523,8 @@ const RegisterScreen = ({navigation}) => {
                 onPress={() => navigation.goBack(null)}
                 style={styles.headerIcon}
                 name="chevron-left"
+                accessibilityRole="button"
+                accessibilityLabel="Back"
                 size={25}
                 color={COLORS.PRIMARY}
               />
@@ -646,7 +644,7 @@ const RegisterScreen = ({navigation}) => {
             </View>
             {Platform.OS == 'ios' && (
               <DateTimePickerModal
-              isVisible={isStartDatePickerVisible}
+              isVisible={showStartDatePicker}
               maximumDate={eighteenYearsAgo}
               mode="date"
               onConfirm={handleStartDateConfirm}
@@ -955,7 +953,6 @@ const styles = StyleSheet.create({
   datePickerView: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 5,
     borderWidth: 1,
     marginTop: 10,
     borderColor: COLORS.WHITE,
@@ -1012,7 +1009,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginLeft: 35,
     marginRight: 35,
-    marginTop: 10,
     elevation: 4,
     marginBottom: 30,
     marginTop: 30,

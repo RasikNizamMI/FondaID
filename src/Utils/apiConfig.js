@@ -26,5 +26,5 @@ export const API_ENDPOINTS = {
   ADDNOTIFICATION: `${API_BASE_URL}v1/user/notification`,
   ADDNEWDOCGET: `${API_BASE_URL}docaposte/url`,
   GETUSERDOCUMENT: `${API_BASE_URL}user/documents`,
-  GETPENDINGDOC:  `${API_BASE_URL}pending/documents`,
+  GETPENDINGDOC: `${API_BASE_URL}pending/documents`,
 };

@@ -1,4 +1,4 @@
-import React, {useState, createRef, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
   View,
@@ -6,11 +6,10 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
-  Platform,
   ActivityIndicator,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
+import {getData} from '../Utils/AsyncStorageUtil';
 import {COLORS, FONTS} from '../assets/Colors';
 import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
@@ -119,6 +118,8 @@ const ProfileScreen = ({navigation}) => {
               }}
               style={styles.headerIcon}
               name="chevron-left"
+              accessibilityRole="button"
+              accessibilityLabel="Back"
               size={25}
               color={COLORS.PRIMARY}
             />
@@ -355,7 +356,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginLeft: 35,
     marginRight: 35,
-    marginTop: 10,
     elevation: 4,
     marginBottom: 30,
     marginTop: 30,

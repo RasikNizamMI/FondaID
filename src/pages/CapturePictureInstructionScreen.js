@@ -1,37 +1,23 @@
-import React, {useState, createRef, useEffect} from 'react';
+import React, {useState} from 'react';
 import {
   StyleSheet,
-  TextInput,
   View,
   Text,
   ScrollView,
   Image,
   TouchableOpacity,
-  Platform,
-  PermissionsAndroid,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import {SelectList} from 'react-native-dropdown-select-list';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import {COLORS, FONTS} from '../assets/Colors';
 import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const CapturePictureInstructionScreen = ({navigation}) => {
   const [useDocumentNumber, setUseDocumentNumber] = useState('');
   const [useplaceofissue, setUseplaceofissue] = useState('');
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [selectedStartDate, setSelectedStartDate] = useState('Date of Issue');
   const [selectedEndDate, setSelectedEndDate] = useState('Date of Expiry');
-  const [filePath, setFilePath] = useState({});
   const [progress, setProgress] = useState(10);
-
-  const handleSkip = () => {
-    navigation.goBack(null);
-  };
 
   const data = [
     {key: '1', value: 'Mobiles', disabled: true},
@@ -43,67 +29,8 @@ const CapturePictureInstructionScreen = ({navigation}) => {
     {key: '7', value: 'Drinks'},
   ];
 
-  const handleStartDateChange = (event, date) => {
-    setShowStartDatePicker(false);
-    setShowStartDatePicker(Platform.OS === 'ios');
-    if (date) {
-      setStartDate(date);
-      const formattedDate = date.toDateString(); // Format the selected date
-      setSelectedStartDate(formattedDate);
-    }
-  };
-
-  const handleEndDateChange = (event, date) => {
-    setShowEndDatePicker(false);
-    setShowEndDatePicker(Platform.OS === 'ios');
-    if (date) {
-      setEndDate(date);
-      const formattedDate = date.toDateString(); // Format the selected date
-      setSelectedEndDate(formattedDate);
-    }
-  };
-
-  const showStartDatePickerModal = () => {
-    setShowStartDatePicker(true);
-  };
-
-  const showEndDatePickerModal = () => {
-    setShowEndDatePicker(true);
-  };
-
   const handleToAddNewDoc = () => {
     navigation.navigate('CapturePictureScreen');
-  };
-
-  const captureImage = type => {
-    let options = {
-      mediaType: type,
-      maxWidth: 550,
-      maxHeight: 550,
-      quality: 1,
-      videoQuality: 'low',
-      durationLimit: 30, //Video max duration in seconds
-      saveToPhotos: true,
-    };
-
-    launchCamera(options, response => {
-      const {assets} = response;
-
-      if (response.didCancel) {
-        alert('User cancelled camera picker');
-        return;
-      } else if (response.errorCode === 'camera_unavailable') {
-        alert('Camera not available on device');
-        return;
-      } else if (response.errorCode === 'permission') {
-        alert('Permission not satisfied');
-        return;
-      } else if (response.errorCode === 'others') {
-        alert(response.errorMessage);
-        return;
-      }
-      setFilePath(assets[0]);
-    });
   };
 
   return (
@@ -119,6 +46,8 @@ const CapturePictureInstructionScreen = ({navigation}) => {
               }}
               style={styles.headerIcon}
               name="chevron-left"
+              accessibilityRole="button"
+              accessibilityLabel="Back"
               size={25}
               color={'#F5A922'}
             />
@@ -226,7 +155,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginLeft: 35,
     marginRight: 35,
-    marginTop: 10,
     elevation: 4,
     marginBottom: 30,
     marginTop: 30,

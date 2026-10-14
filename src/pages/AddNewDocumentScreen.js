@@ -9,13 +9,12 @@ import {
   TouchableOpacity,
   Platform,
   PermissionsAndroid,
-  Modal,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import {SelectList} from 'react-native-dropdown-select-list';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
+import {launchCamera} from 'react-native-image-picker';
+import {setData} from '../Utils/AsyncStorageUtil';
 import {COLORS, FONTS} from '../assets/Colors';
 import CommonModal from '../component/CommonModal';
 import withInternetConnectivity from '../Utils/withInternetConnectivity';
@@ -120,38 +119,6 @@ const AddNewDocumentScreen = ({navigation}) => {
     });
   };
 
-  const captureImage = type => {
-    let options = {
-      mediaType: type,
-      maxWidth: 550,
-      maxHeight: 550,
-      quality: 1,
-      videoQuality: 'low',
-      durationLimit: 30, //Video max duration in seconds
-      saveToPhotos: true,
-      includeBase64: true,
-    };
-
-    launchCamera(options, response => {
-      const {assets} = response;
-
-      if (response.didCancel) {
-        alert('User cancelled camera picker');
-        return;
-      } else if (response.errorCode === 'camera_unavailable') {
-        alert('Camera not available on device');
-        return;
-      } else if (response.errorCode === 'permission') {
-        alert('Permission not satisfied');
-        return;
-      } else if (response.errorCode === 'others') {
-        alert(response.errorMessage);
-        return;
-      }
-      setFilePath(assets[0]);
-    });
-  };
-
   const resetState = () => {
     setUseDocumentNumber('');
     setStartDate(new Date());
@@ -205,6 +172,8 @@ const AddNewDocumentScreen = ({navigation}) => {
               }}
               style={styles.headerIcon}
               name="chevron-left"
+              accessibilityRole="button"
+              accessibilityLabel="Back"
               size={25}
               color={COLORS.PRIMARY}
             />
@@ -243,9 +212,6 @@ const AddNewDocumentScreen = ({navigation}) => {
               autoCapitalize="none"
               keyboardType="default"
               returnKeyType="next"
-              onSubmitEditing={() =>
-                passwordInputRef.current && passwordInputRef.current.focus()
-              }
               underlineColorAndroid="#f000"
               blurOnSubmit={false}
               maxLength={12}
@@ -374,7 +340,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginLeft: 35,
     marginRight: 35,
-    marginTop: 10,
     elevation: 4,
     marginBottom: 30,
     marginTop: 30,
@@ -439,7 +404,6 @@ const styles = StyleSheet.create({
   datePickerView: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 5,
     borderWidth: 1,
     marginTop: 15,
     marginLeft: 30,

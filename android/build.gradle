@@ -15,6 +15,9 @@ buildscript {
         mavenCentral()
     }
     dependencies {
+        // Newer R8/D8 than the one bundled with AGP 7.3.1, which crashes (NPE) dexing the id3 SDK AARs.
+        // Must be declared before the Android Gradle plugin.
+        classpath("com.android.tools:r8:8.2.47")
         classpath("com.android.tools.build:gradle:7.3.1")
         classpath("com.facebook.react:react-native-gradle-plugin")
     }

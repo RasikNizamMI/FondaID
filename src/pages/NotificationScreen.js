@@ -12,7 +12,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import {COLORS, FONTS} from '../assets/Colors';
 import {postRequest, getRequest} from '../Utils/apiUtils';
 import {API_ENDPOINTS} from '../Utils/apiConfig';
-import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
+import {getData} from '../Utils/AsyncStorageUtil';
 import CommonModal from '../component/CommonModal';
 import withInternetConnectivity from '../Utils/withInternetConnectivity';
 import {useIsFocused} from '@react-navigation/native';
@@ -35,7 +35,6 @@ const NotificationScreen = ({navigation}) => {
       try {
         const storedUserFondaID = await getData('fonda_ID');
         const storedJwtToken = await getData('jwt_token');
-        getDocumentDetails(storedUserFondaID, storedJwtToken);
         if (storedUserFondaID) {
           setUserFondaID(storedUserFondaID);
           setJwtToken(storedJwtToken);
@@ -161,9 +160,8 @@ const NotificationScreen = ({navigation}) => {
         setErrorCode('F401');
       } else {
         setLoading(false);
-        setApiResponseMessage('POST error:', error);
         setModalVisible(true);
-        setErrorMessage(error);
+        setErrorMessage(error.message);
         setModalColor(COLORS.ERROR);
         setModalImage(require('../assets/images/error.png'));
         setModalHeader('Error');
@@ -189,6 +187,8 @@ const NotificationScreen = ({navigation}) => {
           }}
           style={styles.headerIcon}
           name="chevron-left"
+          accessibilityRole="button"
+          accessibilityLabel="Back"
           size={25}
           color={'#F5A922'}
         />

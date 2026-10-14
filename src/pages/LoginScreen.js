@@ -50,11 +50,6 @@ const LoginScreen = ({navigation}) => {
     };
   }, []);
 
-  const formatPhoneNumber = number => {
-    const formattedNumber = number.replace(/(\d{3})(\d{3})(\d{3})/, '$1-$2-$3');
-    setFondaPhone(formattedNumber);
-  };
-
   const handleLogin = async () => {
     setLoading(true);
 
@@ -495,7 +490,6 @@ const styles = StyleSheet.create({
     borderColor: COLORS.WHITE,
     height: 50,
     alignItems: 'center',
-    borderRadius: 0,
     marginHorizontal: 30,
     marginVertical: 10,
     elevation: 4,

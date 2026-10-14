@@ -4,29 +4,16 @@ import {
   Text,
   ScrollView,
   StyleSheet,
-  Switch,
   TouchableOpacity,
-  Linking,
   Image,
 } from 'react-native';
-import { setData, getData, removeData } from '../Utils/AsyncStorageUtil';
-import {COLORS, FONTS} from '../assets/Colors';
+import {FONTS} from '../assets/Colors';
 import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const SettingScreen = ({navigation}) => {
   const [dataStorageEnabled, setDataStorageEnabled] = useState(false);
   const [dataStorageEnabled1, setDataStorageEnabled1] = useState(false);
   const [dataStorageEnabled2, setDataStorageEnabled2] = useState(false);
-
-  const toggleDataStorage = () => {
-    setDataStorageEnabled(!dataStorageEnabled);
-  };
-  const toggleDataStorage1 = () => {
-    setDataStorageEnabled1(!dataStorageEnabled1);
-  };
-  const toggleDataStorage2 = () => {
-    setDataStorageEnabled2(!dataStorageEnabled2);
-  };
 
   const handleLogout = () => {
     navigation.navigate('Auth', {screen: 'LoginScreen'})
@@ -155,26 +142,8 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
     textAlign: 'center',
   },
-  buttonStyle: {
-    backgroundColor: '#F5A922',
-    borderWidth: 0,
-    color: '#FFFFFF',
-    borderColor: '#F5A922',
-    height: 50,
-    alignItems: 'center',
-    borderRadius: 10,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 20,
-  },
-  buttonTextStyle: {
-    color: '#FFFFFF',
-    paddingVertical: 10,
-    fontSize: 16,
-  },
   skipButtonStyle: {
     backgroundColor: '#FFFFFF',
-    borderWidth: 0,
     color: '#FFFFFF',
     borderColor: '#F5A922',
     height: 50,

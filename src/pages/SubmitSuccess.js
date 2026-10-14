@@ -1,36 +1,24 @@
-import React, {useState, createRef, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
-  TextInput,
   View,
   Text,
   ScrollView,
   Image,
-  Keyboard,
   TouchableOpacity,
-  KeyboardAvoidingView,
-  Button,
-  Platform,
   Share,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import {SelectList} from 'react-native-dropdown-select-list';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import {setData, getData, removeData} from '../Utils/AsyncStorageUtil';
+import {getData} from '../Utils/AsyncStorageUtil';
 import {useClipboard} from '@react-native-community/clipboard';
-import {COLORS, FONTS} from '../assets/Colors';
 import withInternetConnectivity from '../Utils/withInternetConnectivity';
 
 const SubmitSuccess = ({navigation}) => {
   const [useDocumentNumber, setUseDocumentNumber] = useState('');
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [selectedStartDate, setSelectedStartDate] = useState('Date of Issue');
   const [selectedEndDate, setSelectedEndDate] = useState('Date of Expiry');
-  const [filePath, setFilePath] = useState({});
   const [userFondaID, setUserFondaID] = useState('');
   const [data, setString] = useClipboard();
 
@@ -94,6 +82,8 @@ const SubmitSuccess = ({navigation}) => {
                 left: 0,
               }}
               name="chevron-left"
+              accessibilityRole="button"
+              accessibilityLabel="Back"
               size={25}
               color={'#F5A922'}
             />
@@ -294,7 +284,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginLeft: 35,
     marginRight: 35,
-    marginTop: 10,
     elevation: 4,
     marginBottom: 30,
     marginTop: 30,
